@@ -53,7 +53,31 @@ parser code {:
 // Declaración de terminales (Ejemplo)
 
 terminal Token PLUS;
-terminal Token MINUS;
+terminal Token MAYOR;
+terminal Token IGUAL;
+terminal Token OR;
+terminal Token ASIGNACION;
+terminal Token ACCESO;
+
+terminal Token LITERAL_ENTERO;
+terminal Token LITERAL_LOGICO;
+terminal Token CADENA;
+terminal Token IDENTIFICADOR;
+terminal Token FOR;
+terminal Token FUNCTION;
+terminal Token IF;
+terminal Token IN;
+terminal Token INTEGER;
+terminal Token IS;
+terminal Token LOOP;^
+terminal Token OF;
+terminal Token PROCEDURE;
+terminal Token RECORD;
+terminal Token RETURN;
+terminal Token THEN;
+terminal Token TYPE;
+terminal Token PUT_LINE;
+
 // ...
 
 
@@ -66,8 +90,7 @@ non terminal Axiom		axiom;
 
 
 // Declaración de relaciones de precedencia
-precedence left     PLUS,
-                    MINUS;
+precedence left     PLUS;
 // ...
 
 // Declaración de reglas de producción

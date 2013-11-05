@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="lib"/>
-	<classpathentry kind="lib" path="lib/compiler-api.jar"/>
+	<classpathentry excluding="**/*.lex|**/*.cup" kind="src" path="src"/>
+	<classpathentry excluding="**/*.lex|**/*.cup" kind="src" path="lib"/>
+	<classpathentry kind="lib" path="lib/compiler-api.jar" sourcepath="doc/api/compiler">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/jgarcia/git/ArquitecturaPDL-2013-2014/doc/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/Cup.jar"/>
 	<classpathentry kind="lib" path="lib/JFlex.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
