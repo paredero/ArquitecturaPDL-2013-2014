@@ -27,6 +27,7 @@ DIGITO = [0-9]
 NUMERO = {DIGITO}+
 IDENTIFICADOR = {LETRA}({LETRA}|{DIGITO})*
 CONTENIDO_CADENA = [^\"]* 
+ESPACIO=([\ \t\b\r\n\f])+
 
 %{
   LexicalErrorManager lexicalErrorManager = new LexicalErrorManager ();
@@ -43,7 +44,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.BEGIN);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: begin***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -51,7 +52,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.BOOLEAN);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: Boolean***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -59,7 +60,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.CONSTANT);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: constant***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -67,7 +68,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.ELSE);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: else***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -75,7 +76,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.END);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: end***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -83,7 +84,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.FALSE);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: False***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -91,7 +92,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.FOR);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: for***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -99,7 +100,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.FUNCTION);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: function***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -107,7 +108,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.IF);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: if***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -115,7 +116,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.IN);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: in***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -123,7 +124,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.INTEGER);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: Integer***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -131,7 +132,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.IS);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: is***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -139,7 +140,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.LOOP);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: loop***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -147,7 +148,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.OR);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: or***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -155,7 +156,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.PROCEDURE);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: procedure***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -163,7 +164,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.PUT_LINE);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: Put_line***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -171,7 +172,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.RECORD);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: record***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -179,7 +180,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.RETURN);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: return***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -187,7 +188,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.THEN);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: then***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -195,7 +196,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.TRUE);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: True***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -203,7 +204,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.TYPE);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***PALABRA RESERVADA: type***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -212,7 +213,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.PLUS);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***OPERADOR MAS***");
+            token.setLexema (yytext ());
             return token;
         }
            
@@ -220,7 +221,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.MAYOR);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***OPERADOR MAYOR***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -228,7 +229,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.IGUAL);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***OPERADOR IGUAL***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -236,7 +237,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.ASIGNACION);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***OPERADOR ASIGNACION***");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -244,7 +245,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.ACCESO);
            token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***OPERADOR ACCESO***");
+            token.setLexema (yytext ());
             return token;
         }
 
@@ -254,7 +255,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.COMILLA);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR COMILLA***");
+            token.setLexema (yytext ());
             return token;
         }
                                       
@@ -262,7 +263,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.ABRE_PARENTESIS);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR ABRE PARENTESIS***");
+            token.setLexema (yytext ());
             return token;
         }
 
@@ -270,7 +271,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.CIERRA_PARENTESIS);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR CIERRA PARENTESIS***");
+            token.setLexema (yytext ());
             return token;
         }
 
@@ -278,39 +279,17 @@ CONTENIDO_CADENA = [^\"]*
            Token token = new Token (sym.DELIMITADOR_RANGO);
            token.setLine (yyline + 1);
            token.setColumn (yycolumn + 1);
-           token.setLexema (yytext () + "***DELIMITADOR RANGO***");
+           token.setLexema (yytext ());
            return token;
         }
 
-    \n|\r|\r\n {
-            Token token = new Token (sym.SALTO_LINEA);
-            token.setLine (yyline + 1);
-            token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR SALTO LINEA***");
-            return token;
-        }
-        
-    \t {
-            Token token = new Token (sym.TABULADOR);
-            token.setLine (yyline + 1);
-            token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR TABULADOR***");
-            return token;
-        }        
-        
-    " " {
-            Token token = new Token (sym.ESPACIO);
-            token.setLine (yyline + 1);
-            token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR ESPACIO***");
-            return token;
-        }        
+  {ESPACIO}        {}   
 
     "," {
             Token token = new Token (sym.SEPARADOR_COMA);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR COMA***");
+            token.setLexema (yytext ());
             return token;
         }
 
@@ -318,7 +297,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.PUNTO_COMA);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR PUNTO Y COMA***");
+            token.setLexema (yytext ());
             return token;
         }
 
@@ -326,7 +305,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.DOS_PUNTOS);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***DELIMITADOR DOS PUNTOS***");
+            token.setLexema (yytext ());
             return token;
         }
 
@@ -336,7 +315,7 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.NUMERO);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***NUMERO***");
+            token.setLexema (yytext ());
             return token;
         }
   
@@ -344,23 +323,23 @@ CONTENIDO_CADENA = [^\"]*
             Token token = new Token (sym.IDENTIFICADOR);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***IDENTIFICADOR***");
+            token.setLexema (yytext ());
             return token;
     }
     
     "--".*\r\n {
-            Token token = new Token (sym.COMENTARIO);
-            token.setLine (yyline + 1);
-            token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***COMENTARIO***");
-            return token;
+//            Token token = new Token (sym.COMENTARIO);
+//            token.setLine (yyline + 1);
+//            token.setColumn (yycolumn + 1);
+//            token.setLexema (yytext ());
+            //****************return token;
     }
     
-    \"{CONTENIDO_CADENA}\" {
+    \"{CONTENIDO_CADENA }\" {
             Token token = new Token (sym.CADENA);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + "***CADENA***");
+            token.setLexema (yytext ());
             return token;
     }       
       

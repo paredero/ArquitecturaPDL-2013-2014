@@ -28,8 +28,8 @@ import compiler.code.*;
 action code {:
     
     SyntaxErrorManager   syntaxErrorManager   = CompilerContext.getSyntaxErrorManager();
-    SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
-    ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
+//    SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
+//    ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
     FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
 
 :}  
@@ -87,27 +87,52 @@ terminal Token COMILLA;
 terminal Token ABRE_PARENTESIS;
 terminal Token CIERRA_PARENTESIS;
 terminal Token DELIMITADOR_RANGO;
-terminal Token SALTO_LINEA;
 terminal Token SEPARADOR_COMA;
 terminal Token PUNTO_COMA;
 terminal Token DOS_PUNTOS;
-terminal Token TABULADOR;
-terminal Token ESPACIO;
 
 // OTROS
 terminal Token NUMERO;
 terminal Token IDENTIFICADOR;
-terminal Token COMENTARIO;
 terminal Token CADENA;
-// ...
-
 
 // Declaración de no terminales
 // no modificar los propuestos
 
 non terminal            program;
 non terminal Axiom      axiom;
-// ...
+
+non terminal    vacio;
+non terminal    cabecera;
+non terminal    declaraciones;
+non terminal    seccion_constantes;
+non terminal    declaracion_constantes;
+non terminal    seccion_registros;
+non terminal    declaracion_registros;
+non terminal    seccion_variables; 
+non terminal    declaracion_variables;
+non terminal    declaracion_subprogramas;
+non terminal    inicio_declaracion;
+non terminal    lista_nombres;
+non terminal    constante;
+non terminal    valor;
+
+non terminal    registro;
+non terminal    lista_campos;
+non terminal    campo;
+non terminal    tipo;
+
+non terminal    variable;
+non terminal    lista_identificadores;
+non terminal    cuerpo;
+non terminal    lista_sentencias;
+non terminal    sentencia;
+non terminal    sentencia_entrada_salida;
+non terminal    sentencia_asignacion;
+non terminal    referencia;
+non terminal    acceso_registro;
+non terminal    expresion;
+non terminal    parametro;
 
 
 // Declaración de relaciones de precedencia, SEPARADOS POR COMAS
@@ -127,12 +152,73 @@ program ::=
   {: 
         // No modificar esta estructura, aunque se pueden añadir más acciones semánticas
         
-        List intermediateCode = ax.getIntermediateCode ();
-        finalCodeFactory.create (intermediateCode);
+        //List intermediateCode = ax.getIntermediateCode ();
+        //finalCodeFactory.create (intermediateCode);
 
         
         syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
 
-axiom ::= ;
+axiom ::= cabecera declaraciones cuerpo
+        | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
+vacio ::= ;
+
+cabecera ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS
+        | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de cabecera."); :};
+
+declaraciones ::= declaracion_constantes;
+
+declaracion_constantes ::= constante declaracion_constantes | declaracion_registros;
+
+declaracion_registros ::= registro declaracion_registros | declaracion_variables;
+
+declaracion_variables ::= variable declaracion_variables | declaracion_subprogramas;
+
+declaracion_subprogramas ::= vacio;
+
+constante ::= inicio_declaracion CONSTANT ASIGNACION valor PUNTO_COMA;
+valor ::= TRUE | FALSE | NUMERO;
+
+registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTO_COMA;
+lista_campos ::= campo lista_campos | campo;
+campo ::= IDENTIFICADOR DOS_PUNTOS tipo PUNTO_COMA;
+tipo ::= IDENTIFICADOR | INTEGER | BOOLEAN;
+
+variable ::= inicio_declaracion tipo PUNTO_COMA;
+
+inicio_declaracion ::= lista_nombres DOS_PUNTOS;
+lista_nombres ::= IDENTIFICADOR SEPARADOR_COMA lista_nombres | IDENTIFICADOR;
+
+cuerpo ::=  BEGIN lista_sentencias
+        | error {: syntaxErrorManager.syntaxDebug ("Error en cuerpo de procedimiento."); :};
+        
+lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias |  END IDENTIFICADOR PUNTO_COMA;
+sentencia ::= sentencia_entrada_salida 
+        | sentencia_asignacion
+        | llamada_subprograma;
+        
+sentencia_asignacion ::= referencia ASIGNACION expresion;
+referencia ::= IDENTIFICADOR | acceso_registro;
+
+acceso_registro ::= IDENTIFICADOR ACCESO acceso_registro
+        | IDENTIFICADOR ACCESO IDENTIFICADOR;
+        
+expresion ::= expresion PLUS expresion
+        | expresion MAYOR expresion
+        | expresion IGUAL expresion
+        | expresion OR expresion      
+        | ABRE_PARENTESIS expresion CIERRA_PARENTESIS
+        | llamada_funcion
+        | referencia
+        | CADENA
+        | NUMERO;
+
+sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
+parametro ::= CADENA | NUMERO | IDENTIFICADOR;
+
+llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS lista_parametros CIERRA_PARENTESIS;
+
+lista_parametros ::= expresion SEPARADOR_COMA lista_parametros
+                    | expresion
+                    |;
