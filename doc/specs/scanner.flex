@@ -76,7 +76,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             Token token = new Token (sym.END);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext ());
+            token.setLexema (yytext () + " END");
             return token;
         }
         
@@ -108,7 +108,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             Token token = new Token (sym.IF);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext ());
+            token.setLexema (yytext () + " IF");
             return token;
         }
         
@@ -250,15 +250,7 @@ ESPACIO=([\ \t\b\r\n\f])+
         }
 
 // Delimitadores
-        
-    "\"" {
-            Token token = new Token (sym.COMILLA);
-            token.setLine (yyline + 1);
-            token.setColumn (yycolumn + 1);
-            token.setLexema (yytext ());
-            return token;
-        }
-                                      
+                                             
     "\(" {
             Token token = new Token (sym.ABRE_PARENTESIS);
             token.setLine (yyline + 1);
@@ -323,7 +315,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             Token token = new Token (sym.IDENTIFICADOR);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext ());
+            token.setLexema (yytext () + " IDENTIFICADOR");
             return token;
     }
     

@@ -83,7 +83,6 @@ terminal Token ASIGNACION;
 terminal Token ACCESO;
 
 // DELIMITADORES
-terminal Token COMILLA;
 terminal Token ABRE_PARENTESIS;
 terminal Token CIERRA_PARENTESIS;
 terminal Token DELIMITADOR_RANGO;
@@ -105,11 +104,8 @@ non terminal Axiom      axiom;
 non terminal    vacio;
 non terminal    cabecera;
 non terminal    declaraciones;
-non terminal    seccion_constantes;
 non terminal    declaracion_constantes;
-non terminal    seccion_registros;
 non terminal    declaracion_registros;
-non terminal    seccion_variables; 
 non terminal    declaracion_variables;
 non terminal    declaracion_subprogramas;
 non terminal    inicio_declaracion;
@@ -123,21 +119,36 @@ non terminal    campo;
 non terminal    tipo;
 
 non terminal    variable;
-non terminal    lista_identificadores;
 non terminal    cuerpo;
 non terminal    lista_sentencias;
 non terminal    sentencia;
 non terminal    sentencia_entrada_salida;
 non terminal    sentencia_asignacion;
+non terminal    sentencia_if;
+non terminal    sentencia_for;
 non terminal    referencia;
 non terminal    acceso_registro;
 non terminal    expresion;
 non terminal    parametro;
-
+non terminal    llamada_subprograma;
+non terminal    lista_parametros;
+non terminal    subprograma;
+non terminal    funcion;
+non terminal    procedimiento;
+non terminal    parametros_subprograma;
+non terminal    tipo_primitivo;
+non terminal    cuerpo_funcion;
+non terminal    lista_sentencias_funcion;
+non terminal    sentencia_funcion;
+non terminal    sentencia_return;
 
 // Declaración de relaciones de precedencia, SEPARADOS POR COMAS
-precedence left     PLUS;
-// ...
+
+precedence left OR;
+precedence left IGUAL;
+precedence left MAYOR;
+precedence left PLUS;
+precedence left ACCESO, ABRE_PARENTESIS, CIERRA_PARENTESIS;
 
 // Declaración de reglas de producción
 
@@ -162,6 +173,7 @@ program ::=
 
 axiom ::= cabecera declaraciones cuerpo
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
+
 vacio ::= ;
 
 cabecera ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS
@@ -169,37 +181,79 @@ cabecera ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS
 
 declaraciones ::= declaracion_constantes;
 
-declaracion_constantes ::= constante declaracion_constantes | declaracion_registros;
+declaracion_constantes ::= constante declaracion_constantes 
+        | declaracion_registros;
 
-declaracion_registros ::= registro declaracion_registros | declaracion_variables;
+declaracion_registros ::= registro declaracion_registros 
+        | declaracion_variables;
 
-declaracion_variables ::= variable declaracion_variables | declaracion_subprogramas;
+declaracion_variables ::= variable declaracion_variables 
+        | declaracion_subprogramas;
 
-declaracion_subprogramas ::= vacio;
+declaracion_subprogramas ::= subprograma declaracion_subprogramas 
+        | vacio;
+        
+subprograma ::= funcion | procedimiento; 
+
+funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS parametros_subprograma CIERRA_PARENTESIS RETURN tipo_primitivo IS declaraciones cuerpo_funcion;
+
+parametros_subprograma ::= lista_nombres DOS_PUNTOS tipo PUNTO_COMA parametros_subprograma
+        | lista_nombres DOS_PUNTOS tipo
+        | vacio;
+        
+procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_subprograma CIERRA_PARENTESIS  IS declaraciones cuerpo;
+
+cuerpo_funcion::= BEGIN lista_sentencias_funcion END IDENTIFICADOR PUNTO_COMA;
+
+lista_sentencias_funcion ::=  sentencia_funcion PUNTO_COMA lista_sentencias_funcion |  vacio;
+
+sentencia_funcion ::= sentencia | sentencia_return;
+
+sentencia_return ::= RETURN expresion;
 
 constante ::= inicio_declaracion CONSTANT ASIGNACION valor PUNTO_COMA;
+
 valor ::= TRUE | FALSE | NUMERO;
 
 registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTO_COMA;
+
 lista_campos ::= campo lista_campos | campo;
+
 campo ::= IDENTIFICADOR DOS_PUNTOS tipo PUNTO_COMA;
+
 tipo ::= IDENTIFICADOR | INTEGER | BOOLEAN;
+
+tipo_primitivo ::= INTEGER | BOOLEAN;
 
 variable ::= inicio_declaracion tipo PUNTO_COMA;
 
 inicio_declaracion ::= lista_nombres DOS_PUNTOS;
+
 lista_nombres ::= IDENTIFICADOR SEPARADOR_COMA lista_nombres | IDENTIFICADOR;
 
-cuerpo ::=  BEGIN lista_sentencias
+cuerpo ::=  BEGIN lista_sentencias END IDENTIFICADOR PUNTO_COMA
         | error {: syntaxErrorManager.syntaxDebug ("Error en cuerpo de procedimiento."); :};
         
-lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias |  END IDENTIFICADOR PUNTO_COMA;
+lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias 
+        |  vacio;
+
 sentencia ::= sentencia_entrada_salida 
+        | sentencia_if
+        | sentencia_for
         | sentencia_asignacion
         | llamada_subprograma;
+
+sentencia_if ::= IF expresion THEN lista_sentencias END IF
+        | IF expresion THEN lista_sentencias ELSE lista_sentencias END IF
+        | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia if"); :};
+
+
+sentencia_for ::=  FOR expresion IN expresion DELIMITADOR_RANGO expresion LOOP lista_sentencias END LOOP;      
         
 sentencia_asignacion ::= referencia ASIGNACION expresion;
-referencia ::= IDENTIFICADOR | acceso_registro;
+
+referencia ::= IDENTIFICADOR 
+        | acceso_registro;
 
 acceso_registro ::= IDENTIFICADOR ACCESO acceso_registro
         | IDENTIFICADOR ACCESO IDENTIFICADOR;
@@ -209,16 +263,21 @@ expresion ::= expresion PLUS expresion
         | expresion IGUAL expresion
         | expresion OR expresion      
         | ABRE_PARENTESIS expresion CIERRA_PARENTESIS
-        | llamada_funcion
+        | llamada_subprograma
         | referencia
         | CADENA
+        | TRUE
+        | FALSE
         | NUMERO;
 
 sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
-parametro ::= CADENA | NUMERO | IDENTIFICADOR;
+
+parametro ::= CADENA 
+        | NUMERO 
+        | referencia;
 
 llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS lista_parametros CIERRA_PARENTESIS;
 
 lista_parametros ::= expresion SEPARADOR_COMA lista_parametros
-                    | expresion
-                    |;
+        | expresion
+        | vacio;
