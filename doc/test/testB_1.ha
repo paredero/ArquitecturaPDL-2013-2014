@@ -20,6 +20,10 @@ p: Tpersona;
         
 begin
 
+      if t then
+                Put_line("cierto");
+      end if;
+
 Put_line("hola");
 Put_line("hola");
 end testCase01;
