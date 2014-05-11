@@ -1,0 +1,290 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 41
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #9
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+SUB #0, #-5[.IY]
+MOVE .A, #-8[.IY]
+; Traducir Quadruple - [ASIG TEMP, _T_0, null]
+MOVE #-8[.IY], #-7[.IY]
+SUB #-6[.IY], #-7[.IY]
+MOVE .A, #-9[.IY]
+; Traducir Quadruple - [ASIG B, _T_1, null]
+MOVE #-9[.IY], #-6[.IY]
+MOVE #-6[.IY] , #0[.IY]
+MOVE #L1 , .PC
+
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L2
+L2 :
+
+NOP
+; Traducir Quadruple - [ASIG TEMP, 0, null]
+MOVE #0, #-8[.IY]
+; Traducir Quadruple - [ASIG I, 1, null]
+MOVE #1, #-7[.IY]
+; Traducir Quadruple - [ASIG _T_1, B, null]
+MOVE #-6[.IY], #-10[.IY]
+; Etiqueta de salto __L5
+L5 :
+; Traducir Quadruple - [CMP _T_1, I, null]
+CMP #-10[.IY], #-7[.IY]
+; Salto si negativo __L6
+BN /L6
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO TEMP, 5, null]
+; Cargado argumento Quadruple - [ARGUMENTO A, 6, null]
+; Llamada Funcion Quadruple - [CALL SUMA, 0, _T_0]
+MOVE .SP , .IX
+MOVE #-8[.IY] , #-5[.IX]
+MOVE #-5[.IY] , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #10
+MOVE .A , .SP
+MOVE #RET_L4 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L4 , #-4[.IY]
+BR /L0
+REF_L4:
+BR /REF_L0
+RET_L4: 
+MOVE .R9 , #-9[.IY]
+
+; Traducir Quadruple - [ASIG TEMP, _T_0, null]
+MOVE #-9[.IY], #-8[.IY]
+INC #-7[.IY]
+BR /L5
+; Etiqueta de salto __L6
+L6 :
+MOVE #-8[.IY] , #0[.IY]
+MOVE #L3 , .PC
+
+L3 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L2: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L2 : 
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L7
+L7 :
+
+NOP
+; Traducir Quadruple - [CMP N, 1, null]
+CMP #-5[.IY], #1
+; Salto si negativo __L9
+BN /L9
+; Traducir Quadruple - [ASIG _T_0, 0, null]
+MOVE #0, #-7[.IY]
+BR /L10
+; Etiqueta de salto __L9
+L9 :
+; Traducir Quadruple - [ASIG _T_0, 1, null]
+MOVE #1, #-7[.IY]
+; Etiqueta de salto __L10
+L10 :
+; Traducir Quadruple - [CMP _T_0, 1, null]
+CMP #-7[.IY], #1
+; Salto si no cero a etiqueta __L14
+BNZ /L14
+MOVE #1 , #0[.IY]
+MOVE #L8 , .PC
+
+BR /L13
+; Etiqueta de salto __L14
+L14 :
+; INICIO ARGUMENTOS FIN
+; INICIO ARGUMENTOS FIN
+SUB #-5[.IY], #1
+MOVE .A, #-8[.IY]
+; Cargado argumento Quadruple - [ARGUMENTO _T_1, 5, null]
+; Llamada Funcion Quadruple - [CALL FACT, 0, _T_2]
+MOVE .SP , .IX
+MOVE #-8[.IY] , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L11 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L11 , #-4[.IY]
+BR /L7
+REF_L11:
+BR /REF_L7
+RET_L11: 
+MOVE .R9 , #-9[.IY]
+
+; Cargado argumento Quadruple - [ARGUMENTO _T_2, 5, null]
+; Cargado argumento Quadruple - [ARGUMENTO N, 6, null]
+; Llamada Funcion Quadruple - [CALL MULTIPLICAR, 0, _T_3]
+MOVE .SP , .IX
+MOVE #-9[.IY] , #-5[.IX]
+MOVE #-5[.IY] , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L12 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L12 , #-4[.IY]
+BR /L2
+REF_L12:
+BR /REF_L2
+RET_L12: 
+MOVE .R9 , #-10[.IY]
+
+MOVE #-10[.IY] , #0[.IY]
+MOVE #L8 , .PC
+
+; Etiqueta de salto __L13
+L13 :
+NOP
+L8 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L7: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L7 : 
+
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 5, 5, null]
+; Cargado argumento Quadruple - [ARGUMENTO 6, 6, null]
+; Llamada Funcion Quadruple - [CALL SUMA, 0, _T_0]
+MOVE .SP , .IX
+MOVE #5 , #-5[.IX]
+MOVE #6 , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #10
+MOVE .A , .SP
+MOVE #RET_L15 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L15 , #-4[.IY]
+BR /L0
+REF_L15:
+BR /REF_L0
+RET_L15: 
+MOVE .R9 , #-6[.IY]
+
+; Traducir Quadruple - [ASIG A, _T_0, null]
+MOVE #-6[.IY], #-5[.IY]
+WRSTR /cadena2
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 5, 5, null]
+; Cargado argumento Quadruple - [ARGUMENTO 6, 6, null]
+; Llamada Funcion Quadruple - [CALL MULTIPLICAR, 0, _T_1]
+MOVE .SP , .IX
+MOVE #5 , #-5[.IX]
+MOVE #6 , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L16 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L16 , #-4[.IY]
+BR /L2
+REF_L16:
+BR /REF_L2
+RET_L16: 
+MOVE .R9 , #-7[.IY]
+
+; Traducir Quadruple - [ASIG A, _T_1, null]
+MOVE #-7[.IY], #-5[.IY]
+WRSTR /cadena3
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 6, 5, null]
+; Llamada Funcion Quadruple - [CALL FACT, 0, _T_2]
+MOVE .SP , .IX
+MOVE #6 , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L17 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L17 , #-4[.IY]
+BR /L7
+REF_L17:
+BR /REF_L7
+RET_L17: 
+MOVE .R9 , #-8[.IY]
+
+; Traducir Quadruple - [ASIG A, _T_2, null]
+MOVE #-8[.IY], #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena4
+WRINT #-5[.IY]
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "INICIO EJECUCION ----"
+cadena2:  DATA "LA SUMA DE 5 Y 6 SON (11): "
+cadena3:  DATA "LA MULTIPLICACION DE 5 Y 6 SON (30): "
+cadena4:  DATA "EL FACTORIAL DE 6 ES (720): "

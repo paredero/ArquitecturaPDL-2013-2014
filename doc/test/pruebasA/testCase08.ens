@@ -1,0 +1,96 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #11
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG X, 5, null]
+MOVE #5, #-6[.IY]
+ADD #-6[.IY], #1
+MOVE .A, #-7[.IY]
+; Traducir Quadruple - [CMP _T_0, 8, null]
+CMP #-7[.IY], #8
+; Salto si negativo __L0
+BN /L0
+; Traducir Quadruple - [ASIG _T_1, 0, null]
+MOVE #0, #-8[.IY]
+BR /L1
+; Etiqueta de salto __L0
+L0 :
+; Traducir Quadruple - [ASIG _T_1, 1, null]
+MOVE #1, #-8[.IY]
+; Etiqueta de salto __L1
+L1 :
+; Traducir Quadruple - [CMP 1, _T_1, null]
+CMP #1, #-8[.IY]
+; Salto si cero a etiqueta __L2
+BZ /L2
+; Traducir Quadruple - [ASIG _T_2, 0, null]
+MOVE #0, #-9[.IY]
+BR /L4
+; Etiqueta de salto __L2
+L2 :
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L3
+BZ /L3
+; Traducir Quadruple - [ASIG _T_2, 0, null]
+MOVE #0, #-9[.IY]
+BR /L4
+; Etiqueta de salto __L3
+L3 :
+; Traducir Quadruple - [ASIG _T_2, 1, null]
+MOVE #1, #-9[.IY]
+; Etiqueta de salto __L4
+L4 :
+; Traducir Quadruple - [ASIG A, _T_2, null]
+MOVE #-9[.IY], #-5[.IY]
+WRSTR /cadena2
+; Traducir Quadruple - [CMP 1, A, null]
+CMP #1, #-5[.IY]
+; Salto si cero a etiqueta __L5
+BZ /L5
+; Traducir Quadruple - [ASIG _T_3, 0, null]
+MOVE #0, #-10[.IY]
+BR /L7
+; Etiqueta de salto __L5
+L5 :
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L6
+BZ /L6
+; Traducir Quadruple - [ASIG _T_3, 0, null]
+MOVE #0, #-10[.IY]
+BR /L7
+; Etiqueta de salto __L6
+L6 :
+; Traducir Quadruple - [ASIG _T_3, 1, null]
+MOVE #1, #-10[.IY]
+; Etiqueta de salto __L7
+L7 :
+; Traducir Quadruple - [CMP _T_3, 1, null]
+CMP #-10[.IY], #1
+; Salto si no cero a etiqueta __L9
+BNZ /L9
+WRSTR /cadena3
+BR /L8
+; Etiqueta de salto __L9
+L9 :
+WRSTR /cadena4
+; Etiqueta de salto __L8
+L8 :
+NOP
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "PRECEDENCIA DE OPERADORES"
+cadena2:  DATA "A(TRUE):"
+cadena3:  DATA "TRUE"
+cadena4:  DATA "FALSE"

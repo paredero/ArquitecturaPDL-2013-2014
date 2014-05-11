@@ -9,10 +9,11 @@ UNO: constant := 1;
 
 -- Declaracion de tipos
 type Tpersona is record
-        dni: Integer;
+       dni: Integer;
         casado: Boolean;
     end record;
     
+
 -- Declaracion de variables    
 y,j: Integer;
 t: Boolean;

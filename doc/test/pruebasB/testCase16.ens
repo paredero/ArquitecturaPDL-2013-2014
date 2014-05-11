@@ -1,0 +1,201 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 21
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #26
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+WRSTR /cadena1
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [CMP B, 1, null]
+CMP #-6[.IY], #1
+; Salto si no cero a etiqueta __L2
+BNZ /L2
+WRSTR /cadena2
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Etiqueta de salto __L2
+L2 :
+NOP
+SUB #100, #-5[.IY]
+MOVE .A, #-7[.IY]
+MOVE #-7[.IY] , #0[.IY]
+MOVE #L1 , .PC
+
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG_REGISTRO PERSONA, DNI, 3]
+SUB .IY , #6
+MOVE #3 , [.A]
+; Traducir Quadruple - [ASIG_REGISTRO PERSONA, C1, 5]
+SUB .IY , #8
+MOVE #5 , [.A]
+; Traducir Quadruple - [ASIG_REGISTRO PERSONA, CASADO, 1]
+SUB .IY , #7
+MOVE #1 , [.A]
+WRSTR /cadena3
+; Traducir Quadruple - [ACCESO_REGISTRO _T_0, PERSONA, DNI]
+SUB .IY , #6
+MOVE [.A] , #-9[.IY]
+WRINT #-9[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ACCESO_REGISTRO _T_1, PERSONA, DNI]
+SUB .IY , #6
+MOVE [.A] , #-10[.IY]
+SUB #9, #-10[.IY]
+MOVE .A, #-11[.IY]
+SUB #-11[.IY], #5
+MOVE .A, #-12[.IY]
+; Traducir Quadruple - [ASIG A, _T_3, null]
+MOVE #-12[.IY], #-5[.IY]
+WRSTR /cadena4
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ACCESO_REGISTRO _T_4, PERSONA, C1]
+SUB .IY , #8
+MOVE [.A] , #-13[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO PERSONA, DNI, _T_4]
+SUB .IY , #6
+MOVE #-13[.IY] , [.A]
+WRSTR /cadena5
+; Traducir Quadruple - [ACCESO_REGISTRO _T_5, PERSONA, DNI]
+SUB .IY , #6
+MOVE [.A] , #-14[.IY]
+WRINT #-14[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ACCESO_REGISTRO _T_6, PERSONA, C1]
+SUB .IY , #8
+MOVE [.A] , #-15[.IY]
+; Traducir Quadruple - [ACCESO_REGISTRO _T_7, PERSONA, DNI]
+SUB .IY , #6
+MOVE [.A] , #-16[.IY]
+SUB #-15[.IY], #-16[.IY]
+MOVE .A, #-17[.IY]
+SUB #-17[.IY], #2
+MOVE .A, #-18[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO PERSONA, DNI, _T_9]
+SUB .IY , #6
+MOVE #-18[.IY] , [.A]
+WRSTR /cadena6
+; Traducir Quadruple - [ACCESO_REGISTRO _T_10, PERSONA, DNI]
+SUB .IY , #6
+MOVE [.A] , #-19[.IY]
+WRINT #-19[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ACCESO_REGISTRO _T_11, PERSONA, CASADO]
+SUB .IY , #7
+MOVE [.A] , #-20[.IY]
+; Traducir Quadruple - [CMP _T_11, 1, null]
+CMP #-20[.IY], #1
+; Salto si no cero a etiqueta __L3
+BNZ /L3
+WRSTR /cadena7
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Etiqueta de salto __L3
+L3 :
+NOP
+; Traducir Quadruple - [ACCESO_REGISTRO _T_12, PERSONA, CASADO]
+SUB .IY , #7
+MOVE [.A] , #-21[.IY]
+; Traducir Quadruple - [CMP 1, 0, null]
+CMP #1, #0
+; Salto si cero a etiqueta __L4
+BZ /L4
+; Traducir Quadruple - [CMP 1, _T_12, null]
+CMP #1, #-21[.IY]
+; Salto si cero a etiqueta __L4
+BZ /L4
+; Traducir Quadruple - [ASIG _T_13, 0, null]
+MOVE #0, #-22[.IY]
+BR /L5
+; Etiqueta de salto __L4
+L4 :
+; Traducir Quadruple - [ASIG _T_13, 1, null]
+MOVE #1, #-22[.IY]
+; Etiqueta de salto __L5
+L5 :
+; Traducir Quadruple - [CMP _T_13, 1, null]
+CMP #-22[.IY], #1
+; Salto si no cero a etiqueta __L6
+BNZ /L6
+WRSTR /cadena8
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Etiqueta de salto __L6
+L6 :
+NOP
+; INICIO ARGUMENTOS FIN
+; Traducir Quadruple - [ACCESO_REGISTRO _T_14, PERSONA, DNI]
+SUB .IY , #6
+MOVE [.A] , #-23[.IY]
+; Cargado argumento Quadruple - [ARGUMENTO _T_14, 5, null]
+; Traducir Quadruple - [ACCESO_REGISTRO _T_15, PERSONA, CASADO]
+SUB .IY , #7
+MOVE [.A] , #-24[.IY]
+; Cargado argumento Quadruple - [ARGUMENTO _T_15, 6, null]
+; Llamada Funcion Quadruple - [CALL SUMA, 0, _T_16]
+MOVE .SP , .IX
+MOVE #-23[.IY] , #-5[.IX]
+MOVE #-24[.IY] , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #8
+MOVE .A , .SP
+MOVE #RET_L7 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L7 , #-4[.IY]
+BR /L0
+REF_L7:
+BR /REF_L0
+RET_L7: 
+MOVE .R9 , #-25[.IY]
+
+; Traducir Quadruple - [ASIG A, _T_16, null]
+MOVE #-25[.IY], #-5[.IY]
+WRSTR /cadena9
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "PARAMETRO A (-2): "
+cadena2:  DATA "IMPRIME PARAMETRO B."
+cadena3:  DATA "IMPRIME PERSONA.DNI(3): "
+cadena4:  DATA "IMPRIME 9 - PERSONA.DNI - 5 (1): "
+cadena5:  DATA "IMPRIME ASIGNACION PERSONA.DNI := PERSONA.C1 (5): "
+cadena6:  DATA "IMPRIME ASIGNACION PERSONA.DNI := PERSONA.C1-PERSONA.DNI (-2): "
+cadena7:  DATA "IMPRIME PERSONA.CASADO:"
+cadena8:  DATA "IMPRIME FALSE OR PERSONA.CASADO:"
+cadena9:  DATA "IMPRIME CAMPOS PASADOS COMO ARGUMENTO(102): "

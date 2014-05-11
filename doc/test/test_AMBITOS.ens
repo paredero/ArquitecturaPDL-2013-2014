@@ -1,0 +1,235 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 41
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #15
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L2
+L2 :
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L4
+L4 :
+
+NOP
+; Traducir Quadruple - [ASIG A3, 100, null]
+MOVE #100, #-6[.IY]
+; Traducir Quadruple - [ASIG A2, 777, null]
+MOVE /2 , .R3 
+SUB .R3 , #6
+MOVE #777, [.A]
+; Traducir Quadruple - [ASIG A1, 100, null]
+MOVE /1 , .R3 
+SUB .R3 , #6
+MOVE #100, [.A]
+; Traducir Quadruple - [ASIG A0, 100, null]
+MOVE /0 , .R3 
+SUB .R3 , #5
+MOVE #100, [.A]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena2
+MOVE /2 , .R1 
+SUB .R1 , #6
+MOVE [.A] , .R2 
+WRINT .R2
+; Escribimos un salto de linea
+WRSTR /cadena0
+MOVE #0 , #0[.IY]
+MOVE #L5 , .PC
+
+L5 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L4: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /2
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L4 : 
+
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 2, 5, null]
+; Llamada Funcion Quadruple - [CALL NIVEL3, 2, _T_0]
+MOVE .SP , .IX
+MOVE #2 , #-5[.IX]
+MOVE /2 , #-2[.IY]
+MOVE .IY , /2
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #7
+MOVE .A , .SP
+MOVE #RET_L6 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L6 , #-4[.IY]
+BR /L4
+REF_L6:
+BR /REF_L4
+RET_L6: 
+MOVE .R9 , #-7[.IY]
+
+; Traducir Quadruple - [ASIG T, _T_0, null]
+MOVE /0 , .R3 
+SUB .R3 , #8
+MOVE #-7[.IY], [.A]
+WRSTR /cadena3
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena4
+WRINT #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG B5, 15, null]
+MOVE /0 , .R3 
+SUB .R3 , #6
+MOVE #15, [.A]
+; Traducir Quadruple - [ASIG B1, 8, null]
+MOVE /1 , .R3 
+SUB .R3 , #7
+MOVE #8, [.A]
+MOVE #1000 , #0[.IY]
+MOVE #L3 , .PC
+
+L3 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L2: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /1
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L2 : 
+
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 2, 5, null]
+; Llamada Funcion Quadruple - [CALL NIVEL2, 1, _T_0]
+MOVE .SP , .IX
+MOVE #2 , #-5[.IX]
+MOVE /1 , #-2[.IY]
+MOVE .IY , /1
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #8
+MOVE .A , .SP
+MOVE #RET_L7 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L7 , #-4[.IY]
+BR /L2
+REF_L7:
+BR /REF_L2
+RET_L7: 
+MOVE .R9 , #-8[.IY]
+
+; Traducir Quadruple - [ASIG T, _T_0, null]
+MOVE /0 , .R3 
+SUB .R3 , #8
+MOVE #-8[.IY], [.A]
+WRSTR /cadena5
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena6
+WRINT #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena7
+WRINT #-7[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG C2, 90, null]
+MOVE /0 , .R3 
+SUB .R3 , #7
+MOVE #90, [.A]
+MOVE #1000 , #0[.IY]
+MOVE #L1 , .PC
+
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Escribimos un salto de linea
+WRSTR /cadena0
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 2, 5, null]
+; Llamada Funcion Quadruple - [CALL NIVEL1, 0, _T_0]
+MOVE .SP , .IX
+MOVE #2 , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #9
+MOVE .A , .SP
+MOVE #RET_L8 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L8 , #-4[.IY]
+BR /L0
+REF_L8:
+BR /REF_L0
+RET_L8: 
+MOVE .R9 , #-14[.IY]
+
+; Traducir Quadruple - [ASIG T, _T_0, null]
+MOVE #-14[.IY], #-8[.IY]
+WRSTR /cadena8
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena9
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena10
+WRINT #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena11
+WRINT #-7[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "PASO POR NIVEL 3"
+cadena2:  DATA "VALOR DE A2 DEBE SER 777: "
+cadena3:  DATA "PASO POR NIVEL 2"
+cadena4:  DATA "*** IMPRIME A2 VALOR ASIGNADO EN NIVEL 3 (777): "
+cadena5:  DATA "PASO POR NIVEL 1"
+cadena6:  DATA "IMPRIME VALOR ASIGNADO EN NIVEL 3 (100): "
+cadena7:  DATA "IMPRIME VALOR ASIGNADO EN NIVEL 2 (8): "
+cadena8:  DATA "PASO POR NIVEL 0"
+cadena9:  DATA "IMPRIME VALOR ASIGNADO EN NIVEL 3 (100): "
+cadena10:  DATA "IMPRIME VALOR ASIGNADO EN NIVEL 2 (15): "
+cadena11:  DATA "IMPRIME VALOR ASIGNADO EN NIVEL 1 (90): "

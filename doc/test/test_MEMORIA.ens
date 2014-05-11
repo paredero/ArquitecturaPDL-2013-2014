@@ -1,0 +1,309 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 51
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #22
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+; Traducir Quadruple - [ASIG TEMP, 0, null]
+MOVE #0, #-8[.IY]
+; Traducir Quadruple - [ASIG I, 1, null]
+MOVE #1, #-7[.IY]
+; Traducir Quadruple - [ASIG _T_1, B, null]
+MOVE #-6[.IY], #-10[.IY]
+; Etiqueta de salto __L2
+L2 :
+; Traducir Quadruple - [CMP _T_1, I, null]
+CMP #-10[.IY], #-7[.IY]
+; Salto si negativo __L3
+BN /L3
+ADD #-8[.IY], #-5[.IY]
+MOVE .A, #-9[.IY]
+; Traducir Quadruple - [ASIG TEMP, _T_0, null]
+MOVE #-9[.IY], #-8[.IY]
+INC #-7[.IY]
+BR /L2
+; Etiqueta de salto __L3
+L3 :
+MOVE #-8[.IY] , #0[.IY]
+MOVE #L1 , .PC
+
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L4
+L4 :
+
+NOP
+; Traducir Quadruple - [CMP N, 1, null]
+CMP #-5[.IY], #1
+; Salto si negativo __L6
+BN /L6
+; Traducir Quadruple - [ASIG _T_0, 0, null]
+MOVE #0, #-7[.IY]
+BR /L7
+; Etiqueta de salto __L6
+L6 :
+; Traducir Quadruple - [ASIG _T_0, 1, null]
+MOVE #1, #-7[.IY]
+; Etiqueta de salto __L7
+L7 :
+; Traducir Quadruple - [CMP _T_0, 1, null]
+CMP #-7[.IY], #1
+; Salto si no cero a etiqueta __L11
+BNZ /L11
+MOVE #1 , #0[.IY]
+MOVE #L5 , .PC
+
+BR /L10
+; Etiqueta de salto __L11
+L11 :
+WRSTR /cadena1
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; INICIO ARGUMENTOS FIN
+; INICIO ARGUMENTOS FIN
+SUB #-5[.IY], #1
+MOVE .A, #-8[.IY]
+; Cargado argumento Quadruple - [ARGUMENTO _T_1, 5, null]
+; Llamada Funcion Quadruple - [CALL FACT, 0, _T_2]
+MOVE .SP , .IX
+MOVE #-8[.IY] , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L8 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L8 , #-4[.IY]
+BR /L4
+REF_L8:
+BR /REF_L4
+RET_L8: 
+MOVE .R9 , #-9[.IY]
+
+; Cargado argumento Quadruple - [ARGUMENTO _T_2, 5, null]
+; Cargado argumento Quadruple - [ARGUMENTO N, 6, null]
+; Llamada Funcion Quadruple - [CALL MULTIPLICAR, 0, _T_3]
+MOVE .SP , .IX
+MOVE #-9[.IY] , #-5[.IX]
+MOVE #-5[.IY] , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L9 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L9 , #-4[.IY]
+BR /L0
+REF_L9:
+BR /REF_L0
+RET_L9: 
+MOVE .R9 , #-10[.IY]
+
+MOVE #-10[.IY] , #0[.IY]
+MOVE #L5 , .PC
+
+; Etiqueta de salto __L10
+L10 :
+NOP
+L5 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L4: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L4 : 
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L12
+L12 :
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L14
+L14 :
+
+NOP
+; Traducir Quadruple - [ASIG H1, 11, null]
+MOVE #11, #-5[.IY]
+; Traducir Quadruple - [ASIG H2, 22, null]
+MOVE #22, #-6[.IY]
+; Traducir Quadruple - [ASIG H3, 1, null]
+MOVE #1, #-7[.IY]
+L15 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L14: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /1
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L14 : 
+
+; INICIO ARGUMENTOS FIN
+; Cargado argumento REFERENCIA Quadruple - [ARGUMENTO_REF P1, 5, null]
+; Cargado argumento REFERENCIA Quadruple - [ARGUMENTO_REF P2, 6, null]
+; Cargado argumento Quadruple - [ARGUMENTO 0, 7, null]
+; Llamada Funcion Quadruple - [CALL HIJO, 1, 0]
+MOVE .SP , .IX
+MOVE #-5[.IY] , #-5[.IX]
+MOVE #-6[.IY] , #-6[.IX]
+MOVE #0 , #-7[.IX]
+MOVE /1 , #-2[.IY]
+MOVE .IY , /1
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #8
+MOVE .A , .SP
+MOVE #RET_L16 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L16 , #-4[.IY]
+BR /L14
+REF_L16:
+MOVE #-5[.IY] , #-5[.IX]
+MOVE #-6[.IY] , #-6[.IX]
+BR /REF_L14
+RET_L16: 
+NOP 
+
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena2
+WRINT #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena3
+WRINT #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena4
+MOVE /0 , .R1 
+SUB .R1 , #5
+MOVE [.A] , .R2 
+WRINT .R2
+L13 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L12: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L12 : 
+
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 5, 5, null]
+; Llamada Funcion Quadruple - [CALL FACT, 0, _T_0]
+MOVE .SP , .IX
+MOVE #5 , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #11
+MOVE .A , .SP
+MOVE #RET_L17 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L17 , #-4[.IY]
+BR /L4
+REF_L17:
+BR /REF_L4
+RET_L17: 
+MOVE .R9 , #-19[.IY]
+
+; Traducir Quadruple - [ASIG GLOBAL, _T_0, null]
+MOVE #-19[.IY], #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena5
+WRINT #-5[.IY]
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 0, 5, null]
+; Cargado argumento Quadruple - [ARGUMENTO 0, 6, null]
+; Llamada Funcion Quadruple - [CALL PADRE, 0, 0]
+MOVE .SP , .IX
+MOVE #0 , #-5[.IX]
+MOVE #0 , #-6[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #7
+MOVE .A , .SP
+MOVE #RET_L18 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L18 , #-4[.IY]
+BR /L12
+REF_L18:
+BR /REF_L12
+RET_L18: 
+NOP 
+
+; Traducir Quadruple - [DIR_MEM _T_1, GLOBAL, null]
+SUB .IY , #5
+MOVE .A ,  #-20[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO_PUNTERO PERSONA, C1, _T_1]
+SUB .IY , #18
+MOVE [.A] , .R2 
+SUB .R2 , #0
+MOVE #-20[.IY] , [.A]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena6
+; Traducir Quadruple - [ACCESO_REGISTRO_PUNTERO _T_2, PERSONA, C1]
+SUB .IY , #18
+MOVE [.A] , .R1 
+SUB .R1 , #0 
+MOVE [.A] , #-21[.IY]
+WRINT #-21[.IY]
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "EL PARAMETRO VALE: "
+cadena2:  DATA "EL P1 DEBE VALER (11): "
+cadena3:  DATA "EL P2 DEBE VALER (22): "
+cadena4:  DATA "VAR GLOBAL VALE (120): "
+cadena5:  DATA "EL FACTORIAL DE 5 ES (120): "
+cadena6:  DATA "PERSONA.C1 DESPL GLOBAL(-6):"

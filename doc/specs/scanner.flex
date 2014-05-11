@@ -76,7 +76,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             Token token = new Token (sym.END);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + " END");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -108,7 +108,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             Token token = new Token (sym.IF);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + " IF");
+            token.setLexema (yytext ());
             return token;
         }
         
@@ -315,7 +315,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             Token token = new Token (sym.IDENTIFICADOR);
             token.setLine (yyline + 1);
             token.setColumn (yycolumn + 1);
-            token.setLexema (yytext () + " IDENTIFICADOR");
+            token.setLexema (yytext ());
             return token;
     }
     

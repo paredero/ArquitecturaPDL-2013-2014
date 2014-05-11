@@ -1,0 +1,56 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 21
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #6
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 9, 5, null]
+; Llamada Funcion Quadruple - [CALL RESTA, 0, _T_0]
+MOVE .SP , .IX
+MOVE #9 , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #7
+MOVE .A , .SP
+MOVE #RET_L2 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L2 , #-4[.IY]
+BR /L0
+REF_L2:
+BR /REF_L0
+RET_L2: 
+MOVE .R9 , #-6[.IY]
+
+MOVE #-6[.IY] , #0[.IY]
+MOVE #L1 , .PC
+
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+NOP
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"

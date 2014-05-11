@@ -28,8 +28,8 @@ import compiler.code.*;
 action code {:
     
     SyntaxErrorManager   syntaxErrorManager   = CompilerContext.getSyntaxErrorManager();
-//    SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
-//    ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
+    SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
+    ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
     FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
 
 :}  
@@ -108,14 +108,12 @@ non terminal    declaracion_constantes;
 non terminal    declaracion_registros;
 non terminal    declaracion_variables;
 non terminal    declaracion_subprogramas;
-non terminal    inicio_declaracion;
 non terminal    lista_nombres;
 non terminal    constante;
 non terminal    valor;
 
 non terminal    registro;
-non terminal    lista_campos;
-non terminal    campo;
+non terminal    ListaObjetos lista_campos;
 non terminal    tipo;
 
 non terminal    variable;
@@ -163,10 +161,9 @@ program ::=
   {: 
         // No modificar esta estructura, aunque se pueden añadir más acciones semánticas
         
-        //List intermediateCode = ax.getIntermediateCode ();
-        //finalCodeFactory.create (intermediateCode);
-
-        
+        List intermediateCode = ax.getIntermediateCode ();
+        finalCodeFactory.create (intermediateCode);
+                
         syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
@@ -176,24 +173,182 @@ axiom ::= cabecera declaraciones cuerpo
 
 vacio ::= ;
 
-cabecera ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS
+cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
+    {:
+        //Crear el ámbito global del programa asociado al nombre del procedimiento.
+        String name = id.getLexema();
+        scopeManager.openScope(name);
+        ScopeIF scope = scopeManager.getCurrentScope();
+        semanticErrorManager.semanticDebug("Abierto ambito " + name);
+        
+        //******************* Ahora insertar tipos basicos en la tabla
+        TypeTableIF tablaTipos = scope.getTypeTable();
+        TypeSimple tipoBooleano = new TypeSimple(scope);
+        tipoBooleano.setName("BOOLEAN");
+        tablaTipos.addType(tipoBooleano);
+        TypeSimple tipoEntero = new TypeSimple(scope);
+        tipoEntero.setName("INTEGER");
+        tablaTipos.addType(tipoEntero);
+    :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de cabecera."); :};
+
+tipo ::= IDENTIFICADOR:id  {: RESULT=id.getLexema();:}
+        | INTEGER:t {: RESULT="INTEGER"; :} 
+        | BOOLEAN:t {: RESULT="BOOLEAN"; :};
+
+tipo_primitivo ::= INTEGER:t {: RESULT="INTEGER"; :} 
+        | BOOLEAN:t {: RESULT="BOOLEAN"; :};
+        
+valor ::= NUMERO {: RESULT="INTEGER"; :}
+        | TRUE {: RESULT="BOOLEAN"; :}
+        | FALSE {: RESULT="BOOLEAN"; :};             
 
 declaraciones ::= declaracion_constantes;
 
 declaracion_constantes ::= constante declaracion_constantes 
         | declaracion_registros;
 
+/*******************************************************************************
+CAMBIAR LA CONSTANTE EN TRES PRODUCCIONES SEGUN EL TIPO DE VALOR
+1 Divido valor en valor_numerico y valor_booleano
+2 Divido la produccion constante en constante:: ...valor_numeroco | ...valor_booleano
+*******************************************************************************/
+constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v PUNTO_COMA
+    {:
+        ScopeIF scope = scopeManager.getCurrentScope();
+        String nombreConstante = (String)((ListaObjetos)listaNombres).get(0);
+        semanticErrorManager.semanticInfo("Declaracion de constante " + nombreConstante);
+        // comprueba si la constante ha sido declarada y se encuentra en la tabla de simbolos
+        if (scope.getSymbolTable().containsSymbol(nombreConstante)) {
+            semanticErrorManager.semanticFatalError("Error: la constante "+nombreConstante+" ya ha sido declarada");
+        } else {
+            // Creo la constante en el ambito
+            SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+            String tipo = (String)v;
+            SymbolConstant simboloCte = new SymbolConstant(scope,nombreConstante,scopeManager.searchType(tipo));
+            // La guardo en la tabla de simbolos
+            tablaSimbolos.addSymbol(nombreConstante, simboloCte);
+            semanticErrorManager.semanticInfo("Constante " + nombreConstante + " " + tipo + " guardada en la tabla de simbolos");
+        }
+    :};
+    
+lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres
+    {:
+        semanticErrorManager.semanticInfo("Se encuentra el nombre " + id.getLexema()); 
+        semanticErrorManager.semanticInfo("Se encuentra el listado " + listaNombres.toString());
+        ListaObjetos listaResultado = new ListaObjetos((ListaObjetos)listaNombres);
+        listaResultado.add(id.getLexema());
+        RESULT = listaResultado;
+    :}
+    | IDENTIFICADOR:id
+    {:
+        ListaObjetos listaNombres = new ListaObjetos();
+        listaNombres.add(id.getLexema());
+        RESULT = listaNombres;
+    :};
+
 declaracion_registros ::= registro declaracion_registros 
         | declaracion_variables;
+        
+registro ::= TYPE IDENTIFICADOR:idRegistro IS RECORD lista_campos:listaCamposRegistro END RECORD PUNTO_COMA
+    {:
+        syntaxErrorManager.syntaxInfo("Declaracion de registro " + idRegistro.getLexema() + ". Linea " + idRegistro.getLine());
+        // Comprueba en la tabla de tipos si el tipo ya está declarado
+        ScopeIF scope = scopeManager.getCurrentScope();
+        
+        TypeTableIF typeTable = scope.getTypeTable();
+        
+        if (typeTable.containsType(idRegistro.getLexema())) {
+            semanticErrorManager.semanticFatalError("Error: el tipo "+idRegistro.getLexema()+" en la linea: "+idRegistro.getLine()+" ya ha sido declarado");
+        } else {
+            TypeRecord tipoRegistro = new TypeRecord(scope, idRegistro.getLexema());
+            typeTable.addType(tipoRegistro);
+            syntaxErrorManager.syntaxInfo("Tipo registro " + idRegistro.getLexema() + ". Añadido en la tabla de tipos");
+            // Compruebo los campos
+        for (int i = 0; i<listaCamposRegistro.size();i++) {
+            CampoRegistro c = (CampoRegistro) listaCamposRegistro.get(i);
+            SymbolVariable var = (SymbolVariable) c.getSymbol();
+            if (!tipoRegistro.containsCampo(c.getNombre())) {
+                semanticErrorManager.semanticInfo("Se inserta el campo " + c.getNombre() + "linea " + c.getLinea() + "... ");
+                tipoRegistro.addCampo(c.getNombre(), var); 
+                semanticErrorManager.semanticInfo("...OK!");                                        
+            } else {
+                semanticErrorManager.semanticFatalError ("El campo: " + c.getNombre() +" en " + c.getLinea() + " ya ha sido definido.");
+            }
+        } 
+        }
+        
+        
+    :};
+
+/**
+    CAMBIO: Elimino el no terminal campo y lo sustituyo por su produccion
+**/
+lista_campos ::= IDENTIFICADOR:idCampo DOS_PUNTOS tipo:tipoCampo PUNTO_COMA lista_campos:listaCampos
+    {:
+    // Añadir ID + tipo a lista de campos del registro registro
+    ScopeIF scope = scopeManager.getCurrentScope();
+    TypeTableIF tablaTipos = scope.getTypeTable();
+    SymbolIF simbolo = new SymbolVariable(scope,
+                                            idCampo.getLexema(),
+                                            scopeManager.searchType(tipoCampo.toString()));
+    CampoRegistro campo = new CampoRegistro(idCampo.getLexema(), idCampo.getLine(), 
+                                            idCampo.getColumn(), simbolo);
+    semanticErrorManager.semanticInfo("Identificado el campo " + campo.getNombre() + ". ");
+    if (listaCampos == null) {
+        listaCampos = new ListaObjetos();
+    }
+    listaCampos.add(campo);
+    
+    RESULT = listaCampos;
+    :} 
+    | vacio;
+   
 
 declaracion_variables ::= variable declaracion_variables 
-        | declaracion_subprogramas;
+        | declaracion_subprogramas {:syntaxErrorManager.syntaxDebug("Declaracion subprogramas");:};
+/**
+    CAMBIO: sustituyo lista_nombres por su produccion
+**/
+variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
+    {:
+        String tipoVariable = (String)objTipo;
+        ListaObjetos listaNombres = (ListaObjetos)objListaNombres; 
+        semanticErrorManager.semanticDebug("Declaracion variables de tipo " + tipoVariable);
+        
+        ScopeIF scope = scopeManager.getCurrentScope();
+        TypeTableIF tablaTipos = scope.getTypeTable();
+        SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+        
+        // Si el tipo no existe, error
+        if (!tablaTipos.containsType(tipoVariable)) {
+            semanticErrorManager.semanticFatalError("ERROR: El tipo " 
+                                + tipoVariable + 
+                                " no ha sido definido en el programa");
+        } else {
+            semanticErrorManager.semanticDebug("Encontrado el tipo, valida que no haya nombres duplicados");
+	        // Para cada nombre creo una variable
+	        for (Object objeto:listaNombres.getVariables()) {
+	           String nombreVar = (String)objeto;
+	            semanticErrorManager.semanticInfo("Declaracion de variable " + nombreVar);
+	            if (tablaSimbolos.containsSymbol(nombreVar)) {
+	               semanticErrorManager.semanticFatalError("ERROR: variable duplicada " + nombreVar);
+	            } else {
+	               semanticErrorManager.semanticDebug("Variable valida, crea el simbolo");
+	               SymbolVariable sV = new SymbolVariable(scope, nombreVar, tablaTipos.getType(tipoVariable));
+	               tablaSimbolos.addSymbol(nombreVar, sV);
+	            }
+	        }
+        }
+        semanticErrorManager.semanticDebug("End declaracion variable");
+    :};
+
 
 declaracion_subprogramas ::= subprograma declaracion_subprogramas 
         | vacio;
         
-subprograma ::= funcion | procedimiento; 
+subprograma ::= funcion {:syntaxErrorManager.syntaxDebug("Declaracion funcion");:} 
+    | procedimiento {:syntaxErrorManager.syntaxDebug("Declaracion procedimiento");:}; 
 
 funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS parametros_subprograma CIERRA_PARENTESIS RETURN tipo_primitivo IS declaraciones cuerpo_funcion;
 
@@ -211,27 +366,13 @@ sentencia_funcion ::= sentencia | sentencia_return;
 
 sentencia_return ::= RETURN expresion;
 
-constante ::= inicio_declaracion CONSTANT ASIGNACION valor PUNTO_COMA;
 
-valor ::= TRUE | FALSE | NUMERO;
-
-registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTO_COMA;
-
-lista_campos ::= campo lista_campos | campo;
-
-campo ::= IDENTIFICADOR DOS_PUNTOS tipo PUNTO_COMA;
-
-tipo ::= IDENTIFICADOR | INTEGER | BOOLEAN;
-
-tipo_primitivo ::= INTEGER | BOOLEAN;
-
-variable ::= inicio_declaracion tipo PUNTO_COMA;
-
-inicio_declaracion ::= lista_nombres DOS_PUNTOS;
-
-lista_nombres ::= IDENTIFICADOR SEPARADOR_COMA lista_nombres | IDENTIFICADOR;
 
 cuerpo ::=  BEGIN lista_sentencias END IDENTIFICADOR PUNTO_COMA
+    {:
+        semanticErrorManager.semanticDebug("Cierro ambito ");
+        scopeManager.closeScope();
+    :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en cuerpo de procedimiento."); :};
         
 lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias 
@@ -258,6 +399,10 @@ referencia ::= IDENTIFICADOR
 acceso_registro ::= IDENTIFICADOR ACCESO acceso_registro
         | IDENTIFICADOR ACCESO IDENTIFICADOR;
         
+/*******************************************************************************
+    CAMBIO: TRUE,FALSE pasan a valor_booleano
+    NUMERO pasa a valor_numerico
+*******************************************************************************/
 expresion ::= expresion PLUS expresion
         | expresion MAYOR expresion
         | expresion IGUAL expresion
@@ -266,9 +411,7 @@ expresion ::= expresion PLUS expresion
         | llamada_subprograma
         | referencia
         | CADENA
-        | TRUE
-        | FALSE
-        | NUMERO;
+        | valor;
 
 sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
 

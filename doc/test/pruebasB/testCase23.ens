@@ -1,0 +1,212 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 21
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #14
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+; Traducir Quadruple - [ASIG A, 0, null]
+MOVE #0, #-5[.IY]
+; Traducir Quadruple - [ASIG _T_0, 10, null]
+MOVE #10, #-7[.IY]
+; Etiqueta de salto __L2
+L2 :
+; Traducir Quadruple - [CMP _T_0, A, null]
+CMP #-7[.IY], #-5[.IY]
+; Salto si negativo __L3
+BN /L3
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG A, 10, null]
+MOVE #10, #-5[.IY]
+INC #-5[.IY]
+BR /L2
+; Etiqueta de salto __L3
+L3 :
+MOVE #-5[.IY] , #0[.IY]
+MOVE #L1 , .PC
+
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG A, 0, null]
+MOVE #0, #-5[.IY]
+; Traducir Quadruple - [ASIG _T_0, 5, null]
+MOVE #5, #-7[.IY]
+; Etiqueta de salto __L4
+L4 :
+; Traducir Quadruple - [CMP _T_0, A, null]
+CMP #-7[.IY], #-5[.IY]
+; Salto si negativo __L5
+BN /L5
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena1
+WRINT #-5[.IY]
+INC #-5[.IY]
+BR /L4
+; Etiqueta de salto __L5
+L5 :
+; Traducir Quadruple - [ASIG A, 0, null]
+MOVE #0, #-5[.IY]
+; Traducir Quadruple - [ASIG _T_1, 5, null]
+MOVE #5, #-8[.IY]
+; Etiqueta de salto __L6
+L6 :
+; Traducir Quadruple - [CMP _T_1, A, null]
+CMP #-8[.IY], #-5[.IY]
+; Salto si negativo __L7
+BN /L7
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena2
+; Traducir Quadruple - [ASIG A, 5, null]
+MOVE #5, #-5[.IY]
+INC #-5[.IY]
+BR /L6
+; Etiqueta de salto __L7
+L7 :
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [CMP 5, 4, null]
+CMP #5, #4
+; Salto si negativo __L8
+BN /L8
+; Traducir Quadruple - [ASIG _T_2, 0, null]
+MOVE #0, #-9[.IY]
+BR /L9
+; Etiqueta de salto __L8
+L8 :
+; Traducir Quadruple - [ASIG _T_2, 1, null]
+MOVE #1, #-9[.IY]
+; Etiqueta de salto __L9
+L9 :
+; Traducir Quadruple - [CMP _T_2, 1, null]
+CMP #-9[.IY], #1
+; Salto si no cero a etiqueta __L11
+BNZ /L11
+WRSTR /cadena3
+BR /L10
+; Etiqueta de salto __L11
+L11 :
+WRSTR /cadena4
+; Etiqueta de salto __L10
+L10 :
+NOP
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG B, 10, null]
+MOVE #10, #-6[.IY]
+; Traducir Quadruple - [ASIG A, 0, null]
+MOVE #0, #-5[.IY]
+; Traducir Quadruple - [ASIG _T_4, 5, null]
+MOVE #5, #-11[.IY]
+; Etiqueta de salto __L12
+L12 :
+; Traducir Quadruple - [CMP _T_4, A, null]
+CMP #-11[.IY], #-5[.IY]
+; Salto si negativo __L13
+BN /L13
+SUB #-6[.IY], #1
+MOVE .A, #-10[.IY]
+; Traducir Quadruple - [ASIG B, _T_3, null]
+MOVE #-10[.IY], #-6[.IY]
+INC #-5[.IY]
+BR /L12
+; Etiqueta de salto __L13
+L13 :
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena5
+WRINT #-6[.IY]
+; Traducir Quadruple - [ASIG B, 2, null]
+MOVE #2, #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena6
+WRINT #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [CMP 5, 4, null]
+CMP #5, #4
+; Salto si negativo __L14
+BN /L14
+; Traducir Quadruple - [ASIG _T_5, 0, null]
+MOVE #0, #-12[.IY]
+BR /L15
+; Etiqueta de salto __L14
+L14 :
+; Traducir Quadruple - [ASIG _T_5, 1, null]
+MOVE #1, #-12[.IY]
+; Etiqueta de salto __L15
+L15 :
+; Traducir Quadruple - [CMP _T_5, 1, null]
+CMP #-12[.IY], #1
+; Salto si no cero a etiqueta __L17
+BNZ /L17
+; Traducir Quadruple - [ASIG B, 2, null]
+MOVE #2, #-6[.IY]
+WRSTR /cadena7
+BR /L16
+; Etiqueta de salto __L17
+L17 :
+; Traducir Quadruple - [ASIG B, 4, null]
+MOVE #4, #-6[.IY]
+WRSTR /cadena8
+; Etiqueta de salto __L16
+L16 :
+NOP
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 8, 5, null]
+; Llamada Funcion Quadruple - [CALL RESTA, 0, _T_6]
+MOVE .SP , .IX
+MOVE #8 , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #8
+MOVE .A , .SP
+MOVE #RET_L18 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L18 , #-4[.IY]
+BR /L0
+REF_L18:
+BR /REF_L0
+RET_L18: 
+MOVE .R9 , #-13[.IY]
+
+; Traducir Quadruple - [ASIG A, _T_6, null]
+MOVE #-13[.IY], #-5[.IY]
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "ESCRIBE 6 VECES (CONATADOR BUCLE): "
+cadena2:  DATA "ESCRIBE SOLO UNA VEZ, SE MODIFICA CONTADOR."
+cadena3:  DATA "ESCRIBE QUE 4>5"
+cadena4:  DATA "ESCRIBE QUE NO 4>5."
+cadena5:  DATA "B AL FINAL DEL BUCLE DEBE VALER (4): "
+cadena6:  DATA "B DESPUES DE LA ASIGNACION DEBE VALER (2): "
+cadena7:  DATA "ESCRIBE QUE 4>5"
+cadena8:  DATA "ESCRIBE QUE NO 4>5."

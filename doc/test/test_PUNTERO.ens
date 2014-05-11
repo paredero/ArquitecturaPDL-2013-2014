@@ -1,0 +1,135 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #34
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+; Traducir Quadruple - [ASIG P, Q, null]
+MOVE #-6[.IY], #-5[.IY]
+; Traducir Quadruple - [ACCESO_REGISTRO _T_0, R, PUNTERO]
+SUB .IY , #10
+MOVE [.A] , #-11[.IY]
+; Traducir Quadruple - [ASIG P, _T_0, null]
+MOVE #-11[.IY], #-5[.IY]
+; Traducir Quadruple - [DIR_MEM _T_1, E, null]
+SUB .IY , #8
+MOVE .A ,  #-12[.IY]
+; Traducir Quadruple - [ASIG P, _T_1, null]
+MOVE #-12[.IY], #-5[.IY]
+; Traducir Quadruple - [DIR_MEM_REGISTRO _T_2, R, ENTERO]
+SUB .IY , #9
+MOVE .A , #-13[.IY]
+; Traducir Quadruple - [ASIG P, _T_2, null]
+MOVE #-13[.IY], #-5[.IY]
+SUB #-6[.IY], #1
+MOVE .A, #-14[.IY]
+; Traducir Quadruple - [ASIG F, _T_3, null]
+MOVE #-14[.IY], #-7[.IY]
+SUB #-6[.IY], #1
+MOVE .A, #-15[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, _T_4]
+SUB .IY , #9
+MOVE #-15[.IY] , [.A]
+SUB #-6[.IY], #-6[.IY]
+MOVE .A, #-16[.IY]
+; Traducir Quadruple - [ASIG F, _T_5, null]
+MOVE #-16[.IY], #-7[.IY]
+SUB #-6[.IY], #-6[.IY]
+MOVE .A, #-17[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, _T_6]
+SUB .IY , #9
+MOVE #-17[.IY] , [.A]
+; Traducir Quadruple - [ASIG F, P, null]
+MOVE #-5[.IY], #-7[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, P]
+SUB .IY , #9
+MOVE #-5[.IY] , [.A]
+; Traducir Quadruple - [DIR_MEM _T_7, F, null]
+SUB .IY , #7
+MOVE .A ,  #-18[.IY]
+; Traducir Quadruple - [ASIG F, _T_7, null]
+MOVE #-18[.IY], #-7[.IY]
+; Traducir Quadruple - [DIR_MEM_REGISTRO _T_8, R, ENTERO]
+SUB .IY , #9
+MOVE .A , #-19[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, _T_8]
+SUB .IY , #9
+MOVE #-19[.IY] , [.A]
+; Traducir Quadruple - [DIR_MEM _T_9, E, null]
+SUB .IY , #8
+MOVE .A ,  #-20[.IY]
+SUB #-20[.IY], #1
+MOVE .A, #-21[.IY]
+; Traducir Quadruple - [ASIG F, _T_10, null]
+MOVE #-21[.IY], #-7[.IY]
+; Traducir Quadruple - [DIR_MEM _T_11, E, null]
+SUB .IY , #8
+MOVE .A ,  #-22[.IY]
+SUB #-22[.IY], #1
+MOVE .A, #-23[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, _T_12]
+SUB .IY , #9
+MOVE #-23[.IY] , [.A]
+SUB #-5[.IY] , #0 
+MOVE [.A] , #-24[.IY]
+; Traducir Quadruple - [ASIG F, _T_13, null]
+MOVE #-24[.IY], #-7[.IY]
+SUB #-5[.IY] , #0 
+MOVE [.A] , #-25[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, _T_14]
+SUB .IY , #9
+MOVE #-25[.IY] , [.A]
+SUB #-5[.IY] , #0 
+MOVE [.A] , #-26[.IY]
+SUB #-26[.IY], #3
+MOVE .A, #-27[.IY]
+; Traducir Quadruple - [ASIG F, _T_16, null]
+MOVE #-27[.IY], #-7[.IY]
+SUB #-5[.IY] , #0 
+MOVE [.A] , #-28[.IY]
+SUB #-28[.IY], #3
+MOVE .A, #-29[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO R, ENTERO, _T_18]
+SUB .IY , #9
+MOVE #-29[.IY] , [.A]
+; Traducir Quadruple - [ASIG_PUNTERO P, F, null]
+SUB #-5[.IY], #0 
+MOVE #-7[.IY], [.A]
+; Traducir Quadruple - [ASIG_REGISTRO_PUNTERO R, PUNTERO, F]
+SUB .IY , #10
+MOVE [.A] , .R2 
+SUB .R2 , #0
+MOVE #-7[.IY] , [.A]
+; Traducir Quadruple - [ASIG_PUNTERO P, P, null]
+SUB #-5[.IY], #0 
+MOVE #-5[.IY], [.A]
+; Traducir Quadruple - [ACCESO_REGISTRO _T_19, R, PUNTERO]
+SUB .IY , #10
+MOVE [.A] , #-30[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO_PUNTERO R, PUNTERO, _T_19]
+SUB .IY , #10
+MOVE [.A] , .R2 
+SUB .R2 , #0
+MOVE #-30[.IY] , [.A]
+SUB #-5[.IY], #1
+MOVE .A, #-31[.IY]
+; Traducir Quadruple - [ASIG_PUNTERO P, _T_20, null]
+SUB #-5[.IY], #0 
+MOVE #-31[.IY], [.A]
+; Traducir Quadruple - [ACCESO_REGISTRO _T_21, R, PUNTERO]
+SUB .IY , #10
+MOVE [.A] , #-32[.IY]
+SUB #-32[.IY], #1
+MOVE .A, #-33[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO_PUNTERO R, PUNTERO, _T_22]
+SUB .IY , #10
+MOVE [.A] , .R2 
+SUB .R2 , #0
+MOVE #-33[.IY] , [.A]
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"

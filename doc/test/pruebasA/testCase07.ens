@@ -1,0 +1,141 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #10
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L0
+BZ /L0
+; Traducir Quadruple - [ASIG _T_0, 0, null]
+MOVE #0, #-6[.IY]
+BR /L2
+; Etiqueta de salto __L0
+L0 :
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L1
+BZ /L1
+; Traducir Quadruple - [ASIG _T_0, 0, null]
+MOVE #0, #-6[.IY]
+BR /L2
+; Etiqueta de salto __L1
+L1 :
+; Traducir Quadruple - [ASIG _T_0, 1, null]
+MOVE #1, #-6[.IY]
+; Etiqueta de salto __L2
+L2 :
+; Traducir Quadruple - [ASIG A, _T_0, null]
+MOVE #-6[.IY], #-5[.IY]
+WRSTR /cadena2
+; Traducir Quadruple - [CMP 1, A, null]
+CMP #1, #-5[.IY]
+; Salto si cero a etiqueta __L3
+BZ /L3
+; Traducir Quadruple - [ASIG _T_1, 0, null]
+MOVE #0, #-7[.IY]
+BR /L5
+; Etiqueta de salto __L3
+L3 :
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L4
+BZ /L4
+; Traducir Quadruple - [ASIG _T_1, 0, null]
+MOVE #0, #-7[.IY]
+BR /L5
+; Etiqueta de salto __L4
+L4 :
+; Traducir Quadruple - [ASIG _T_1, 1, null]
+MOVE #1, #-7[.IY]
+; Etiqueta de salto __L5
+L5 :
+; Traducir Quadruple - [CMP _T_1, 1, null]
+CMP #-7[.IY], #1
+; Salto si no cero a etiqueta __L7
+BNZ /L7
+WRSTR /cadena3
+BR /L6
+; Etiqueta de salto __L7
+L7 :
+WRSTR /cadena4
+; Etiqueta de salto __L6
+L6 :
+NOP
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L8
+BZ /L8
+; Traducir Quadruple - [ASIG _T_2, 0, null]
+MOVE #0, #-8[.IY]
+BR /L10
+; Etiqueta de salto __L8
+L8 :
+; Traducir Quadruple - [CMP 1, 0, null]
+CMP #1, #0
+; Salto si cero a etiqueta __L9
+BZ /L9
+; Traducir Quadruple - [ASIG _T_2, 0, null]
+MOVE #0, #-8[.IY]
+BR /L10
+; Etiqueta de salto __L9
+L9 :
+; Traducir Quadruple - [ASIG _T_2, 1, null]
+MOVE #1, #-8[.IY]
+; Etiqueta de salto __L10
+L10 :
+; Traducir Quadruple - [ASIG A, _T_2, null]
+MOVE #-8[.IY], #-5[.IY]
+WRSTR /cadena5
+; Traducir Quadruple - [CMP 1, A, null]
+CMP #1, #-5[.IY]
+; Salto si cero a etiqueta __L11
+BZ /L11
+; Traducir Quadruple - [ASIG _T_3, 0, null]
+MOVE #0, #-9[.IY]
+BR /L13
+; Etiqueta de salto __L11
+L11 :
+; Traducir Quadruple - [CMP 1, 1, null]
+CMP #1, #1
+; Salto si cero a etiqueta __L12
+BZ /L12
+; Traducir Quadruple - [ASIG _T_3, 0, null]
+MOVE #0, #-9[.IY]
+BR /L13
+; Etiqueta de salto __L12
+L12 :
+; Traducir Quadruple - [ASIG _T_3, 1, null]
+MOVE #1, #-9[.IY]
+; Etiqueta de salto __L13
+L13 :
+; Traducir Quadruple - [CMP _T_3, 1, null]
+CMP #-9[.IY], #1
+; Salto si no cero a etiqueta __L15
+BNZ /L15
+WRSTR /cadena6
+BR /L14
+; Etiqueta de salto __L15
+L15 :
+WRSTR /cadena7
+; Etiqueta de salto __L14
+L14 :
+NOP
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "IF AND"
+cadena2:  DATA "A(TRUE):"
+cadena3:  DATA "TRUE"
+cadena4:  DATA "FALSE"
+cadena5:  DATA " A(FALSE):"
+cadena6:  DATA "TRUE"
+cadena7:  DATA "FALSE"

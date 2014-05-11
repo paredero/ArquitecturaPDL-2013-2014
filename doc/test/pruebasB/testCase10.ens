@@ -1,0 +1,133 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 41
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #20
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+SUB #-5[.IY], #-6[.IY]
+MOVE .A, #-8[.IY]
+; Traducir Quadruple - [ASIG Z, _T_0, null]
+MOVE #-8[.IY], #-7[.IY]
+SUB #-5[.IY], #-6[.IY]
+MOVE .A, #-9[.IY]
+; Traducir Quadruple - [ASIG A, _T_1, null]
+MOVE #-9[.IY], #-5[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #10
+MOVE [.A] , .R2 
+SUB .R2, #3
+MOVE .A, #-10[.IY]
+; Traducir Quadruple - [ASIG Z, _T_2, null]
+MOVE #-10[.IY], #-7[.IY]
+SUB #4, #-7[.IY]
+MOVE .A, #-11[.IY]
+; Traducir Quadruple - [ASIG E, _T_3, null]
+MOVE /0 , .R3 
+SUB .R3 , #11
+MOVE #-11[.IY], [.A]
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L2
+L2 :
+
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L4
+L4 :
+
+NOP
+MOVE /1 , .R3 
+SUB .R3 , #7
+MOVE [.A] , .R4 
+SUB #7, .R4
+MOVE .A, #-7[.IY]
+; Traducir Quadruple - [ASIG Y, _T_0, null]
+MOVE #-7[.IY], #-6[.IY]
+SUB #7, #-6[.IY]
+MOVE .A, #-8[.IY]
+; Traducir Quadruple - [ASIG X, _T_1, null]
+MOVE #-8[.IY], #-5[.IY]
+; Traducir Quadruple - [ASIG X, E, null]
+MOVE /0 , .R1 
+SUB .R1 , #11
+MOVE [.A] , .R2 
+MOVE .R2, #-5[.IY]
+; Traducir Quadruple - [ASIG E, X, null]
+MOVE /0 , .R3 
+SUB .R3 , #11
+MOVE #-5[.IY], [.A]
+WRINT #1
+L5 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L4: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /1
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L4 : 
+
+MOVE /0 , .R1 
+SUB .R1 , #9
+MOVE [.A] , .R2 
+SUB .R2, #1
+MOVE .A, #-8[.IY]
+; Traducir Quadruple - [ASIG X, _T_0, null]
+MOVE #-8[.IY], #-5[.IY]
+L3 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L2: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L2 : 
+
+SUB #-10[.IY], #3
+MOVE .A, #-18[.IY]
+; Traducir Quadruple - [ASIG W, _T_0, null]
+MOVE #-18[.IY], #-9[.IY]
+SUB #-5[.IY] , #0 
+MOVE [.A] , #-19[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO RR, DNI, _T_1]
+SUB .IY , #7
+MOVE #-19[.IY] , [.A]
+; Traducir Quadruple - [ASIG G, 1, null]
+MOVE #1, #-14[.IY]
+WRSTR /cadena1
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "RESULTADO:"

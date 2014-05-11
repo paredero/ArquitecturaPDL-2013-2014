@@ -1,0 +1,48 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #12
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG X, 0, null]
+MOVE #0, #-5[.IY]
+WRSTR /cadena2
+; Etiqueta de salto __L2
+L2 :
+WRINT #-5[.IY]
+ADD #-5[.IY], #1
+MOVE .A, #-9[.IY]
+; Traducir Quadruple - [ASIG X, _T_0, null]
+MOVE #-9[.IY], #-5[.IY]
+; Traducir Quadruple - [CMP 5, X, null]
+CMP #5, #-5[.IY]
+; Salto si negativo __L0
+BN /L0
+; Traducir Quadruple - [ASIG _T_1, 0, null]
+MOVE #0, #-10[.IY]
+BR /L1
+; Etiqueta de salto __L0
+L0 :
+; Traducir Quadruple - [ASIG _T_1, 1, null]
+MOVE #1, #-10[.IY]
+; Etiqueta de salto __L1
+L1 :
+; Traducir Quadruple - [CMP _T_1, 0, null]
+CMP #-10[.IY], #0
+; Salto si no cero a etiqueta __L3
+BNZ /L3
+BR /L2
+; Etiqueta de salto __L3
+L3 :
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "CRONTROL FLUJO REPEAT"
+cadena2:  DATA "X(012345):"

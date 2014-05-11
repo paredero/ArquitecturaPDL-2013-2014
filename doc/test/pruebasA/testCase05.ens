@@ -1,0 +1,48 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #7
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+; Traducir Quadruple - [ASIG A, 1, null]
+MOVE #1, #-5[.IY]
+WRSTR /cadena2
+; Traducir Quadruple - [CMP A, 0, null]
+CMP #-5[.IY], #0
+; Salto si no cero a etiqueta __L0
+BNZ /L0
+; Traducir Quadruple - [ASIG _T_0, 0, null]
+MOVE #0, #-6[.IY]
+BR /L1
+; Etiqueta de salto __L0
+L0 :
+; Traducir Quadruple - [ASIG _T_0, 1, null]
+MOVE #1, #-6[.IY]
+; Etiqueta de salto __L1
+L1 :
+; Traducir Quadruple - [CMP _T_0, 1, null]
+CMP #-6[.IY], #1
+; Salto si no cero a etiqueta __L3
+BNZ /L3
+WRSTR /cadena3
+BR /L2
+; Etiqueta de salto __L3
+L3 :
+WRSTR /cadena4
+; Etiqueta de salto __L2
+L2 :
+NOP
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "IF VARIABLES LOGICAS"
+cadena2:  DATA "TRUE:"
+cadena3:  DATA "TRUE"
+cadena4:  DATA "FALSE"

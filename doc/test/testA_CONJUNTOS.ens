@@ -1,0 +1,404 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 21
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #83
+MOVE .A , .SP
+MOVE .IY , /0
+;-- Definicion FUNCION/PROCEDIMIENTO 
+BR /FIN_L0
+L0 :
+
+NOP
+; Traducir Quadruple - [UNION_SET _T_0, C1, C2]
+MOVE /0 , .R1 
+SUB .R1 , #5
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #15
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-16[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #6
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #16
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-17[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #7
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #17
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-18[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #8
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #18
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-19[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #9
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #19
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-20[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #10
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #20
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-21[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #11
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #21
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-22[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #12
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #22
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-23[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #13
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #23
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-24[.IY]
+MOVE /0 , .R1 
+SUB .R1 , #14
+MOVE [.A] , .R2 
+MOVE /0 , .R3 
+SUB .R3 , #24
+MOVE [.A] , .R4 
+OR .R2 , .R4
+MOVE .A , #-25[.IY]
+
+; Traducir Quadruple - [ASIG_SET C3, _T_0, null]
+MOVE #-16[.IY] , #-6[.IY]
+MOVE #-17[.IY] , #-7[.IY]
+MOVE #-18[.IY] , #-8[.IY]
+MOVE #-19[.IY] , #-9[.IY]
+MOVE #-20[.IY] , #-10[.IY]
+MOVE #-21[.IY] , #-11[.IY]
+MOVE #-22[.IY] , #-12[.IY]
+MOVE #-23[.IY] , #-13[.IY]
+MOVE #-24[.IY] , #-14[.IY]
+MOVE #-25[.IY] , #-15[.IY]
+
+WRSTR /cadena1
+; Traducir Quadruple - [ASIG I, 1, null]
+MOVE /0 , .R3 
+SUB .R3 , #46
+MOVE #1, [.A]
+; Traducir Quadruple - [ASIG _T_2, 10, null]
+MOVE #10, #-27[.IY]
+; Etiqueta de salto __L5
+L5 :
+; Traducir Quadruple - [CMP _T_2, I, null]
+MOVE /0 , .R3 
+SUB .R3 , #46
+MOVE [.A] , .R4 
+CMP #-27[.IY], .R4
+; Salto si negativo __L6
+BN /L6
+; Traducir Quadruple - [CMP I, 1, null]
+MOVE /0 , .R1 
+SUB .R1 , #46
+MOVE [.A] , .R2 
+CMP .R2, #1
+; Salto si negativo __L2
+BN /L2
+; Traducir Quadruple - [CMP 10, I, null]
+MOVE /0 , .R3 
+SUB .R3 , #46
+MOVE [.A] , .R4 
+CMP #10, .R4
+; Salto si negativo __L2
+BN /L2
+; Traducir Quadruple - [IN_SET _T_1, C3, I]
+MOVE /0 , .R3 
+SUB .R3 , #46
+MOVE [.A] , .R4 
+ADD .R4 ,#5
+SUB .IY , .A 
+MOVE [.A] , #-26[.IY]
+BR /L3
+; Etiqueta de salto __L2
+L2 :
+; Traducir Quadruple - [ASIG _T_1, 0, null]
+MOVE #0, #-26[.IY]
+; Etiqueta de salto __L3
+L3 :
+; Traducir Quadruple - [CMP _T_1, 1, null]
+CMP #-26[.IY], #1
+; Salto si no cero a etiqueta __L4
+BNZ /L4
+; Escribimos un salto de linea
+WRSTR /cadena0
+MOVE /0 , .R1 
+SUB .R1 , #46
+MOVE [.A] , .R2 
+WRINT .R2
+WRSTR /cadena2
+; Etiqueta de salto __L4
+L4 :
+NOP
+MOVE /0 , .R1 
+SUB .R1 , #46
+MOVE [.A] , .R2 
+INC .R2 
+MOVE .R2 , [.A]
+BR /L5
+; Etiqueta de salto __L6
+L6 :
+; Traducir Quadruple - [ASIG J, 1500, null]
+MOVE #1500, #-5[.IY]
+L1 : 
+; Retorno Argumentos REFERENCIA 
+MOVE #-4[.IY] , .R5 
+MOVE .R5 , .PC 
+REF_L0: 
+; Retorno Subprograma 
+MOVE #0[.IY] , .R9
+MOVE #-1[.IY] , .R7
+MOVE #-2[.IY] , /0
+MOVE .IY , .SP
+MOVE .IX , .IY
+MOVE #-3[.IY], .IX
+MOVE .R7 , .PC
+FIN_L0 : 
+
+; Traducir Quadruple - [INICIAR_SET C1, 10, null]
+MOVE #0 , #-5[.IY]
+MOVE #0 , #-6[.IY]
+MOVE #0 , #-7[.IY]
+MOVE #0 , #-8[.IY]
+MOVE #0 , #-9[.IY]
+MOVE #0 , #-10[.IY]
+MOVE #0 , #-11[.IY]
+MOVE #0 , #-12[.IY]
+MOVE #0 , #-13[.IY]
+MOVE #0 , #-14[.IY]
+
+; Traducir Quadruple - [CARGAR_SET C1, 1, 4]
+MOVE #1 , #-5[.IY]
+MOVE #1 , #-6[.IY]
+MOVE #1 , #-7[.IY]
+MOVE #1 , #-8[.IY]
+
+; Traducir Quadruple - [INICIAR_SET C2, 10, null]
+MOVE #0 , #-15[.IY]
+MOVE #0 , #-16[.IY]
+MOVE #0 , #-17[.IY]
+MOVE #0 , #-18[.IY]
+MOVE #0 , #-19[.IY]
+MOVE #0 , #-20[.IY]
+MOVE #0 , #-21[.IY]
+MOVE #0 , #-22[.IY]
+MOVE #0 , #-23[.IY]
+MOVE #0 , #-24[.IY]
+
+; Traducir Quadruple - [CARGAR_SET C2, 5, 5]
+MOVE #1 , #-19[.IY]
+
+; Traducir Quadruple - [INICIAR_SET C3, 10, null]
+MOVE #0 , #-25[.IY]
+MOVE #0 , #-26[.IY]
+MOVE #0 , #-27[.IY]
+MOVE #0 , #-28[.IY]
+MOVE #0 , #-29[.IY]
+MOVE #0 , #-30[.IY]
+MOVE #0 , #-31[.IY]
+MOVE #0 , #-32[.IY]
+MOVE #0 , #-33[.IY]
+MOVE #0 , #-34[.IY]
+
+; Traducir Quadruple - [CARGAR_SET C3, 10, 10]
+MOVE #1 , #-34[.IY]
+
+; INICIO ARGUMENTOS FIN
+; Cargado argumento Quadruple - [ARGUMENTO 1, 5, null]
+; Llamada Funcion Quadruple - [CALL INICIALIZAR, 0, 0]
+MOVE .SP , .IX
+MOVE #1 , #-5[.IX]
+MOVE /0 , #-2[.IY]
+MOVE .IY , /0
+MOVE .IY , .IX
+MOVE .SP , .IY
+SUB .SP , #28
+MOVE .A , .SP
+MOVE #RET_L7 , #-1[.IY]
+MOVE .IX , #-3[.IY]
+MOVE #REF_L7 , #-4[.IY]
+BR /L0
+REF_L7:
+BR /REF_L0
+RET_L7: 
+NOP 
+
+; Traducir Quadruple - [UNION_SET _T_0, C1, C2]
+OR #-5[.IY] , #-15[.IY]
+MOVE .A , #-50[.IY]
+OR #-6[.IY] , #-16[.IY]
+MOVE .A , #-51[.IY]
+OR #-7[.IY] , #-17[.IY]
+MOVE .A , #-52[.IY]
+OR #-8[.IY] , #-18[.IY]
+MOVE .A , #-53[.IY]
+OR #-9[.IY] , #-19[.IY]
+MOVE .A , #-54[.IY]
+OR #-10[.IY] , #-20[.IY]
+MOVE .A , #-55[.IY]
+OR #-11[.IY] , #-21[.IY]
+MOVE .A , #-56[.IY]
+OR #-12[.IY] , #-22[.IY]
+MOVE .A , #-57[.IY]
+OR #-13[.IY] , #-23[.IY]
+MOVE .A , #-58[.IY]
+OR #-14[.IY] , #-24[.IY]
+MOVE .A , #-59[.IY]
+
+; Traducir Quadruple - [UNION_SET _T_1, C3, C4]
+OR #-25[.IY] , #-35[.IY]
+MOVE .A , #-60[.IY]
+OR #-26[.IY] , #-36[.IY]
+MOVE .A , #-61[.IY]
+OR #-27[.IY] , #-37[.IY]
+MOVE .A , #-62[.IY]
+OR #-28[.IY] , #-38[.IY]
+MOVE .A , #-63[.IY]
+OR #-29[.IY] , #-39[.IY]
+MOVE .A , #-64[.IY]
+OR #-30[.IY] , #-40[.IY]
+MOVE .A , #-65[.IY]
+OR #-31[.IY] , #-41[.IY]
+MOVE .A , #-66[.IY]
+OR #-32[.IY] , #-42[.IY]
+MOVE .A , #-67[.IY]
+OR #-33[.IY] , #-43[.IY]
+MOVE .A , #-68[.IY]
+OR #-34[.IY] , #-44[.IY]
+MOVE .A , #-69[.IY]
+
+; Traducir Quadruple - [UNION_SET _T_2, _T_0, _T_1]
+OR #-50[.IY] , #-60[.IY]
+MOVE .A , #-70[.IY]
+OR #-51[.IY] , #-61[.IY]
+MOVE .A , #-71[.IY]
+OR #-52[.IY] , #-62[.IY]
+MOVE .A , #-72[.IY]
+OR #-53[.IY] , #-63[.IY]
+MOVE .A , #-73[.IY]
+OR #-54[.IY] , #-64[.IY]
+MOVE .A , #-74[.IY]
+OR #-55[.IY] , #-65[.IY]
+MOVE .A , #-75[.IY]
+OR #-56[.IY] , #-66[.IY]
+MOVE .A , #-76[.IY]
+OR #-57[.IY] , #-67[.IY]
+MOVE .A , #-77[.IY]
+OR #-58[.IY] , #-68[.IY]
+MOVE .A , #-78[.IY]
+OR #-59[.IY] , #-69[.IY]
+MOVE .A , #-79[.IY]
+
+; Traducir Quadruple - [ASIG_SET C4, _T_2, null]
+MOVE #-70[.IY] , #-35[.IY]
+MOVE #-71[.IY] , #-36[.IY]
+MOVE #-72[.IY] , #-37[.IY]
+MOVE #-73[.IY] , #-38[.IY]
+MOVE #-74[.IY] , #-39[.IY]
+MOVE #-75[.IY] , #-40[.IY]
+MOVE #-76[.IY] , #-41[.IY]
+MOVE #-77[.IY] , #-42[.IY]
+MOVE #-78[.IY] , #-43[.IY]
+MOVE #-79[.IY] , #-44[.IY]
+
+; Traducir Quadruple - [ASIG Y, 100, null]
+MOVE #100, #-48[.IY]
+; Traducir Quadruple - [ASIG Z, 200, null]
+MOVE #200, #-49[.IY]
+ADD #-48[.IY], #-49[.IY]
+MOVE .A, #-80[.IY]
+; Traducir Quadruple - [ASIG X, _T_3, null]
+MOVE #-80[.IY], #-47[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena3
+WRINT #-47[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena4
+; Traducir Quadruple - [ASIG I, 1, null]
+MOVE #1, #-46[.IY]
+; Traducir Quadruple - [ASIG _T_5, 10, null]
+MOVE #10, #-82[.IY]
+; Etiqueta de salto __L11
+L11 :
+; Traducir Quadruple - [CMP _T_5, I, null]
+CMP #-82[.IY], #-46[.IY]
+; Salto si negativo __L12
+BN /L12
+; Traducir Quadruple - [CMP I, 1, null]
+CMP #-46[.IY], #1
+; Salto si negativo __L8
+BN /L8
+; Traducir Quadruple - [CMP 10, I, null]
+CMP #10, #-46[.IY]
+; Salto si negativo __L8
+BN /L8
+; Traducir Quadruple - [IN_SET _T_4, C4, I]
+ADD #-46[.IY] ,#34
+SUB .IY , .A 
+MOVE [.A] , #-81[.IY]
+BR /L9
+; Etiqueta de salto __L8
+L8 :
+; Traducir Quadruple - [ASIG _T_4, 0, null]
+MOVE #0, #-81[.IY]
+; Etiqueta de salto __L9
+L9 :
+; Traducir Quadruple - [CMP _T_4, 1, null]
+CMP #-81[.IY], #1
+; Salto si no cero a etiqueta __L10
+BNZ /L10
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRINT #-46[.IY]
+WRSTR /cadena5
+; Etiqueta de salto __L10
+L10 :
+NOP
+INC #-46[.IY]
+BR /L11
+; Etiqueta de salto __L12
+L12 :
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "C3 DEBE SER TRUE DEL 1 AL 5"
+cadena2:  DATA " ES TRUE"
+cadena3:  DATA "X VALE 300: "
+cadena4:  DATA "C4 DEL 1 AL 5 DEBEN SER TRUE Y EL 10:"
+cadena5:  DATA " ES TRUE"

@@ -1,0 +1,59 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #11
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+; Traducir Quadruple - [ASIG A, 0, null]
+MOVE #0, #-5[.IY]
+; Traducir Quadruple - [ASIG B, 0, null]
+MOVE #0, #-6[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena1
+; Etiqueta de salto __L2
+L2 :
+ADD #-5[.IY], #1
+MOVE .A, #-7[.IY]
+; Traducir Quadruple - [ASIG A, _T_0, null]
+MOVE #-7[.IY], #-5[.IY]
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena2
+WRINT #-5[.IY]
+ADD #-5[.IY], #-6[.IY]
+MOVE .A, #-8[.IY]
+; Traducir Quadruple - [CMP _T_1, 10, null]
+CMP #-8[.IY], #10
+; Salto si cero a etiqueta __L0
+BZ /L0
+; Traducir Quadruple - [ASIG _T_2, 0, null]
+MOVE #0, #-9[.IY]
+BR /L1
+; Etiqueta de salto __L0
+L0 :
+; Traducir Quadruple - [ASIG _T_2, 1, null]
+MOVE #1, #-9[.IY]
+; Etiqueta de salto __L1
+L1 :
+; Traducir Quadruple - [CMP _T_2, 0, null]
+CMP #-9[.IY], #0
+; Salto si no cero a etiqueta __L3
+BNZ /L3
+BR /L2
+; Etiqueta de salto __L3
+L3 :
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena3
+WRINT #-5[.IY]
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "ESTE BUCLE SE DEBE REPETIR 10 VECES: "
+cadena2:  DATA "VALOR DE A: "
+cadena3:  DATA "DESPUES DE SALIR BUCLE INDIVIDUAL "

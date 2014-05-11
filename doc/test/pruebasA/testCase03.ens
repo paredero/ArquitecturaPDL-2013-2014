@@ -1,0 +1,20 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #5
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+WRSTR /cadena1
+; Escribimos un salto de linea
+WRSTR /cadena0
+WRSTR /cadena2
+WRINT #1
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
+cadena1:  DATA "CONSTANTES"
+cadena2:  DATA "UNO(1):"

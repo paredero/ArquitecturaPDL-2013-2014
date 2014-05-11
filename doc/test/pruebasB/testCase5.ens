@@ -1,0 +1,21 @@
+; INICIO PROGRAMA PRINCIPAL pasQal 
+RES 11
+MOVE #65535, .SP
+MOVE .SP , .IY
+SUB  .SP , #11
+MOVE .A , .SP
+MOVE .IY , /0
+NOP
+SUB #-5[.IY] , #0 
+MOVE [.A] , #-10[.IY]
+; Traducir Quadruple - [ASIG_REGISTRO RR, DNI, _T_0]
+SUB .IY , #7
+MOVE #-10[.IY] , [.A]
+; Traducir Quadruple - [ASIG_REGISTRO RR, CASADO, 1]
+SUB .IY , #8
+MOVE #1 , [.A]
+HALT 
+
+; Inicio Cadenas de Texto
+
+cadena0:  DATA "\n"
