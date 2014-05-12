@@ -18,6 +18,15 @@ type Tpersona is record
 y,j: Integer;
 t: Boolean;
 p: Tpersona;
+suma: Boolean;
+
+function suma (a : Integer; b: Integer; c:Boolean) return Integer is
+begin
+
+  return a+b;   
+
+end suma;
+
         
 begin
 

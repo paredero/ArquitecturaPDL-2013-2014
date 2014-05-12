@@ -129,7 +129,7 @@ non terminal    acceso_registro;
 non terminal    expresion;
 non terminal    parametro;
 non terminal    llamada_subprograma;
-non terminal    lista_parametros;
+non terminal    ListaParametros lista_parametros;
 non terminal    subprograma;
 non terminal    funcion;
 non terminal    procedimiento;
@@ -350,10 +350,100 @@ declaracion_subprogramas ::= subprograma declaracion_subprogramas
 subprograma ::= funcion {:syntaxErrorManager.syntaxDebug("Declaracion funcion");:} 
     | procedimiento {:syntaxErrorManager.syntaxDebug("Declaracion procedimiento");:}; 
 
-funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS parametros_subprograma CIERRA_PARENTESIS RETURN tipo_primitivo IS declaraciones cuerpo_funcion;
+funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS RETURN tipo_primitivo:tipoRetorno
+    {:
+        String nombreFuncion = idFuncion.getLexema();
+        
+        // Comprueba si la funcion ha sido declarada
+        if (!(scopeManager.containsSymbol(nombreFuncion)
+            && scopeManager.containsType(nombreFuncion))) {
+            semanticErrorManager.semanticInfo("Declaracion de funcion " + nombreFuncion 
+                                            + " en linea " + idFuncion.getLine());
+            
+            ScopeIF scope = scopeManager.getCurrentScope();
+            TypeTableIF tablaTipos = scope.getTypeTable();
+            SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+            
+            //Creo un tipo y un simbolo para la funcion y los añado a la tabla
+            TypeFunction tipoFuncion = new TypeFunction(scope, nombreFuncion);
+            TypeIF tipoResultado = scopeManager.searchType((String)tipoRetorno);
+            semanticErrorManager.semanticInfo("Retorna " + tipoResultado.getName());
+            tipoFuncion.setTipoResultado(tipoResultado);
+            tablaTipos.addType(nombreFuncion, tipoFuncion);
+            SymbolFunction simboloFuncion = new SymbolFunction(scope, nombreFuncion, tipoFuncion);
+            tablaSimbolos.addSymbol(nombreFuncion, simboloFuncion);
+            
+            // Abro un nuevo ambito para la funcion, con una nueva tabla simbolos y tipos
+            semanticErrorManager.semanticInfo("Nuevo ambito " + nombreFuncion);
+            ScopeIF scopeFuncion = scopeManager.openScope(nombreFuncion);
+            TypeTableIF tablaTiposFuncion = scopeFuncion.getTypeTable();
+            SymbolTableIF tablaSimbolosFuncion = scopeFuncion.getSymbolTable();
+            
 
-parametros_subprograma ::= lista_nombres DOS_PUNTOS tipo PUNTO_COMA parametros_subprograma
-        | lista_nombres DOS_PUNTOS tipo
+            for (SymbolParameter parametro:((ListaParametros)listaParametros).getListaParametros()) {
+                semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
+                                + " de tipo " + parametro.getType().getName());
+                tablaSimbolosFuncion.addSymbol(parametro.getName(),parametro);
+                tipoFuncion.addTipoParametro(parametro.getType());
+            }
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " + nombreFuncion
+                                                    +" en linea: "+idFuncion.getLine());        }
+        
+    :} IS declaraciones cuerpo_funcion;
+
+parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO_COMA parametros_subprograma:listaParametrosPrevios
+	    {:
+		ScopeIF scope = scopeManager.getCurrentScope();
+		TypeTableIF tablaTipos = scope.getTypeTable();
+		SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+		
+		if (!scopeManager.containsType((String)tipo)) {
+		   semanticErrorManager.semanticFatalError("ERROR: tipo desconocido " + (String)tipo);
+		} else {
+		   ListaParametros listaParametros = new ListaParametros(((ListaParametros)listaParametrosPrevios).getListaParametros());
+		   // Para cada nombre creo un parametro
+		   for (Object objeto:((ListaObjetos)listaNombres).getVariables()) {
+		       String nombreParametro = (String)objeto;
+		       semanticErrorManager.semanticInfo("Declaracion de parametro " + nombreParametro + " tipo " + (String)tipo);
+		       if (scopeManager.containsSymbol(nombreParametro)) {
+		           semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + nombreParametro);
+	           } else {
+	               semanticErrorManager.semanticDebug("Parametro valida, crea el simbolo");
+	               SymbolParameter sP = new SymbolParameter(scope, nombreParametro, tablaTipos.getType((String)tipo));
+	               tablaSimbolos.addSymbol(nombreParametro, sP);
+	               listaParametros.getListaParametros().add(sP);
+	           }
+	        }
+	        RESULT = listaParametros;
+	    }	    
+	    :}
+        | lista_nombres:listaNombres DOS_PUNTOS tipo:tipo 
+        {:
+            ScopeIF scope = scopeManager.getCurrentScope();
+            TypeTableIF tablaTipos = scope.getTypeTable();
+            SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+            
+            if (!scopeManager.containsType((String)tipo)) {
+                semanticErrorManager.semanticFatalError("ERROR: tipo desconocido " + (String)tipo);
+            } else {
+	            ListaParametros listaParametros = new ListaParametros();
+	            // Para cada nombre creo un parametro
+	            for (Object objeto:((ListaObjetos)listaNombres).getVariables()) {
+	               String nombreParametro = (String)objeto;
+	                semanticErrorManager.semanticInfo("Declaracion de parametro " + nombreParametro);
+	                if (scopeManager.containsSymbol(nombreParametro)) {
+	                   semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + nombreParametro);
+	                } else {
+	                   semanticErrorManager.semanticDebug("Parametro valida, crea el simbolo");
+	                   SymbolParameter sP = new SymbolParameter(scope, nombreParametro, tablaTipos.getType((String)tipo));
+	                   tablaSimbolos.addSymbol(nombreParametro, sP);
+	                   listaParametros.getListaParametros().add(sP);
+	                }
+	            }
+	            RESULT = listaParametros;
+            }        
+        :}
         | vacio;
         
 procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_subprograma CIERRA_PARENTESIS  IS declaraciones cuerpo;
