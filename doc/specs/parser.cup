@@ -189,6 +189,9 @@ cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
         TypeSimple tipoEntero = new TypeSimple(scope);
         tipoEntero.setName("INTEGER");
         tablaTipos.addType(tipoEntero);
+        TypeSimple tipoString = new TypeSimple(scope);
+        tipoString.setName("STRING");
+        tablaTipos.addType(tipoString);        
     :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de cabecera."); :};
 
@@ -201,7 +204,8 @@ tipo_primitivo ::= INTEGER:t {: RESULT="INTEGER"; :}
         
 valor ::= NUMERO {: RESULT="INTEGER"; :}
         | TRUE {: RESULT="BOOLEAN"; :}
-        | FALSE {: RESULT="BOOLEAN"; :};             
+        | FALSE {: RESULT="BOOLEAN"; :}
+        | CADENA {:RESULT="STRING":};             
 
 declaraciones ::= declaracion_constantes;
 
@@ -347,8 +351,8 @@ variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
 declaracion_subprogramas ::= subprograma declaracion_subprogramas 
         | vacio;
         
-subprograma ::= funcion {:syntaxErrorManager.syntaxDebug("Declaracion funcion");:} 
-    | procedimiento {:syntaxErrorManager.syntaxDebug("Declaracion procedimiento");:}; 
+subprograma ::= funcion
+    | procedimiento; 
 
 funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS RETURN tipo_primitivo:tipoRetorno
     {:
@@ -446,7 +450,46 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
         :}
         | vacio;
         
-procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_subprograma CIERRA_PARENTESIS  IS declaraciones cuerpo;
+procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS
+    {:
+        // El procedimiento es igual que la funcion, pero crea un tipo procedure que no tiene retorno
+        String nombreProcedimiento = idProcedimiento.getLexema();
+        
+        // Comprueba si la funcion ha sido declarada
+        if (!(scopeManager.containsSymbol(nombreProcedimiento)
+            && scopeManager.containsType(nombreProcedimiento))) {
+            semanticErrorManager.semanticInfo("Declaracion de procedimiento " + nombreProcedimiento 
+                                            + " en linea " + idProcedimiento.getLine());
+            
+            ScopeIF scope = scopeManager.getCurrentScope();
+            TypeTableIF tablaTipos = scope.getTypeTable();
+            SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+            
+            //Creo un tipo y un simbolo para el procedimiento y los añado a la tabla
+            TypeProcedure tipoProcedimiento = new TypeProcedure(scope, nombreProcedimiento);
+            
+            tablaTipos.addType(nombreProcedimiento, tipoProcedimiento);
+            SymbolProcedure simboloProcedimiento = new SymbolProcedure(scope, nombreProcedimiento, tipoProcedimiento);
+            tablaSimbolos.addSymbol(nombreProcedimiento, simboloProcedimiento);
+            
+            // Abro un nuevo ambito para el procedimiento, con una nueva tabla simbolos y tipos
+            semanticErrorManager.semanticInfo("Nuevo ambito " + nombreProcedimiento);
+            ScopeIF scopeProcedimiento = scopeManager.openScope(nombreProcedimiento);
+            TypeTableIF tablaTiposProcedimiento = scopeFuncion.getTypeTable();
+            SymbolTableIF tablaSimbolosProcedimiento = scopeFuncion.getSymbolProcedimiento();
+            
+            // Almaceno los parametros en la tabla de simbolos y la de tipos
+            for (SymbolParameter parametro:((ListaParametros)listaParametros).getListaParametros()) {
+                semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
+                                + " de tipo " + parametro.getType().getName());
+                tablaSimbolosProcedimiento.addSymbol(parametro.getName(),parametro);
+                tipoProcedimiento.addTipoParametro(parametro.getType());
+            }
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " + nombreFuncion
+                                                    +" en linea: "+idFuncion.getLine());        }
+        
+    :}  IS declaraciones cuerpo;
 
 cuerpo_funcion::= BEGIN lista_sentencias_funcion END IDENTIFICADOR PUNTO_COMA;
 
@@ -483,31 +526,162 @@ sentencia_for ::=  FOR expresion IN expresion DELIMITADOR_RANGO expresion LOOP l
         
 sentencia_asignacion ::= referencia ASIGNACION expresion;
 
-referencia ::= IDENTIFICADOR 
-        | acceso_registro;
 
-acceso_registro ::= IDENTIFICADOR ACCESO acceso_registro
-        | IDENTIFICADOR ACCESO IDENTIFICADOR;
         
 /*******************************************************************************
     CAMBIO: TRUE,FALSE pasan a valor_booleano
     NUMERO pasa a valor_numerico
 *******************************************************************************/
-expresion ::= expresion PLUS expresion
-        | expresion MAYOR expresion
-        | expresion IGUAL expresion
-        | expresion OR expresion      
-        | ABRE_PARENTESIS expresion CIERRA_PARENTESIS
-        | llamada_subprograma
-        | referencia
-        | CADENA
-        | valor;
+expresion ::= expresion:exp1 PLUS:operador expresion:exp2
+    {:
+        Expresion e1 = (Expresion)exp1;
+        Expresion e2 = (Expresion)exp2;
+        TypeIF type1 = e1.getType();
+        TypeIF type2 = e2.getType();
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " + " + type2.getType());
+        if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
+            //OK
+            TypeIF tipoExpresion = type1;   // No hay conversion de tipos
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            semanticErrorManager.semanticDebug("Expresion " + lexema);
+            Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            RESULT = expresionResultado;
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
+                          + e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema()); 
+        }
+    :}
+        | expresion:exp1 MAYOR:operador expresion:exp2
+    {:
+        Expresion e1 = (Expresion)exp1;
+        Expresion e2 = (Expresion)exp2;
+        TypeIF type1 = e1.getType();
+        TypeIF type2 = e2.getType();
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " > " + type2.getType());
+        if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
+            //OK
+            TypeIF tipoExpresion = expresion.cast(operador);   // Aqui si hay conversion de tipos
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            semanticErrorManager.semanticDebug("Expresion " + lexema);
+            Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            RESULT = expresionResultado;
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
+                          + e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema()); 
+        }
+    :}            
+        | expresion:exp1 IGUAL:operador expresion:exp2
+    {:
+        Expresion e1 = (Expresion)exp1;
+        Expresion e2 = (Expresion)exp2;
+        TypeIF type1 = e1.getType();
+        TypeIF type2 = e2.getType();
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " == " + type2.getType());
+        if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
+            //OK
+            TypeIF tipoExpresion = expresion.cast(operador);   // Aqui si hay conversion de tipos
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            semanticErrorManager.semanticDebug("Expresion " + lexema);
+            Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            RESULT = expresionResultado;
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
+                          + e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema()); 
+        }
+    :}         
+        | expresion:exp1 OR:operador expresion:exp2 
+    {:
+        Expresion e1 = (Expresion)exp1;
+        Expresion e2 = (Expresion)exp2;
+        TypeIF type1 = e1.getType();
+        TypeIF type2 = e2.getType();
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " OR " + type2.getType());
+        if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
+            //OK
+            TypeIF tipoExpresion = expresion.cast(operador);
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            semanticErrorManager.semanticDebug("Expresion " + lexema);
+            Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            RESULT = expresionResultado;
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
+                          + e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema()); 
+        }
+    :}            
+        | ABRE_PARENTESIS:a expresion:exp CIERRA_PARENTESIS:b
+{:
+    Expresion e = (Expresion)exp;
+    TypeIF tipoExpresion = e.getType();
+    String lexema = a.getLexema() + " " + e.getLexema() + " " + b.getLexema():
+    semanticErrorManager.semanticDebug("Expresion " + lexema);
+    Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+    RESULT = expresionResultado;
+:}        
+        | llamada_subprograma:objLlamada
+{:  
+    Llamada l = (Llamada)objLlamada;
+    if (l.getType() instanceOf TypeFunction) {
+        Expresion expresionResultado = new Expresion(l.getType().getTipoResultado(), l.getLexema());
+        RESULT expresionResultado;
+    } else {
+       semanticErrorManager.semanticFatalError("ERROR: uso de un procedimiento en una expresion " + l.getLine() + " " + l.getLexema()); 
+    }
+:}        
+        | referencia:ref
+{:
+    Referencia r = (Referencia)ref;
+    TypeIF tipo = r.getType();
+    String lexema = r.getLexema();
+    RESULT = new Expresion(tipo, lexema);
+:}              
+        | valor:valor
+{:
+    TypeIF tipo = scopeManager.searchType((String)valor);
+    Expresion expresionResultado = new Expresion(tipo, (String)valor);
+    RESULT = expresionResultado;
+:};
+
+referencia ::= IDENTIFICADOR:id 
+{:
+    String name = id.getLexema();
+    if (scopeManager.contains(name)) {
+        SymbolIF simbolo = scopeManager.searchSymbol(name);
+        TypeIF tipo = simbolo.getType();
+        Referencia r = new Referencia(tipo, name); 
+        RESULT = r;
+    } else {
+       semanticErrorManager.semanticFatalError("ERROR: uso de una referencia desconocida " + id.getLine() + " " + name);         
+    }
+:}
+        | acceso_registro:a
+{:
+    RESULT = (Referencia)a;
+:};
+
+acceso_registro ::= referencia:objRegistro ACCESO identificador:campo
+{:
+    Referencia registro = (Referencia)objRegistro;
+    String nombreRegistro = registro.getNombre();
+    String nombreCampo = campo.getLexema();
+    TypeIf tipoRegistro = registro.getType();
+    if (tipoRegistro instanceof TypeRecord) {
+        TypeRecord tRec = (TypeRecord)tipoRegistro;
+        if (tRec.containsCampo(nombreCampo)) {
+            TypeIF innerType = tRec.getCampo(nombreCampo);
+            RESULT = new Referencia(innerType, nombreRegistro + "." + nombreCampo);
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: campo no declarado " + nombreCampo);
+        }
+    } else {
+        semanticErrorManager.semanticFatalError("ERROR: tipo no declarado " + tipoRegistro.getName());
+    }
+:};
 
 sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
 
-parametro ::= CADENA 
-        | NUMERO 
-        | referencia;
+parametro ::= CADENA:c 
+        | NUMERO:n
+        | referencia:r;
 
 llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS lista_parametros CIERRA_PARENTESIS;
 

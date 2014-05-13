@@ -86,4 +86,8 @@ public class TypeRecord
         this.getTablaCampos().put(nombre, tipo);
     
     }
+
+    public SymbolIF getCampo(String nombre) {
+    	return tablaCampos.get(nombre);
+    }
 }

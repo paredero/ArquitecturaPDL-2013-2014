@@ -1,7 +1,11 @@
 package compiler.semantic.type;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeProcedure.
@@ -13,7 +17,10 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 public class TypeProcedure
     extends TypeBase
 {   
-   /**
+	// Almacena el listado de parametros
+   private List<TypeIF> tipoParametro;
+
+/**
      * Constructor for TypeProcedure.
      * @param scope The declaration scope.
      */
@@ -42,4 +49,25 @@ public class TypeProcedure
         // TODO: Student work
         return 1;
     }
+
+	/**
+	 * @return the tipoParametro
+	 */
+	public List<TypeIF> getTipoParametro() {
+		return tipoParametro;
+	}
+
+	/**
+	 * @param tipoParametro the tipoParametro to set
+	 */
+	public void setTipoParametro(List<TypeIF> tipoParametro) {
+		this.tipoParametro = tipoParametro;
+	}
+
+	public void addTipoParametro(TypeIF tipoParametro) {
+		if (this.tipoParametro == null) {
+			this.tipoParametro = new ArrayList<TypeIF>();
+		}
+		this.tipoParametro.add(tipoParametro);
+	}
 }
