@@ -110,7 +110,7 @@ non terminal    declaracion_variables;
 non terminal    declaracion_subprogramas;
 non terminal    lista_nombres;
 non terminal    constante;
-non terminal    valor;
+non terminal    Valor   valor;
 
 non terminal    registro;
 non terminal    ListaObjetos lista_campos;
@@ -124,7 +124,7 @@ non terminal    sentencia_entrada_salida;
 non terminal    sentencia_asignacion;
 non terminal    sentencia_if;
 non terminal    sentencia_for;
-non terminal    referencia;
+non terminal    Referencia referencia;
 non terminal    acceso_registro;
 non terminal    expresion;
 non terminal    parametro;
@@ -184,13 +184,13 @@ cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
         //******************* Ahora insertar tipos basicos en la tabla
         TypeTableIF tablaTipos = scope.getTypeTable();
         TypeSimple tipoBooleano = new TypeSimple(scope);
-        tipoBooleano.setName("BOOLEAN");
+        tipoBooleano.setName(TipoSimple.LOGICO);
         tablaTipos.addType(tipoBooleano);
         TypeSimple tipoEntero = new TypeSimple(scope);
-        tipoEntero.setName("INTEGER");
+        tipoEntero.setName(TipoSimple.NUMERO);
         tablaTipos.addType(tipoEntero);
         TypeSimple tipoString = new TypeSimple(scope);
-        tipoString.setName("STRING");
+        tipoString.setName(TipoSimple.CADENA);
         tablaTipos.addType(tipoString);        
     :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de cabecera."); :};
@@ -202,10 +202,26 @@ tipo ::= IDENTIFICADOR:id  {: RESULT=id.getLexema();:}
 tipo_primitivo ::= INTEGER:t {: RESULT="INTEGER"; :} 
         | BOOLEAN:t {: RESULT="BOOLEAN"; :};
         
-valor ::= NUMERO {: RESULT="INTEGER"; :}
-        | TRUE {: RESULT="BOOLEAN"; :}
-        | FALSE {: RESULT="BOOLEAN"; :}
-        | CADENA {:RESULT="STRING":};             
+valor ::= NUMERO:n
+{:
+    Valor v = new Valor(scopeManager.getType(TipoSimple.NUMERO), n.getLexema(), n.getLine());
+    RESULT =v; 
+:}
+        | TRUE:t 
+{: 
+    Valor v = new Valor(scopeManager.getType(TipoSimple.LOGICO), t.getLexema(), t.getLine());
+    RESULT =v; 
+:}
+        | FALSE:f 
+{: 
+    Valor v = new Valor(scopeManager.getType(TipoSimple.LOGICO), f.getLexema(), f.getLine());
+    RESULT =v; 
+:}
+        | CADENA:c 
+{:
+    Valor v = new Valor(scopeManager.getType(TipoSimple.CADENA), c.getLexema(), c.getLine());
+    RESULT =v; 
+:};             
 
 declaraciones ::= declaracion_constantes;
 
@@ -507,24 +523,7 @@ cuerpo ::=  BEGIN lista_sentencias END IDENTIFICADOR PUNTO_COMA
         scopeManager.closeScope();
     :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en cuerpo de procedimiento."); :};
-        
-lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias 
-        |  vacio;
-
-sentencia ::= sentencia_entrada_salida 
-        | sentencia_if
-        | sentencia_for
-        | sentencia_asignacion
-        | llamada_subprograma;
-
-sentencia_if ::= IF expresion THEN lista_sentencias END IF
-        | IF expresion THEN lista_sentencias ELSE lista_sentencias END IF
-        | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia if"); :};
-
-
-sentencia_for ::=  FOR expresion IN expresion DELIMITADOR_RANGO expresion LOOP lista_sentencias END LOOP;      
-        
-sentencia_asignacion ::= referencia ASIGNACION expresion;
+ 
 
 
         
@@ -627,9 +626,8 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
        semanticErrorManager.semanticFatalError("ERROR: uso de un procedimiento en una expresion " + l.getLine() + " " + l.getLexema()); 
     }
 :}        
-        | referencia:ref
+        | referencia:r
 {:
-    Referencia r = (Referencia)ref;
     TypeIF tipo = r.getType();
     String lexema = r.getLexema();
     RESULT = new Expresion(tipo, lexema);
@@ -655,12 +653,11 @@ referencia ::= IDENTIFICADOR:id
 :}
         | acceso_registro:a
 {:
-    RESULT = (Referencia)a;
+    RESULT = a;
 :};
 
-acceso_registro ::= referencia:objRegistro ACCESO identificador:campo
+acceso_registro ::= referencia:registro ACCESO identificador:campo
 {:
-    Referencia registro = (Referencia)objRegistro;
     String nombreRegistro = registro.getNombre();
     String nombreCampo = campo.getLexema();
     TypeIf tipoRegistro = registro.getType();
@@ -677,13 +674,90 @@ acceso_registro ::= referencia:objRegistro ACCESO identificador:campo
     }
 :};
 
-sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
+       
+lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias 
+        |  vacio;
 
-parametro ::= CADENA:c 
-        | NUMERO:n
-        | referencia:r;
+sentencia ::= sentencia_entrada_salida 
+        | sentencia_if
+        | sentencia_for
+        | sentencia_asignacion
+        | llamada_subprograma;
 
-llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS lista_parametros CIERRA_PARENTESIS;
+sentencia_if ::= IF expresion:objExp THEN lista_sentencias END IF
+{:
+    Expresion expCondicion = (Expresion)objExp;
+    if (!expCondicion.getType().getName().equalsIgnoreCase("BOOLEAN") {
+        semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
+    }
+:}
+        | IF expresion:objExp THEN lista_sentencias ELSE lista_sentencias END IF
+{:
+    Expresion expCondicion = (Expresion)objExp;
+    if (!expCondicion.getType().getName().equalsIgnoreCase("BOOLEAN") {
+        semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
+    }
+:}        
+        | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia if"); :};
+
+
+sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:objExpIni DELIMITADOR_RANGO expresion:objExpFin LOOP lista_sentencias END LOOP
+{:
+    //Indice debe corresponder con una variable de tipo entero
+    List<SymbolIF> posiblesIndices = scopeManager.searchSymbols(indice.getLexema(), SymbolVariable.class);
+    if (posiblesIndices == null || posiblesIndices.length() == 0) {
+        semanticErrorManager.semanticFatalError("ERROR: simbolo no declarado en indice, linea: " + indice.getLine());
+    } else {
+        // Compruebo que el tipo de la variable sea entero
+        SymbolVariable varIndex = null;
+        TypeSimple tipoEntero = scopeManager.findType("INTEGER");
+        for (SymbolIF posibleIndex:poliblesIndices) {
+            if (posibleIndex.getType().equals(tipoEntero)) {
+                varIndex = posibleIndex;
+            }
+        }
+        if (varIndex == null) {
+            semanticErrorManager.semanticFatalError("ERROR: el indice debe ser una variable de tipo entero, linea: " + indice.getLine());
+        } else {
+            Expresion expInicio = (Expresion)objExpInicio;
+            Expresion expFin = (Expresion)objExpFin;
+            if (!expInicio.getType().equals(tipoEntero) || !expFin.getType().equals(tipoEntero)) {
+                semanticErrorManager.semanticFatalError("ERROR: el rango de la sentencia for debe ser expresiones de tipo entero, linea: " + indice.getLine());
+            }
+        }
+    }
+:};      
+        
+sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:objExp
+{:
+    // Debo comprobar que tanto referencia como expresion coinciden en tipo y que este es uno de los tipos simples
+    if (!(referencia.getType() instanceof TypeSimple)) {
+        semanticErrorManager.semanticFatalError("ERROR: no se permiten asignaciones a tipos compuestos, linea: " + referencia.getLine());
+    } else if (!referencia.getType().equals(expresion.getType())) {
+        semanticErrorManager.semanticFatalError("ERROR: tipos distintos en asignacion, linea: " + referencia.getLine()); 
+    }
+:};
+
+sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro:param CIERRA_PARENTESIS
+{:
+    Parametro parametro = (Parametro)param;
+    if (!parametro.getType() instanceof TypeSimple) {
+        semanticErrorManager.semanticFatalError("ERROR: parametros no compatibles en put_line " + parametro.getLexema() + ", linea: " + parametro.getLine());
+    }
+:};
+
+parametro ::= valor:valor
+{:
+    Parametro parametro =  new Parametro(valor.getType(), valor.getLexema(), valor.getLine());
+    RESULT = parametro;
+:}
+        | referencia:referencia
+{:
+    Parametro parametro = new Parametro(referencia.getType(),referencia.getLexema(),referencia.getLine());
+    RESULT = parametro;
+:};
+
+llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:objListaParam CIERRA_PARENTESIS;
 
 lista_parametros ::= expresion SEPARADOR_COMA lista_parametros
         | expresion

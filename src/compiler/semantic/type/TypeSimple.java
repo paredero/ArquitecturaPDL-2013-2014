@@ -16,6 +16,9 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 public class TypeSimple
     extends TypeBase
 {
+	public static String NUMERO = "INTEGER";
+	public static String LOGICO = "BOOLEAN";
+	public static String CADENA = "STRING";
     
     /**
      * Constructor for TypeSimple.
