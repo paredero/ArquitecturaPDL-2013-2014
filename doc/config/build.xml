@@ -103,7 +103,9 @@
 	<!-- Final Test -->
 	<target name="finalTest" depends="build"> 		
 		<java classpath="${classpath}" classname="compiler.test.FinalTestCase" fork="true">			
-			<arg file="${test-file}"/>			
+			<arg file="${test-file}"/>		
+			<!-- <jvmarg value="-Xdebug" />
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />	-->
 		</java>		
 	</target>  
 

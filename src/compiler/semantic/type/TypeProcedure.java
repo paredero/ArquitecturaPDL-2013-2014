@@ -18,7 +18,7 @@ public class TypeProcedure
     extends TypeBase
 {   
 	// Almacena el listado de parametros
-   private List<TypeIF> tipoParametro;
+   private List<TypeIF> tipoParametros;
 
 /**
      * Constructor for TypeProcedure.
@@ -53,21 +53,21 @@ public class TypeProcedure
 	/**
 	 * @return the tipoParametro
 	 */
-	public List<TypeIF> getTipoParametro() {
-		return tipoParametro;
+	public List<TypeIF> getTipoParametros() {
+		return tipoParametros;
 	}
 
 	/**
 	 * @param tipoParametro the tipoParametro to set
 	 */
-	public void setTipoParametro(List<TypeIF> tipoParametro) {
-		this.tipoParametro = tipoParametro;
+	public void setTipoParametros(List<TypeIF> tipoParametros) {
+		this.tipoParametros = tipoParametros;
 	}
 
 	public void addTipoParametro(TypeIF tipoParametro) {
-		if (this.tipoParametro == null) {
-			this.tipoParametro = new ArrayList<TypeIF>();
+		if (this.tipoParametros == null) {
+			this.tipoParametros = new ArrayList<TypeIF>();
 		}
-		this.tipoParametro.add(tipoParametro);
+		this.tipoParametros.add(tipoParametro);
 	}
 }

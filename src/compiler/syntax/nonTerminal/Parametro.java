@@ -3,17 +3,17 @@ package compiler.syntax.nonTerminal;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class Parametro extends NonTerminal {
-	private TypeIF tipo;
+	private TypeIF type;
 	private String lexema;
 	private Integer line;
 	/**
-	 * @param tipo
+	 * @param type
 	 * @param lexema
 	 * @param line
 	 */
-	public Parametro(TypeIF tipo, String lexema, Integer line) {
+	public Parametro(TypeIF type, String lexema, Integer line) {
 		super();
-		this.tipo = tipo;
+		this.type = type;
 		this.lexema = lexema;
 		this.line = line;
 	}
@@ -27,14 +27,14 @@ public class Parametro extends NonTerminal {
 	/**
 	 * @return the tipo
 	 */
-	public TypeIF getTipo() {
-		return tipo;
+	public TypeIF getType() {
+		return type;
 	}
 	/**
-	 * @param tipo the tipo to set
+	 * @param type the tipo to set
 	 */
-	public void setTipo(TypeIF tipo) {
-		this.tipo = tipo;
+	public void setType(TypeIF type) {
+		this.type = type;
 	}
 	/**
 	 * @return the lexema

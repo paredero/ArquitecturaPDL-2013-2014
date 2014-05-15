@@ -5,7 +5,7 @@ import java.util.List;
 
 import compiler.semantic.symbol.SymbolParameter;
 
-public class ListaParametros extends NonTerminal {
+public class ListaParametrosDeclaracion extends NonTerminal {
 	private List<SymbolParameter> listaParametros;
 
 	/**
@@ -25,7 +25,7 @@ public class ListaParametros extends NonTerminal {
 	/**
 	 * @param listaParametros
 	 */
-	public ListaParametros(List<SymbolParameter> listaParametros) {
+	public ListaParametrosDeclaracion(List<SymbolParameter> listaParametros) {
 		super();
 		this.listaParametros = listaParametros;
 	}
@@ -33,7 +33,7 @@ public class ListaParametros extends NonTerminal {
 	/**
 	 * 
 	 */
-	public ListaParametros() {
+	public ListaParametrosDeclaracion() {
 		super();
 		this.listaParametros = new ArrayList<SymbolParameter>();
 	}

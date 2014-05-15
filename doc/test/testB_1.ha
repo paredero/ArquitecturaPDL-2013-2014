@@ -15,7 +15,7 @@ type Tpersona is record
     
 
 -- Declaracion de variables    
-y,j: Integer;
+y,j,k: Integer;
 t: Boolean;
 p: Tpersona;
 suma: Boolean;
@@ -33,7 +33,7 @@ begin
       if t then
                 Put_line("cierto");
       end if;
-
+    k := suma(y,j,t);
 Put_line("hola");
 Put_line("hola");
 end testCase01;

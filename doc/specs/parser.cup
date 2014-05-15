@@ -125,11 +125,11 @@ non terminal    sentencia_asignacion;
 non terminal    sentencia_if;
 non terminal    sentencia_for;
 non terminal    Referencia referencia;
-non terminal    acceso_registro;
-non terminal    expresion;
-non terminal    parametro;
-non terminal    llamada_subprograma;
-non terminal    ListaParametros lista_parametros;
+non terminal    Referencia acceso_registro;
+non terminal    Expresion expresion;
+non terminal    Parametro parametro;
+non terminal    Expresion llamada_subprograma;
+non terminal    ListaParametrosEjecucion lista_parametros;
 non terminal    subprograma;
 non terminal    funcion;
 non terminal    procedimiento;
@@ -184,42 +184,42 @@ cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
         //******************* Ahora insertar tipos basicos en la tabla
         TypeTableIF tablaTipos = scope.getTypeTable();
         TypeSimple tipoBooleano = new TypeSimple(scope);
-        tipoBooleano.setName(TipoSimple.LOGICO);
+        tipoBooleano.setName(TypeSimple.LOGICO);
         tablaTipos.addType(tipoBooleano);
         TypeSimple tipoEntero = new TypeSimple(scope);
-        tipoEntero.setName(TipoSimple.NUMERO);
+        tipoEntero.setName(TypeSimple.NUMERO);
         tablaTipos.addType(tipoEntero);
         TypeSimple tipoString = new TypeSimple(scope);
-        tipoString.setName(TipoSimple.CADENA);
+        tipoString.setName(TypeSimple.CADENA);
         tablaTipos.addType(tipoString);        
     :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de cabecera."); :};
 
 tipo ::= IDENTIFICADOR:id  {: RESULT=id.getLexema();:}
-        | INTEGER:t {: RESULT="INTEGER"; :} 
-        | BOOLEAN:t {: RESULT="BOOLEAN"; :};
+        | INTEGER:t {: RESULT=TypeSimple.NUMERO; :} 
+        | BOOLEAN:t {: RESULT=TypeSimple.LOGICO; :};
 
-tipo_primitivo ::= INTEGER:t {: RESULT="INTEGER"; :} 
-        | BOOLEAN:t {: RESULT="BOOLEAN"; :};
+tipo_primitivo ::= INTEGER:t {: RESULT=TypeSimple.NUMERO; :} 
+        | BOOLEAN:t {: RESULT=TypeSimple.LOGICO; :};
         
 valor ::= NUMERO:n
 {:
-    Valor v = new Valor(scopeManager.getType(TipoSimple.NUMERO), n.getLexema(), n.getLine());
+    Valor v = new Valor(scopeManager.searchType(TypeSimple.NUMERO), n.getLexema(), n.getLine());
     RESULT =v; 
 :}
         | TRUE:t 
 {: 
-    Valor v = new Valor(scopeManager.getType(TipoSimple.LOGICO), t.getLexema(), t.getLine());
+    Valor v = new Valor(scopeManager.searchType(TypeSimple.LOGICO), t.getLexema(), t.getLine());
     RESULT =v; 
 :}
         | FALSE:f 
 {: 
-    Valor v = new Valor(scopeManager.getType(TipoSimple.LOGICO), f.getLexema(), f.getLine());
+    Valor v = new Valor(scopeManager.searchType(TypeSimple.LOGICO), f.getLexema(), f.getLine());
     RESULT =v; 
 :}
         | CADENA:c 
 {:
-    Valor v = new Valor(scopeManager.getType(TipoSimple.CADENA), c.getLexema(), c.getLine());
+    Valor v = new Valor(scopeManager.searchType(TypeSimple.CADENA), c.getLexema(), c.getLine());
     RESULT =v; 
 :};             
 
@@ -244,11 +244,10 @@ constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v 
         } else {
             // Creo la constante en el ambito
             SymbolTableIF tablaSimbolos = scope.getSymbolTable();
-            String tipo = (String)v;
-            SymbolConstant simboloCte = new SymbolConstant(scope,nombreConstante,scopeManager.searchType(tipo));
+            SymbolConstant simboloCte = new SymbolConstant(scope,nombreConstante,v.getType());
             // La guardo en la tabla de simbolos
             tablaSimbolos.addSymbol(nombreConstante, simboloCte);
-            semanticErrorManager.semanticInfo("Constante " + nombreConstante + " " + tipo + " guardada en la tabla de simbolos");
+            semanticErrorManager.semanticInfo("Constante " + nombreConstante + " guardada en la tabla de simbolos");
         }
     :};
     
@@ -371,46 +370,48 @@ subprograma ::= funcion
     | procedimiento; 
 
 funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS RETURN tipo_primitivo:tipoRetorno
-    {:
-        String nombreFuncion = idFuncion.getLexema();
+{:
+    String nombreFuncion = idFuncion.getLexema();
         
-        // Comprueba si la funcion ha sido declarada
-        if (!(scopeManager.containsSymbol(nombreFuncion)
-            && scopeManager.containsType(nombreFuncion))) {
-            semanticErrorManager.semanticInfo("Declaracion de funcion " + nombreFuncion 
-                                            + " en linea " + idFuncion.getLine());
+    // Comprueba si la funcion ha sido declarada
+    if (!(scopeManager.containsSymbol(nombreFuncion)
+        && scopeManager.containsType(nombreFuncion))) {
+        semanticErrorManager.semanticInfo("Declaracion de funcion " + nombreFuncion 
+            + " en linea " + idFuncion.getLine());
             
-            ScopeIF scope = scopeManager.getCurrentScope();
-            TypeTableIF tablaTipos = scope.getTypeTable();
-            SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+        ScopeIF scope = scopeManager.getCurrentScope();
+        TypeTableIF tablaTipos = scope.getTypeTable();
+        SymbolTableIF tablaSimbolos = scope.getSymbolTable();
             
-            //Creo un tipo y un simbolo para la funcion y los añado a la tabla
-            TypeFunction tipoFuncion = new TypeFunction(scope, nombreFuncion);
-            TypeIF tipoResultado = scopeManager.searchType((String)tipoRetorno);
-            semanticErrorManager.semanticInfo("Retorna " + tipoResultado.getName());
-            tipoFuncion.setTipoResultado(tipoResultado);
-            tablaTipos.addType(nombreFuncion, tipoFuncion);
-            SymbolFunction simboloFuncion = new SymbolFunction(scope, nombreFuncion, tipoFuncion);
-            tablaSimbolos.addSymbol(nombreFuncion, simboloFuncion);
+        //Creo un tipo y un simbolo para la funcion y los añado a la tabla
+        TypeFunction tipoFuncion = new TypeFunction(scope, nombreFuncion);
+        TypeIF tipoResultado = scopeManager.searchType((String)tipoRetorno);
             
-            // Abro un nuevo ambito para la funcion, con una nueva tabla simbolos y tipos
-            semanticErrorManager.semanticInfo("Nuevo ambito " + nombreFuncion);
-            ScopeIF scopeFuncion = scopeManager.openScope(nombreFuncion);
-            TypeTableIF tablaTiposFuncion = scopeFuncion.getTypeTable();
-            SymbolTableIF tablaSimbolosFuncion = scopeFuncion.getSymbolTable();
+        semanticErrorManager.semanticInfo("Retorna " + tipoResultado.getName());
+        tipoFuncion.setTipoResultado(tipoResultado);
+        tablaTipos.addType(nombreFuncion, tipoFuncion);
+        SymbolFunction simboloFuncion = new SymbolFunction(scope, nombreFuncion, tipoFuncion);
+        tablaSimbolos.addSymbol(nombreFuncion, simboloFuncion);
             
-
-            for (SymbolParameter parametro:((ListaParametros)listaParametros).getListaParametros()) {
-                semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
+        // Abro un nuevo ambito para la funcion, con una nueva tabla simbolos y tipos
+        semanticErrorManager.semanticInfo("Nuevo ambito " + nombreFuncion);
+            
+        ScopeIF scopeFuncion = scopeManager.openScope(nombreFuncion);
+        TypeTableIF tablaTiposFuncion = scopeFuncion.getTypeTable();
+        SymbolTableIF tablaSimbolosFuncion = scopeFuncion.getSymbolTable();
+            
+        for (SymbolParameter parametro:((ListaParametrosDeclaracion)listaParametros).getListaParametros()) {
+            semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
                                 + " de tipo " + parametro.getType().getName());
-                tablaSimbolosFuncion.addSymbol(parametro.getName(),parametro);
-                tipoFuncion.addTipoParametro(parametro.getType());
-            }
-        } else {
-            semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " + nombreFuncion
-                                                    +" en linea: "+idFuncion.getLine());        }
+            tablaSimbolosFuncion.addSymbol(parametro.getName(),parametro);
+            tipoFuncion.addTipoParametro(parametro.getType());
+        }
+    } else {
+        semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " + nombreFuncion
+            +" en linea: "+idFuncion.getLine());        
+    }
         
-    :} IS declaraciones cuerpo_funcion;
+:} IS declaraciones cuerpo_funcion;
 
 parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO_COMA parametros_subprograma:listaParametrosPrevios
 	    {:
@@ -421,7 +422,7 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
 		if (!scopeManager.containsType((String)tipo)) {
 		   semanticErrorManager.semanticFatalError("ERROR: tipo desconocido " + (String)tipo);
 		} else {
-		   ListaParametros listaParametros = new ListaParametros(((ListaParametros)listaParametrosPrevios).getListaParametros());
+		   ListaParametrosDeclaracion listaParametros = new ListaParametrosDeclaracion(((ListaParametrosDeclaracion)listaParametrosPrevios).getListaParametros());
 		   // Para cada nombre creo un parametro
 		   for (Object objeto:((ListaObjetos)listaNombres).getVariables()) {
 		       String nombreParametro = (String)objeto;
@@ -447,7 +448,7 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
             if (!scopeManager.containsType((String)tipo)) {
                 semanticErrorManager.semanticFatalError("ERROR: tipo desconocido " + (String)tipo);
             } else {
-	            ListaParametros listaParametros = new ListaParametros();
+	            ListaParametrosDeclaracion listaParametros = new ListaParametrosDeclaracion();
 	            // Para cada nombre creo un parametro
 	            for (Object objeto:((ListaObjetos)listaNombres).getVariables()) {
 	               String nombreParametro = (String)objeto;
@@ -491,23 +492,27 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parame
             // Abro un nuevo ambito para el procedimiento, con una nueva tabla simbolos y tipos
             semanticErrorManager.semanticInfo("Nuevo ambito " + nombreProcedimiento);
             ScopeIF scopeProcedimiento = scopeManager.openScope(nombreProcedimiento);
-            TypeTableIF tablaTiposProcedimiento = scopeFuncion.getTypeTable();
-            SymbolTableIF tablaSimbolosProcedimiento = scopeFuncion.getSymbolProcedimiento();
+            TypeTableIF tablaTiposProcedimiento = scopeProcedimiento.getTypeTable();
+            SymbolTableIF tablaSimbolosProcedimiento = scopeProcedimiento.getSymbolTable();
             
             // Almaceno los parametros en la tabla de simbolos y la de tipos
-            for (SymbolParameter parametro:((ListaParametros)listaParametros).getListaParametros()) {
+            for (SymbolParameter parametro:((ListaParametrosDeclaracion)listaParametros).getListaParametros()) {
                 semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
                                 + " de tipo " + parametro.getType().getName());
                 tablaSimbolosProcedimiento.addSymbol(parametro.getName(),parametro);
                 tipoProcedimiento.addTipoParametro(parametro.getType());
             }
         } else {
-            semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " + nombreFuncion
-                                                    +" en linea: "+idFuncion.getLine());        }
+            semanticErrorManager.semanticFatalError("ERROR: Procedimiento ya declarada " + nombreProcedimiento
+                                                    +" en linea: "+idProcedimiento.getLine());        }
         
     :}  IS declaraciones cuerpo;
 
-cuerpo_funcion::= BEGIN lista_sentencias_funcion END IDENTIFICADOR PUNTO_COMA;
+cuerpo_funcion::= BEGIN lista_sentencias_funcion END IDENTIFICADOR PUNTO_COMA
+{:
+    semanticErrorManager.semanticDebug("Cierro ambito ");
+    scopeManager.closeScope();
+:};
 
 lista_sentencias_funcion ::=  sentencia_funcion PUNTO_COMA lista_sentencias_funcion |  vacio;
 
@@ -537,11 +542,11 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
         TypeIF type2 = e2.getType();
-        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " + " + type2.getType());
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " + " + type2.getName());
         if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
             //OK
             TypeIF tipoExpresion = type1;   // No hay conversion de tipos
-            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
             RESULT = expresionResultado;
@@ -556,11 +561,11 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
         TypeIF type2 = e2.getType();
-        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " > " + type2.getType());
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " > " + type2.getName());
         if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
             //OK
-            TypeIF tipoExpresion = expresion.cast(operador);   // Aqui si hay conversion de tipos
-            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            TypeIF tipoExpresion = scopeManager.searchType(TypeSimple.LOGICO);
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
             RESULT = expresionResultado;
@@ -575,11 +580,11 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
         TypeIF type2 = e2.getType();
-        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " == " + type2.getType());
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " == " + type2.getName());
         if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
             //OK
-            TypeIF tipoExpresion = expresion.cast(operador);   // Aqui si hay conversion de tipos
-            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            TypeIF tipoExpresion = scopeManager.searchType(TypeSimple.LOGICO);
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
             RESULT = expresionResultado;
@@ -594,11 +599,11 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
         TypeIF type2 = e2.getType();
-        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " OR " + type2.getType());
+        semanticErrorManager.semanticDebug("Expresion " + type1.getName() + " OR " + type2.getName());
         if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
             //OK
-            TypeIF tipoExpresion = expresion.cast(operador);
-            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema():
+            TypeIF tipoExpresion = scopeManager.searchType(TypeSimple.LOGICO);
+            String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
             RESULT = expresionResultado;
@@ -611,19 +616,20 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 {:
     Expresion e = (Expresion)exp;
     TypeIF tipoExpresion = e.getType();
-    String lexema = a.getLexema() + " " + e.getLexema() + " " + b.getLexema():
+    String lexema = a.getLexema() + " " + e.getLexema() + " " + b.getLexema();
     semanticErrorManager.semanticDebug("Expresion " + lexema);
     Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
     RESULT = expresionResultado;
 :}        
-        | llamada_subprograma:objLlamada
+        | llamada_subprograma:l
 {:  
-    Llamada l = (Llamada)objLlamada;
-    if (l.getType() instanceOf TypeFunction) {
-        Expresion expresionResultado = new Expresion(l.getType().getTipoResultado(), l.getLexema());
-        RESULT expresionResultado;
+    
+    if (l != null) {
+        // Si existe devolucion es que es una funcion y no un procedimiento
+        Expresion expresionResultado = new Expresion(l.getType(), l.getLexema());
+        RESULT = expresionResultado;
     } else {
-       semanticErrorManager.semanticFatalError("ERROR: uso de un procedimiento en una expresion " + l.getLine() + " " + l.getLexema()); 
+       semanticErrorManager.semanticFatalError("ERROR: uso de un procedimiento en una expresion "); 
     }
 :}        
         | referencia:r
@@ -634,18 +640,17 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 :}              
         | valor:valor
 {:
-    TypeIF tipo = scopeManager.searchType((String)valor);
-    Expresion expresionResultado = new Expresion(tipo, (String)valor);
+    Expresion expresionResultado = new Expresion(valor.getType(), valor.getLexema());
     RESULT = expresionResultado;
 :};
 
 referencia ::= IDENTIFICADOR:id 
 {:
     String name = id.getLexema();
-    if (scopeManager.contains(name)) {
+    if (scopeManager.containsSymbol(name)) {
         SymbolIF simbolo = scopeManager.searchSymbol(name);
         TypeIF tipo = simbolo.getType();
-        Referencia r = new Referencia(tipo, name); 
+        Referencia r = new Referencia(tipo, name, id.getLine()); 
         RESULT = r;
     } else {
        semanticErrorManager.semanticFatalError("ERROR: uso de una referencia desconocida " + id.getLine() + " " + name);         
@@ -656,16 +661,16 @@ referencia ::= IDENTIFICADOR:id
     RESULT = a;
 :};
 
-acceso_registro ::= referencia:registro ACCESO identificador:campo
+acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
 {:
-    String nombreRegistro = registro.getNombre();
+    String nombreRegistro = registro.getLexema();
     String nombreCampo = campo.getLexema();
-    TypeIf tipoRegistro = registro.getType();
+    TypeIF tipoRegistro = registro.getType();
     if (tipoRegistro instanceof TypeRecord) {
         TypeRecord tRec = (TypeRecord)tipoRegistro;
         if (tRec.containsCampo(nombreCampo)) {
-            TypeIF innerType = tRec.getCampo(nombreCampo);
-            RESULT = new Referencia(innerType, nombreRegistro + "." + nombreCampo);
+            TypeIF innerType = tRec.getCampo(nombreCampo).getType();
+            RESULT = new Referencia(innerType, nombreRegistro + "." + nombreCampo, campo.getLine());
         } else {
             semanticErrorManager.semanticFatalError("ERROR: campo no declarado " + nombreCampo);
         }
@@ -687,40 +692,38 @@ sentencia ::= sentencia_entrada_salida
 sentencia_if ::= IF expresion:objExp THEN lista_sentencias END IF
 {:
     Expresion expCondicion = (Expresion)objExp;
-    if (!expCondicion.getType().getName().equalsIgnoreCase("BOOLEAN") {
+    if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
         semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
     }
 :}
         | IF expresion:objExp THEN lista_sentencias ELSE lista_sentencias END IF
 {:
     Expresion expCondicion = (Expresion)objExp;
-    if (!expCondicion.getType().getName().equalsIgnoreCase("BOOLEAN") {
+    if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
         semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
     }
 :}        
         | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia if"); :};
 
 
-sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:objExpIni DELIMITADOR_RANGO expresion:objExpFin LOOP lista_sentencias END LOOP
+sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio DELIMITADOR_RANGO expresion:expFin LOOP lista_sentencias END LOOP
 {:
     //Indice debe corresponder con una variable de tipo entero
-    List<SymbolIF> posiblesIndices = scopeManager.searchSymbols(indice.getLexema(), SymbolVariable.class);
-    if (posiblesIndices == null || posiblesIndices.length() == 0) {
+    List<SymbolIF> posiblesIndices = scopeManager.searchSymbols(indice.getLexema());
+    if (posiblesIndices == null || posiblesIndices.size() == 0) {
         semanticErrorManager.semanticFatalError("ERROR: simbolo no declarado en indice, linea: " + indice.getLine());
     } else {
         // Compruebo que el tipo de la variable sea entero
         SymbolVariable varIndex = null;
-        TypeSimple tipoEntero = scopeManager.findType("INTEGER");
-        for (SymbolIF posibleIndex:poliblesIndices) {
+        TypeIF tipoEntero = scopeManager.searchType(TypeSimple.NUMERO);
+        for (SymbolIF posibleIndex:posiblesIndices) {
             if (posibleIndex.getType().equals(tipoEntero)) {
-                varIndex = posibleIndex;
+                varIndex = (SymbolVariable)posibleIndex;
             }
         }
         if (varIndex == null) {
             semanticErrorManager.semanticFatalError("ERROR: el indice debe ser una variable de tipo entero, linea: " + indice.getLine());
         } else {
-            Expresion expInicio = (Expresion)objExpInicio;
-            Expresion expFin = (Expresion)objExpFin;
             if (!expInicio.getType().equals(tipoEntero) || !expFin.getType().equals(tipoEntero)) {
                 semanticErrorManager.semanticFatalError("ERROR: el rango de la sentencia for debe ser expresiones de tipo entero, linea: " + indice.getLine());
             }
@@ -728,7 +731,7 @@ sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:objExpIni DELIMITADOR_R
     }
 :};      
         
-sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:objExp
+sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
 {:
     // Debo comprobar que tanto referencia como expresion coinciden en tipo y que este es uno de los tipos simples
     if (!(referencia.getType() instanceof TypeSimple)) {
@@ -740,8 +743,8 @@ sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:objExp
 
 sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro:param CIERRA_PARENTESIS
 {:
-    Parametro parametro = (Parametro)param;
-    if (!parametro.getType() instanceof TypeSimple) {
+    Parametro parametro = param;
+    if (!(parametro.getType() instanceof TypeSimple)) {
         semanticErrorManager.semanticFatalError("ERROR: parametros no compatibles en put_line " + parametro.getLexema() + ", linea: " + parametro.getLine());
     }
 :};
@@ -757,8 +760,60 @@ parametro ::= valor:valor
     RESULT = parametro;
 :};
 
-llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:objListaParam CIERRA_PARENTESIS;
+llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIERRA_PARENTESIS
+{:
+    String name = id.getLexema();
+    if (!scopeManager.containsSymbol(name)) {
+        semanticErrorManager.semanticFatalError("ERROR: subprograma desconocido " + name + ", linea: " + id.getLine());    
+    } else {
+        SymbolIF s = scopeManager.searchSymbol(name);
+        if (s instanceof SymbolFunction) {
+            // Se trata de una funcion
+            SymbolFunction sf = (SymbolFunction)s;
+            TypeFunction tf = (TypeFunction)sf.getType();
+            
+            List<TypeIF> paramInvocacion = pa.getParameterTypes();
+            List<TypeIF> paramTeoricos = tf.getTipoParametros();
+            if (paramInvocacion.equals(paramTeoricos)) {
+                //OK
+                TypeIF returnType = tf.getTipoResultado();
+                Expresion e = new Expresion(returnType, name);
+                RESULT = e;
+            } else {
+                semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a funcion " 
+                    + name + ", linea: " + id.getLine());    
+            }
+        } else if (s instanceof SymbolProcedure) {
+            // Se trata de un procedimiento
+            // Se trata de una funcion
+            SymbolProcedure sf = (SymbolProcedure)s;
+            TypeProcedure tf = (TypeProcedure)sf.getType();
+            
+            List<TypeIF> paramInvocacion = pa.getParameterTypes();
+            List<TypeIF> paramTeoricos = tf.getTipoParametros();
+            if (!paramInvocacion.equals(paramTeoricos)) {
+                semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a procedimiento " + name + ", linea: " + id.getLine());    
+            }
+        } else {
+            semanticErrorManager.semanticFatalError("ERROR: El simbolo " + name 
+                + " no se corresponde con un subprograma, linea: " + id.getLine());
+        }
+    }
+:};
 
-lista_parametros ::= expresion SEPARADOR_COMA lista_parametros
-        | expresion
-        | vacio;
+lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista
+{:
+    lista.addParameterType(e.getType());
+    RESULT = lista;
+:}
+        | expresion:e
+{:
+	ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
+	lista.addParameterType(e.getType());
+    RESULT = lista;
+:}  
+        | vacio
+{:
+    ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
+    RESULT = lista;
+:};
