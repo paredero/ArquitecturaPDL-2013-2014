@@ -62,7 +62,7 @@ public class Expresion extends NonTerminal {
 					&& t2.getName().equals(TypeSimple.NUMERO);
 		} else if (operador.equals(Expresion.IGUAL)) {
 			resultado = t1.equals(t2);
-		} else if (operador.equals(Expresion.OR)) {
+		} else if (operador.equalsIgnoreCase(Expresion.OR)) {
 			resultado = t1.getName().equals(TypeSimple.LOGICO)
 					&& t2.getName().equals(TypeSimple.LOGICO);
 		}	

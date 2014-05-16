@@ -65,5 +65,14 @@ public class Referencia extends NonTerminal {
 		this.line = line;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Referencia [type=" + type + ", lexema=" + lexema + ", line="
+				+ line + "]";
+	}
+
 	
 }

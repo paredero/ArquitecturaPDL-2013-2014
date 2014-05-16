@@ -37,6 +37,15 @@ public class ListaParametrosDeclaracion extends NonTerminal {
 		super();
 		this.listaParametros = new ArrayList<SymbolParameter>();
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ListaParametrosDeclaracion [listaParametros=" + listaParametros
+				+ "]";
+	}
 	
 	
 }
