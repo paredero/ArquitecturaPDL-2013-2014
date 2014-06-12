@@ -9,7 +9,7 @@
 	-->
 	
 <!--	<property name="test-file-name" value="testCaseB01.ha"/>-->
-<property name="test-file-name" value="testCaseB12.ha"/>
+<property name="test-file-name" value="testB_1.ha"/>
 	
 	<property name="lib" location="lib"/>
 	<property name="test" location="doc/test"/>
@@ -105,7 +105,7 @@
 		<java classpath="${classpath}" classname="compiler.test.FinalTestCase" fork="true">			
 			<arg file="${test-file}"/>		
 			<!-- <jvmarg value="-Xdebug" />
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />	-->
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" /> -->
 		</java>		
 	</target>  
 

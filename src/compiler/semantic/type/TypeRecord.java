@@ -1,10 +1,13 @@
 package compiler.semantic.type;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeRecord.
@@ -89,5 +92,20 @@ public class TypeRecord
 
     public SymbolIF getCampo(String nombre) {
     	return tablaCampos.get(nombre);
+    }
+
+    public int getOffset(String nombre)
+    {
+    	Iterator<Entry<String, SymbolIF>> it = tablaCampos.entrySet().iterator();
+    	int i = 0;
+    	while (it.hasNext()) {
+    		Entry<String, SymbolIF> entry = it.next();
+    		if(entry.getKey().equals(nombre))
+    		{
+    			return i;
+    		}
+    		i++;    		
+    	}
+    	return -1;
     }
 }

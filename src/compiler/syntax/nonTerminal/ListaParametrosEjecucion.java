@@ -5,7 +5,7 @@ import java.util.List;
 
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
-public class ListaParametrosEjecucion {
+public class ListaParametrosEjecucion extends NonTerminal {
 	private List<TypeIF> parameterTypes;
 	
 	public ListaParametrosEjecucion() {

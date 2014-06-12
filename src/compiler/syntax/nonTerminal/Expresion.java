@@ -1,7 +1,13 @@
 package compiler.syntax.nonTerminal;
 
+import compiler.CompilerContext;
+import compiler.intermediate.InstructionSet;
 import compiler.semantic.type.TypeSimple;
 
+import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.TemporalFactory;
+import es.uned.lsi.compiler.intermediate.TemporalIF;
+import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class Expresion extends NonTerminal {
@@ -12,6 +18,8 @@ public class Expresion extends NonTerminal {
 	
 	private TypeIF type;
 	private String lexema;
+	private TemporalIF temporal;
+	
 	/**
 	 * @param type
 	 * @param lexema
@@ -45,6 +53,20 @@ public class Expresion extends NonTerminal {
 	public void setLexema(String lexema) {
 		this.lexema = lexema;
 	}
+	
+	
+	/**
+	 * @return the temporal
+	 */
+	public TemporalIF getTemporal() {
+		return temporal;
+	}
+	/**
+	 * @param temporal the temporal to set
+	 */
+	public void setTemporal(TemporalIF temporal) {
+		this.temporal = temporal;
+	}
 	/**
 	 * 
 	 */
@@ -69,4 +91,47 @@ public class Expresion extends NonTerminal {
 		return resultado;
 		
 	}
+
+	public void generarCodigoIntermedio(Expresion e1, Expresion e2, String operador) {
+		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+        TemporalFactory tF = new TemporalFactory (scope);
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        TemporalIF temp1 = e1.getTemporal();
+        TemporalIF temp2 = e2.getTemporal();
+        TemporalIF temp = tF.create ();
+        cb.addQuadruples(e1.getIntermediateCode());
+        cb.addQuadruples(e2.getIntermediateCode());
+        cb.addQuadruple(this.getCodigoOperacion(operador), temp, temp1, temp2);
+        this.setTemporal (temp);
+        this.setIntermediateCode(cb.create());		
+	}
+	
+	public void generarCodigoIntermedio(Referencia r) {
+		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+        TemporalFactory tF = new TemporalFactory (scope);
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        
+        TemporalIF tempReferencia = r.getTemporal();
+        TemporalIF temp = tF.create();
+        
+        cb.addQuadruples(r.getIntermediateCode());
+        cb.addQuadruple(InstructionSet.MVP, temp, tempReferencia);
+        this.setTemporal(temp);
+        this.setIntermediateCode(cb.create());
+	}
+	
+	private String getCodigoOperacion(String operador) {
+		String codigoOperacion = "";
+		if (operador.equals(SUMA)) {
+			codigoOperacion = InstructionSet.ADD;
+		} else if (operador.equals(MAYOR)) {
+			codigoOperacion = InstructionSet.GREATER_THAN;
+		} else if (operador.equals(IGUAL)) {
+			codigoOperacion = InstructionSet.EQUAL;
+		} else if (operador.equals(OR)) {
+			codigoOperacion = InstructionSet.OR;
+		}  
+		return codigoOperacion;
+	}
+
 }

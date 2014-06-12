@@ -118,17 +118,17 @@ non terminal    tipo;
 
 non terminal    variable;
 non terminal    cuerpo;
-non terminal    lista_sentencias;
+non terminal    ListaSentencias lista_sentencias;
 non terminal    sentencia;
-non terminal    sentencia_entrada_salida;
-non terminal    sentencia_asignacion;
+non terminal    SentenciaPutLine sentencia_entrada_salida;
+non terminal    SentenciaAsignacion sentencia_asignacion;
 non terminal    sentencia_if;
 non terminal    sentencia_for;
 non terminal    Referencia referencia;
 non terminal    Referencia acceso_registro;
 non terminal    Expresion expresion;
 non terminal    Parametro parametro;
-non terminal    Expresion llamada_subprograma;
+non terminal    LlamadaSubprograma llamada_subprograma;
 non terminal    ListaParametrosEjecucion lista_parametros;
 non terminal    subprograma;
 non terminal    funcion;
@@ -661,6 +661,10 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
             String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+                        
+            expresionResultado.generarCodigoIntermedio(e1, e2, operador.getLexema());
+            semanticErrorManager.semanticDebug("Codigo expresion: ");
+            semanticErrorManager.semanticDebug(expresionResultado.getIntermediateCode());
             RESULT = expresionResultado;
         } else {
             semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
@@ -680,6 +684,10 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
             String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            
+            expresionResultado.generarCodigoIntermedio(e1,e2,operador.getLexema());
+            semanticErrorManager.semanticDebug("Codigo expresion: ");
+            semanticErrorManager.semanticDebug(expresionResultado.getIntermediateCode());
             RESULT = expresionResultado;
         } else {
             semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
@@ -699,6 +707,10 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
             String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            
+            expresionResultado.generarCodigoIntermedio(e1,e2,operador.getLexema());
+            semanticErrorManager.semanticDebug("Codigo expresion: ");
+            semanticErrorManager.semanticDebug(expresionResultado.getIntermediateCode());
             RESULT = expresionResultado;
         } else {
             semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
@@ -718,6 +730,10 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
             String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
             semanticErrorManager.semanticDebug("Expresion " + lexema);
             Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
+            
+            expresionResultado.generarCodigoIntermedio(e1,e2,operador.getLexema());
+            semanticErrorManager.semanticDebug("Codigo expresion: ");
+            semanticErrorManager.semanticDebug(expresionResultado.getIntermediateCode());
             RESULT = expresionResultado;
         } else { 
             semanticErrorManager.semanticFatalError("ERROR: Tipos incompatibles en expresion " 
@@ -727,17 +743,12 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     :}            
         | ABRE_PARENTESIS:a expresion:exp CIERRA_PARENTESIS:b
 {:
-    Expresion e = (Expresion)exp;
-    TypeIF tipoExpresion = e.getType();
-    String lexema = a.getLexema() + " " + e.getLexema() + " " + b.getLexema();
-    semanticErrorManager.semanticDebug("Expresion " + lexema);
-    Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
-    RESULT = expresionResultado;
+    RESULT = exp;
 :}        
         | llamada_subprograma:l
 {:  
     
-    if (l != null) {
+    if (l != null && l.getType() != null) {
         // Si existe devolucion es que es una funcion y no un procedimiento
         Expresion expresionResultado = new Expresion(l.getType(), l.getLexema());
         RESULT = expresionResultado;
@@ -749,7 +760,12 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 {:
     TypeIF tipo = r.getType();
     String lexema = r.getLexema();
-    RESULT = new Expresion(tipo, lexema);
+    Expresion expresion = new Expresion(tipo, lexema);
+    
+    expresion.generarCodigoIntermedio(r);
+    semanticErrorManager.semanticDebug("Codigo expresion: ");
+    semanticErrorManager.semanticDebug(expresion.getIntermediateCode());
+    RESULT = expresion;
 :}              
         | valor:valor
 {:
@@ -766,7 +782,10 @@ referencia ::= IDENTIFICADOR:id
         semanticErrorManager.semanticInfo("Simbolo " + name + " " + simbolo);
         TypeIF tipo = simbolo.getType();
         Referencia r = new Referencia(tipo, name, id.getLine()); 
+        r.generarCodigoIntermedio();
         semanticErrorManager.semanticInfo(r);
+        semanticErrorManager.semanticDebug("Codigo referencia: ");
+        semanticErrorManager.semanticDebug(r.getIntermediateCode());    
         RESULT = r;
     } else {
        semanticErrorManager.semanticFatalError("ERROR: uso de una referencia desconocida " + id.getLine() + " " + name);         
@@ -786,7 +805,11 @@ acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
         TypeRecord tRec = (TypeRecord)tipoRegistro;
         if (tRec.containsCampo(nombreCampo)) {
             TypeIF innerType = tRec.getCampo(nombreCampo).getType();
-            RESULT = new Referencia(innerType, nombreRegistro + "." + nombreCampo, campo.getLine());
+            Referencia r = new Referencia(innerType, nombreRegistro + "." + nombreCampo, campo.getLine());
+            r.generarCodigoIntermedio(registro, nombreCampo);
+            semanticErrorManager.semanticDebug("Codigo acceso registro: ");
+            semanticErrorManager.semanticDebug(r.getIntermediateCode());   
+            RESULT = r;
         } else {
             semanticErrorManager.semanticFatalError("ERROR: campo no declarado " + nombreCampo);
         }
@@ -796,35 +819,69 @@ acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
 :};
 
        
-lista_sentencias ::=  sentencia PUNTO_COMA lista_sentencias 
+lista_sentencias ::=  sentencia:sentencia PUNTO_COMA lista_sentencias:listaSentencias 
+    {:
+        if (listaSentencias == null) {
+            listaSentencias = new ListaSentencias();
+        }
+        listaSentencias.addSentencia((NonTerminal)sentencia);
+        listaSentencias.generarCodigoIntermedio((NonTerminal)sentencia);
+        semanticErrorManager.semanticDebug(listaSentencias.getIntermediateCode());   
+        RESULT = listaSentencias;
+    :}
         |  vacio {:
         semanticErrorManager.semanticInfo("VACIO");
         :};
 
-sentencia ::= sentencia_entrada_salida 
-        | sentencia_if
-        | sentencia_for
-        | sentencia_asignacion
-        | llamada_subprograma;
-
-sentencia_if ::= IF expresion:objExp THEN lista_sentencias END IF
+sentencia ::= sentencia_entrada_salida:sentencia
 {:
-    Expresion expCondicion = (Expresion)objExp;
-    if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
-        semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
-    }
+    RESULT = sentencia;
+:} 
+        | sentencia_if:sentencia
+{:
+    RESULT = sentencia;
 :}
-        | IF expresion:objExp THEN lista_sentencias ELSE lista_sentencias END IF
+        | sentencia_for:sentencia
+{:
+    RESULT = sentencia;
+:}
+        | sentencia_asignacion:sentencia
+{:
+    RESULT = sentencia;
+:}
+        | llamada_subprograma:sentencia
+{:
+    RESULT = sentencia;
+:};
+
+sentencia_if ::= IF expresion:objExp THEN lista_sentencias:listaSentencias END IF
 {:
     Expresion expCondicion = (Expresion)objExp;
     if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
         semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
     }
+    SentenciaIF s = new SentenciaIF();
+    s.generarCodigoIntermedio(expCondicion, listaSentencias);
+    semanticErrorManager.semanticDebug(s.getIntermediateCode());
+    RESULT = s;
+:}
+        | IF expresion:objExp THEN lista_sentencias:listaSentencias ELSE lista_sentencias:listaSentenciasElse END IF
+{:
+    Expresion expCondicion = (Expresion)objExp;
+    if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
+        semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
+    }
+    SentenciaIF s = new SentenciaIF();
+    s.generarCodigoIntermedio(expCondicion, listaSentencias, listaSentenciasElse);
+    semanticErrorManager.semanticDebug(s.getIntermediateCode());
+    RESULT = s;
 :}        
         | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia if"); :};
 
 
-sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio DELIMITADOR_RANGO expresion:expFin LOOP lista_sentencias END LOOP
+sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio 
+    DELIMITADOR_RANGO expresion:expFin LOOP lista_sentencias:listaSentencias 
+    END LOOP
 {:
     //Indice debe corresponder con una variable de tipo entero
     List<SymbolIF> posiblesIndices = scopeManager.searchSymbols(indice.getLexema());
@@ -846,6 +903,10 @@ sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio DELIMITADOR_R
                 semanticErrorManager.semanticFatalError("ERROR: el rango de la sentencia for debe ser expresiones de tipo entero, linea: " + indice.getLine());
             }
         }
+        SentenciaFor s = new SentenciaFor();
+        s.generarCodigoIntermedio(varIndex, expInicio, expFin, listaSentencias);
+        semanticErrorManager.semanticDebug(s.getIntermediateCode());        
+        RESULT = s;
     }
 :};      
         
@@ -860,16 +921,23 @@ sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
         semanticErrorManager.semanticFatalError("ERROR: tipos distintos en asignacion, linea: " + referencia.getLine()); 
     } else {
         semanticErrorManager.semanticInfo("Asignacion valida");
+        SentenciaAsignacion s = new SentenciaAsignacion();
+        s.generarCodigoIntermedio(referencia, expresion);
+        semanticErrorManager.semanticDebug(s.getIntermediateCode());
+        RESULT = s;
     }
 :};
 
-sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS parametro:param CIERRA_PARENTESIS
+sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS expresion:parametro CIERRA_PARENTESIS
 {:
-    Parametro parametro = param;
     if (!(parametro.getType() instanceof TypeSimple)) {
-        semanticErrorManager.semanticFatalError("ERROR: parametros no compatibles en put_line " + parametro.getLexema() + ", linea: " + parametro.getLine());
+        semanticErrorManager.semanticFatalError("ERROR: parametros no compatibles en put_line " + parametro.getLexema());
     }
     semanticErrorManager.semanticInfo("invocacion a put_line");
+    SentenciaPutLine sent = new SentenciaPutLine();
+    sent.generarCodigoIntermedio(parametro);
+    semanticErrorManager.semanticInfo(sent.getIntermediateCode());
+    RESULT = sent;
 :};
 
 parametro ::= valor:valor
@@ -900,8 +968,10 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
             if (paramInvocacion.equals(paramTeoricos)) {
                 //OK
                 TypeIF returnType = tf.getTipoResultado();
-                Expresion e = new Expresion(returnType, name);
-                RESULT = e;
+                
+                LlamadaSubprograma funcion = new LlamadaSubprograma(returnType, name);
+                funcion.generarCodigoIntermedio(sf, pa);
+                RESULT = funcion;
             } else {
                 semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a funcion " 
                     + name + ", linea: " + id.getLine());    
@@ -917,6 +987,10 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
             if (!paramInvocacion.equals(paramTeoricos)) {
                 semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a procedimiento " + name + ", linea: " + id.getLine());    
             }
+            
+            LlamadaSubprograma procedimiento = new LlamadaSubprograma();
+            procedimiento.generarCodigoIntermedio(sf, pa);
+            RESULT = procedimiento;
         } else {
             semanticErrorManager.semanticFatalError("ERROR: El simbolo " + name 
                 + " no se corresponde con un subprograma, linea: " + id.getLine());
@@ -927,12 +1001,21 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
 lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista
 {:
     lista.addParameterType(e.getType());
+    ScopeIF scope = scopeManager.getCurrentScope();
+    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+    cb.addQuadruples(lista.getIntermediateCode());
+    cb.addQuadruples(e.getIntermediateCode());
+    lista.setIntermediateCode(cb.create());
     RESULT = lista;
 :}
         | expresion:e
 {:
 	ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
 	lista.addParameterType(e.getType());
+    ScopeIF scope = scopeManager.getCurrentScope();
+    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+    cb.addQuadruples(e.getIntermediateCode());
+    lista.setIntermediateCode(cb.create());
     RESULT = lista;
 :}  
         | vacio

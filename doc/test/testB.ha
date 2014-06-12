@@ -26,30 +26,3 @@ begin
   Put_line(d);   -- Debe mostar un 5 
 
 end testB;
-
-
-True
-False
-"cadena y tal tal tal"
-for
-function
-if
-in
-Integer
-is
-loop
-of
-procedure
-Put_line
-record
-return
-then
-type
-identificador
-
-
-
-
-
-
-}
