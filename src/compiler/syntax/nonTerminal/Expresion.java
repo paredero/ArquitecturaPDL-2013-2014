@@ -115,7 +115,7 @@ public class Expresion extends NonTerminal {
         TemporalIF temp = tF.create();
         
         cb.addQuadruples(r.getIntermediateCode());
-        cb.addQuadruple(InstructionSet.MVP, temp, tempReferencia);
+        cb.addQuadruple(InstructionSet.MV, temp, tempReferencia);
         this.setTemporal(temp);
         this.setIntermediateCode(cb.create());
 	}
@@ -132,6 +132,17 @@ public class Expresion extends NonTerminal {
 			codigoOperacion = InstructionSet.OR;
 		}  
 		return codigoOperacion;
+	}
+	public void generarCodigoIntermedio(Valor valor) {
+		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+        TemporalFactory tF = new TemporalFactory (scope);
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        
+        TemporalIF temp = tF.create();
+        
+        cb.addQuadruple(InstructionSet.MV, temp, valor.getValue());
+        this.setTemporal(temp);
+        this.setIntermediateCode(cb.create());
 	}
 
 }

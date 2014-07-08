@@ -3,8 +3,8 @@ package compiler.code;
 import java.util.Arrays;
 import java.util.List;
 
+import compiler.intermediate.InstructionSet;
 import compiler.semantic.type.TypeSimple;
-
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
@@ -92,7 +92,11 @@ public class ExecutionEnvironmentEns2001
      */
     @Override
     public final String translate (QuadrupleIF quadruple)
-    {      
+    {   
+    	String op = quadruple.getOperation();
+    	if (op.equals(InstructionSet.MV)) {
+    		
+    	}
         //TODO: Student work
         return quadruple.toString(); 
     }

@@ -20,13 +20,15 @@ public class ListaSentencias extends NonTerminal {
 	}
 	
 	public void addSentencia(NonTerminal sentencia) {
-		this.listaSentencias.add(sentencia);
+		this.listaSentencias.add(0, sentencia);
 	}
 	
-	public void generarCodigoIntermedio(NonTerminal sentencia) {
+	public void generarCodigoIntermedio() {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope ();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        cb.addQuadruples(sentencia.getIntermediateCode());
+        for (NonTerminal sentencia:this.listaSentencias) {
+        	cb.addQuadruples(sentencia.getIntermediateCode());
+        }
         this.setIntermediateCode(cb.create());
 	}
 }

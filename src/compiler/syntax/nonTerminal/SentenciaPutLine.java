@@ -15,8 +15,7 @@ public class SentenciaPutLine extends NonTerminal {
 	public void generarCodigoIntermedio(Expresion exp) {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(CompilerContext.getScopeManager().getCurrentScope());
         cb.addQuadruples(exp.getIntermediateCode());
-        if(esValorBooleano(exp))
-        {
+        if(esValorBooleano(exp)) {
 	        LabelFactoryIF lF = new LabelFactory();
 	        LabelIF l1 = lF.create();
 	        LabelIF l2 = lF.create();
@@ -26,7 +25,7 @@ public class SentenciaPutLine extends NonTerminal {
 	        cb.addQuadruple(InstructionSet.LABEL, l1);
 	        cb.addQuadruple(InstructionSet.ESCRIBE, new Value("\"false\""));
 	        cb.addQuadruple(InstructionSet.LABEL, l2);
-        }else{
+        } else {
         	cb.addQuadruple(InstructionSet.ESCRIBE_VALOR, exp.getTemporal());
         }
         this.setIntermediateCode(cb.create());

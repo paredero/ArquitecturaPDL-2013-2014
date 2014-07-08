@@ -138,7 +138,7 @@ public class Referencia extends NonTerminal {
         SymbolIF sv = scopeManager.searchSymbol(this.getLexema());
         
         Variable var = new Variable(this.getLexema(), sv.getScope());
-        cb.addQuadruple(InstructionSet.MVA, temp, var);
+        cb.addQuadruple(InstructionSet.MV, temp, var);
         this.setTemporal(temp);
         this.setIntermediateCode(cb.create());
 	}

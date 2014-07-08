@@ -1,28 +1,14 @@
-procedure testB() is 
+-- variables y aritmetica simple 
 
--- constantes y variables globales
-A: constant := 1;
+procedure testCase04 () is
 
-d: Integer;
-e: Integer;
-f: Integer;
-
-function suma (a : Integer; b: Integer) return Integer is
-
+    x, y, z: Integer;
+    a,b,c:Boolean;
 begin
-
-  return a+b;	
-
-end suma;
-
--- procedimiento principal
-
-begin
-
-  e := A;
-  f := 4;
-  d := suma (f,e);
-  Put_line("resultado:");
-  Put_line(d);   -- Debe mostar un 5 
-
-end testB;
+    --y := 2;
+    --z := 1;
+    --x := y + z;
+    -- a := True;
+    -- B := False;
+    c := True;
+end TestCase04;

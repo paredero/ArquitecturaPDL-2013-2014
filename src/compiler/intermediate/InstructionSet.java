@@ -19,12 +19,6 @@ public class InstructionSet {
 	// OR x y z		x := y || z
 	public static final String OR = "OR";
 
-	// MVP x y 		x := *y
-	public static final String MVP = "MVP";
-
-	// MVA x y		x := &y
-	public static final String MVA = "MVA";
-
 	// MV x y 		x := y
 	public static final String MV = "MV"; 
 	
