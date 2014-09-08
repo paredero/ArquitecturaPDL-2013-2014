@@ -7,9 +7,6 @@ public class InstructionSet {
 	public static final String ESCRIBE = "ESCRIBE";
 	public static final String ESCRIBE_VALOR = "ESCRIBEVAL";
 	
-	// MUL x y z	x := y * z 
-	public static final String MUL = "MUL";
-	
 	// GR x y z		x := (y > z) ? 1 : 0
 	public static final String GREATER_THAN = "GR";
 	
@@ -30,9 +27,6 @@ public class InstructionSet {
 	
 	// BR L			Salto a L
 	public static final String BRANCH = "BR";
-
-//	STP x y			*x := y
-	public static final String STP = "STP";
 	
 	public static final String GREATER_EQUAL = "GE";
 	
@@ -40,4 +34,9 @@ public class InstructionSet {
 	
 	public static final String CALL = "CALL";
 	public static final String RET = "RET";
+	
+	public static final String INICIO = "INICIO";
+	
+	public static final String FINAL = "FINAL";
+	public static final String MOVE_REG = "MOVE_REG";
 }

@@ -1,7 +1,11 @@
 package compiler.intermediate;
 
+import compiler.CompilerContext;
+import compiler.semantic.symbol.SymbolParameter;
+import compiler.semantic.symbol.SymbolVariable;
 import es.uned.lsi.compiler.intermediate.VariableIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
+import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 
 /**
  * Class for variables in intermediate code.
@@ -12,20 +16,44 @@ public class Variable
 {
     private String  name     = null;
     private ScopeIF scope    = null;
+    private boolean isParameter = false;
+    private SymbolIF simbolo = null;
         
     /**
+	 * @return the simbolo
+	 */
+	public SymbolIF getSimbolo() {
+		return simbolo;
+	}
+
+	/**
+	 * @param simbolo the simbolo to set
+	 */
+	public void setSimbolo(SymbolIF simbolo) {
+		this.simbolo = simbolo;
+	}
+
+	/**
      * Constructor for Variable.
      * @param name The name.
      * @param scope The scope index.
      */
-    public Variable (String name, ScopeIF scope)
+    public Variable(String name, ScopeIF scope)
     {
         super ();
         this.name = name;
         this.scope = scope;
+        this.simbolo = scope.getSymbolTable().getSymbol(name);
     }
 
-    /**
+    public Variable(String name, SymbolIF simbolo) {
+    	super ();
+        this.name = name;
+        this.simbolo = simbolo;
+        this.scope = simbolo.getScope();  
+	}
+
+	/**
      * Returns the name.
      * @return Returns the name.
      */
@@ -52,8 +80,12 @@ public class Variable
     @Override
     public final int getAddress ()
     {
-        // TODO : Student Work
-        return 0;
+    	if (simbolo instanceof SymbolVariable) {
+    		return ((SymbolVariable) simbolo).getAddress();
+    	} else {
+    		return ((SymbolParameter) simbolo).getAddress();
+    	}
+        
     }
 
     /**
@@ -63,8 +95,7 @@ public class Variable
     @Override
     public final boolean isGlobal ()
     {
-        // TODO : Student Work
-        return true;
+        return scope.getLevel() == 0;
     }
 
     /**
@@ -103,13 +134,30 @@ public class Variable
                   ((name == null)? 0 : name.hashCode ());
     } 
 
-    /**
-     * Return a string representing the object.
-     * @return a string representing the object.
-     */
-    @Override
-    public final String toString ()
-    {    
-        return name;
-    }
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Variable [name=" + name + ", scope=" + scope + ", isParameter="
+				+ isParameter + ", simbolo=" + simbolo + "]";
+	}
+
+	/**
+	 * @return the isParameter
+	 */
+	public boolean isParameter() {
+		return isParameter;
+	}
+
+	/**
+	 * @param isParameter the isParameter to set
+	 */
+	public void setParameter(boolean isParameter) {
+		this.isParameter = isParameter;
+	}
+
+    
 }

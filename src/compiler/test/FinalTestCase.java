@@ -87,8 +87,9 @@ public class FinalTestCase
     			
     			// reflect call parser.pase()
     			Method parseMethod =  parserClass.getMethod("parse");
+    			syntaxErrorManager.syntaxInfo ("Llama al parser");
     			parseMethod.invoke(parserConstructor.newInstance(aScanner));
-    			    			
+    			syntaxErrorManager.syntaxInfo ("End parser");    			
                 logSemantics ();
     			
     		} 
@@ -111,8 +112,8 @@ public class FinalTestCase
      */
     private void logSemantics ()
     {
-        logTypeTables ();
-        logSymbolTables ();
+//        logTypeTables ();
+//        logSymbolTables ();
     }
     
     /**

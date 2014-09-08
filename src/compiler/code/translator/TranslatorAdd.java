@@ -10,8 +10,11 @@ public class TranslatorAdd extends Translator {
 
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		sb.append("ADD ").append(translate(q.getFirstOperand())).append(", ")
+				.append(translate(q.getSecondOperand())).append(" \n");
+		sb.append("MOVE .A, ").append(translate(q.getResult()))
+				.append(" \n");
+		return sb.toString();
 	}
 
 }

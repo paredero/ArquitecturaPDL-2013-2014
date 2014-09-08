@@ -24,8 +24,10 @@ public class TranslatorEscribeValor extends Translator {
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		sb.append("WRINT ");
+		sb.append(translate(q.getResult())).append(" \n");
+		sb.append("WRCHAR #10\nWRCHAR #13");
+		return sb.toString();
 	}
 
 }

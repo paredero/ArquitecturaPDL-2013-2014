@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
  * @author jgarcia
- *
+ * 
  */
 public class TranslatorOR extends Translator {
 
@@ -19,13 +19,16 @@ public class TranslatorOR extends Translator {
 		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see compiler.code.translator.Translator#translate()
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		sb.append("OR ").append(translate(q.getFirstOperand())).append(", ")
+				.append(translate(q.getSecondOperand())).append("\n");
+		sb.append("MOVE .A, ").append(translate(q.getResult()));
+		return sb.toString();
 	}
-
 }

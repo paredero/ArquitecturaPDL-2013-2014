@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
  * @author jgarcia
- *
+ * 
  */
 public class TranslatorRet extends Translator {
 
@@ -16,16 +16,28 @@ public class TranslatorRet extends Translator {
 	 */
 	public TranslatorRet(QuadrupleIF quadruple) {
 		super(quadruple);
-		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see compiler.code.translator.Translator#translate()
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		// Esta parte solo es válida para las funciones
+		if (q.getResult() != null) {
+			sb.append("DEC .R0")
+					.append(";decremento el display para que R0 apunte al ambito padre \n");
+			sb.append("ADD #1, [.R0] \n");
+			sb.append("MOVE ")
+					.append(translate(q.getResult()))
+					.append(", [.A]")
+					.append(" ; Muevo el valor de retorno a su posición del RA (#1[.IX]) para tenerlo accesible desde el llamador \n");
+			sb.append("INC .R0").append("; restauro el valor del display \n");
+		}
+		sb.append("RET \n");
+		return sb.toString();
 	}
 
 }

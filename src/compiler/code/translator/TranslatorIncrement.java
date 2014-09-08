@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
  * @author jgarcia
- *
+ * 
  */
 public class TranslatorIncrement extends Translator {
 
@@ -16,16 +16,17 @@ public class TranslatorIncrement extends Translator {
 	 */
 	public TranslatorIncrement(QuadrupleIF quadruple) {
 		super(quadruple);
-		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see compiler.code.translator.Translator#translate()
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		sb.append("INC ").append(translate(q.getResult())).append(" \n");
+		return sb.toString();
 	}
 
 }

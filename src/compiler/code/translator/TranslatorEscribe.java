@@ -24,8 +24,11 @@ public class TranslatorEscribe extends Translator {
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		sb.append("WRSTR ");
+		String label = LabelManager.getLabelText();
+		sb.append("/").append(label).append( "\nWRCHAR #10\nWRCHAR #13");
+		LabelManager.addLabel(label, "DATA "+ q.getResult());
+		return sb.toString();
 	}
 
 }

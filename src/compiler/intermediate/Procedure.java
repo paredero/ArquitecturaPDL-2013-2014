@@ -1,5 +1,9 @@
 package compiler.intermediate;
 
+import java.util.List;
+
+import compiler.semantic.symbol.SymbolParameter;
+import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.ProcedureIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -13,6 +17,8 @@ public class Procedure
 {
     private String  name     = null;
     private ScopeIF scope    = null;
+    private LabelIF codeLabel = null;
+    private List<SymbolParameter> params;
         
     /**
      * Constructor for Variable.
@@ -53,8 +59,11 @@ public class Procedure
     @Override
     public final LabelIF getCodeLabel ()
     {
-        // TODO : Student Work
-        return null;
+		if (codeLabel == null) {
+			LabelFactory labelFactory = new LabelFactory();
+			return labelFactory.create(name.toUpperCase());
+		}
+		return codeLabel;
     }
 
     /**
@@ -102,4 +111,20 @@ public class Procedure
     {    
         return name;
     }
+
+	/**
+	 * @return the params
+	 */
+	public List<SymbolParameter> getParams() {
+		return params;
+	}
+
+	/**
+	 * @param params the params to set
+	 */
+	public void setParams(List<SymbolParameter> params) {
+		this.params = params;
+	}
+    
+    
 }

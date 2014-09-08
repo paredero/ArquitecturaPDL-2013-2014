@@ -3,8 +3,9 @@ package compiler.syntax.nonTerminal;
 import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
 import compiler.semantic.type.TypeSimple;
-
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.Quadruple;
+import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 import es.uned.lsi.compiler.intermediate.TemporalFactory;
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -93,6 +94,9 @@ public class Expresion extends NonTerminal {
 	}
 
 	public void generarCodigoIntermedio(Expresion e1, Expresion e2, String operador) {
+		CompilerContext.getSemanticErrorManager().semanticDebug(
+				"generarCodigoIntermedio(Expresion e1, Expresion e2, String operador) "
+						+ e1 + " " + e2 + " " + operador);
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
@@ -101,17 +105,20 @@ public class Expresion extends NonTerminal {
         TemporalIF temp = tF.create ();
         cb.addQuadruples(e1.getIntermediateCode());
         cb.addQuadruples(e2.getIntermediateCode());
-        cb.addQuadruple(this.getCodigoOperacion(operador), temp, temp1, temp2);
+		cb.addQuadruple(this.getCodigoOperacion(operador),temp, temp1, temp2);		
         this.setTemporal (temp);
         this.setIntermediateCode(cb.create());		
 	}
 	
 	public void generarCodigoIntermedio(Referencia r) {
+		CompilerContext.getSemanticErrorManager().semanticDebug("Codigo intermedio en expresion");
+		CompilerContext.getSemanticErrorManager().semanticDebug("Parte de la referencia " + r);
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         
         TemporalIF tempReferencia = r.getTemporal();
+        CompilerContext.getSemanticErrorManager().semanticDebug("Codigo intermedio en expresion");
         TemporalIF temp = tF.create();
         
         cb.addQuadruples(r.getIntermediateCode());
@@ -124,16 +131,18 @@ public class Expresion extends NonTerminal {
 		String codigoOperacion = "";
 		if (operador.equals(SUMA)) {
 			codigoOperacion = InstructionSet.ADD;
-		} else if (operador.equals(MAYOR)) {
+		} else if (operador.equalsIgnoreCase(MAYOR)) {
 			codigoOperacion = InstructionSet.GREATER_THAN;
-		} else if (operador.equals(IGUAL)) {
+		} else if (operador.equalsIgnoreCase(IGUAL)) {
 			codigoOperacion = InstructionSet.EQUAL;
-		} else if (operador.equals(OR)) {
+		} else if (operador.equalsIgnoreCase(OR)) {
 			codigoOperacion = InstructionSet.OR;
 		}  
 		return codigoOperacion;
 	}
 	public void generarCodigoIntermedio(Valor valor) {
+		CompilerContext.getSemanticErrorManager().semanticDebug("generarCodigoIntermedio(Valor " + valor);
+
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
@@ -144,5 +153,26 @@ public class Expresion extends NonTerminal {
         this.setTemporal(temp);
         this.setIntermediateCode(cb.create());
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Expresion [type=" + type + ", lexema=" + lexema + ", temporal="
+				+ temporal + "]";
+	}
+	public void generarCodigoIntermedio(LlamadaSubprograma l) {
+		CompilerContext.getSemanticErrorManager().semanticDebug("generarCodigoIntermedio(Llamada_Subprograma " + l);
+        ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        TemporalFactory tF = new TemporalFactory (scope);
+        TemporalIF temp = tF.create();
+        cb.addQuadruples(l.getIntermediateCode());
+        cb.addQuadruple (InstructionSet.RET, temp);
+        this.setTemporal(temp);
+        this.setIntermediateCode(cb.create());
+	}
 
+	
+	
 }

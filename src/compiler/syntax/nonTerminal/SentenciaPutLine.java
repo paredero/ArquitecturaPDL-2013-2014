@@ -31,6 +31,13 @@ public class SentenciaPutLine extends NonTerminal {
         this.setIntermediateCode(cb.create());
 	}
 
+	public void generarCodigoIntermedio(String cadena) {
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(
+				CompilerContext.getScopeManager().getCurrentScope());
+		cb.addQuadruple(InstructionSet.ESCRIBE, new Value(cadena));
+		this.setIntermediateCode(cb.create());
+	}
+	
 	private boolean esValorBooleano(Expresion exp) {
 		boolean valorBooleano = false;
 		if (exp.getType().equals(

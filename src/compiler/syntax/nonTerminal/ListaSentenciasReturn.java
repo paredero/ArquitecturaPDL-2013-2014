@@ -3,6 +3,8 @@ package compiler.syntax.nonTerminal;
 import java.util.ArrayList;
 import java.util.List;
 
+import compiler.CompilerContext;
+
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class ListaSentenciasReturn extends NonTerminal {
@@ -29,5 +31,16 @@ public class ListaSentenciasReturn extends NonTerminal {
 	public void setListaTiposReturn(List<TypeIF> listaTiposReturn) {
 		this.listaTiposReturn = listaTiposReturn;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ListaSentenciasReturn [listaTiposReturn=" + listaTiposReturn
+				+ "]";
+	}
+	
+	
 	
 }

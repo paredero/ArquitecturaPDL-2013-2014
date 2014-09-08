@@ -4,7 +4,7 @@ import java.util.List;
 
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
-public class CuerpoFuncion {
+public class CuerpoFuncion extends NonTerminal {
 
 	List<TypeIF> listaSentenciasReturn;
 	String nombreFuncion;
@@ -39,6 +39,15 @@ public class CuerpoFuncion {
 	 */
 	public void setNombreFuncion(String nombreFuncion) {
 		this.nombreFuncion = nombreFuncion;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "CuerpoFuncion [listaSentenciasReturn=" + listaSentenciasReturn
+				+ ", nombreFuncion=" + nombreFuncion + "]";
 	}
 
 	

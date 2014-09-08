@@ -14,7 +14,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class SymbolConstant
     extends SymbolBase
 {
-    
+	private Object value; 
     /**
      * Constructor for SymbolConstant.
      * @param scope The declaration scope.
@@ -26,5 +26,19 @@ public class SymbolConstant
                            TypeIF type)
     {
         super (scope, name, type);
-    } 
+    }
+	/**
+	 * @return the value
+	 */
+	public Object getValue() {
+		return value;
+	}
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(Object value) {
+		this.value = value;
+	} 
+
+    
 }

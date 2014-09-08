@@ -22,6 +22,7 @@ import compiler.semantic.symbol.*;
 import compiler.semantic.type.*;
 import compiler.intermediate.*;
 import compiler.code.*;
+import compiler.code.translator.*;
 
 // Declaración del código de usuario
 
@@ -103,20 +104,20 @@ non terminal Axiom      axiom;
 
 non terminal    vacio;
 non terminal    cabecera;
-non terminal    declaraciones;
-non terminal    declaracion_constantes;
-non terminal    declaracion_registros;
-non terminal    declaracion_variables;
-non terminal    declaracion_subprogramas;
+non terminal    Declaraciones declaraciones;
+non terminal    Declaraciones declaracion_constantes;
+non terminal    Declaraciones declaracion_registros;
+non terminal    Declaraciones declaracion_variables;
+non terminal    Declaraciones declaracion_subprogramas;
 non terminal    lista_nombres;
-non terminal    constante;
+non terminal    Declaraciones constante;
 non terminal    Valor   valor;
 
 non terminal    registro;
 non terminal    ListaObjetos lista_campos;
 non terminal    tipo;
 
-non terminal    variable;
+non terminal    Declaraciones variable;
 non terminal    Cuerpo cuerpo;
 non terminal    ListaSentencias lista_sentencias;
 non terminal    sentencia;
@@ -130,9 +131,9 @@ non terminal    Expresion expresion;
 non terminal    Parametro parametro;
 non terminal    LlamadaSubprograma llamada_subprograma;
 non terminal    ListaParametrosEjecucion lista_parametros;
-non terminal    subprograma;
-non terminal    funcion;
-non terminal    procedimiento;
+non terminal    DeclaracionSubprograma subprograma;
+non terminal    DeclaracionSubprograma funcion;
+non terminal    DeclaracionSubprograma procedimiento;
 non terminal    ListaParametrosDeclaracion parametros_subprograma;
 non terminal    tipo_primitivo;
 non terminal    CuerpoFuncion cuerpo_funcion;
@@ -159,84 +160,82 @@ program ::=
    :}
   axiom:ax
   {:
-        semanticErrorManager.semanticDebug("Asigna memorias");
-        int gAddress = 0;
-        int lOffset = 0;
-        
         List<ScopeIF> scopes = scopeManager.getAllScopes();
         semanticErrorManager.semanticDebug("Numero de entornos: " + scopes.size());
+		MemoryManager.assignAddresses();
+		
         ScopeIF scopeActual = null;
         for (ScopeIF scope:scopes) {
-            semanticErrorManager.semanticDebug("Entorno: "+scope);
-            List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
-            for (SymbolIF symbol:symbols) {
-                if (symbol instanceof SymbolVariable) {
-                    SymbolVariable s = (SymbolVariable)symbol;
-                    if (scope.getLevel() == 0) {
-                        scopeActual = scope;
-                        // se trata de una variable global
-                        s.setAddress(gAddress + s.getType().getSize());
-                        gAddress += s.getType().getSize();
-                    } else {
-                        s.setAddress(lOffset + s.getType().getSize());
-                        lOffset += s.getType().getSize();
-                    }
-                }
-            }
-            List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
-            for (TemporalIF temporal:temporals) {
-                Temporal t = (Temporal)temporal; 
-                t.setAddress(lOffset + t.getSize());
-                lOffset += t.getSize();
-            }
-        } 
-        // No modificar esta estructura, aunque se pueden añadir más acciones semánticas
+			if (scope.getLevel() == 0) {
+				scopeActual = scope;
+			}
+		}
         
-        semanticErrorManager.semanticDebug("Entorno actual: "+scopeActual);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
-        cb.addQuadruple("DATA", gAddress);
+        cb.addQuadruple("INICIO", null,MemoryManager.getgAddress(), ax.getLabel());
         
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);
+		cb.addQuadruple (InstructionSet.FINAL);
         syntaxErrorManager.syntaxInfo ("Codigo intermedio generado " + cb.create());
 
         ExecutionEnvironmentEns2001 e = new ExecutionEnvironmentEns2001();
         finalCodeFactory.setEnvironment(e); 
           
-        finalCodeFactory.create (cb.create());        
+        finalCodeFactory.create(cb.create());               
+        
+        syntaxErrorManager.syntaxInfo ("Codigo intermedio generado  " + cb.create());
         syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
 
-axiom ::= cabecera:apertura declaraciones cuerpo:cierre
+axiom ::= cabecera:apertura declaraciones:declaraciones cuerpo:cierre
 {:
+    semanticErrorManager.semanticDebug("1 axiom ::= cabecera:apertura declaraciones cuerpo:cierre");
     String idApertura = (String)apertura;
     String idCierre = cierre.getIdProcedimiento();
     if (!idApertura.equalsIgnoreCase(idCierre)) {
         semanticErrorManager.semanticFatalError("ERROR semantico: el identificador de apertura debe ser el mismo que el de cierre: "
             + idApertura + " " + idCierre);
     }
-    scopeManager.closeScope();
-    semanticErrorManager.semanticDebug("Fin del analisis de  " + idApertura);
+    
     Axiom ax = new Axiom();
-    ax.setIntermediateCode(cierre.getIntermediateCode());
+	LabelFactoryIF labelFactory = new LabelFactory ();
+    LabelIF label = labelFactory.create (idApertura);
+	ax.setLabel(label);
+	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+	if(declaraciones != null) {
+		ax.getIntermediateCode().addAll(declaraciones.getIntermediateCode());
+    }            
+    cb.addQuadruple(InstructionSet.LABEL, label, 0);
+    ax.getIntermediateCode().addAll(cb.create());
+    ax.getIntermediateCode().addAll(cierre.getIntermediateCode());
+	scopeManager.closeScope();
     RESULT = ax;
 :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
 vacio ::= {:
-//    syntaxErrorManager.syntaxDebug ("VACIO");
+    syntaxErrorManager.syntaxDebug ("2: VACIO");
 :};
 
 cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
     {:
+		semanticErrorManager.semanticDebug("3: CABECERA");
         //Crear el ámbito global del programa asociado al nombre del procedimiento.
         String name = id.getLexema();
         scopeManager.openScope(name);
-        ScopeIF scope = scopeManager.getCurrentScope();
-//        semanticErrorManager.semanticDebug("Abierto ambito " + name);
+
+        ScopeIF scope = null;
+		try {
+			scope = scopeManager.getCurrentScope();
+		} catch (Exception e) {
+			semanticErrorManager.semanticError("Error en 3: CABECERA");
+			semanticErrorManager.semanticError(e.getMessage());
+		}
         
         //******************* Ahora insertar tipos basicos en la tabla
+		
         TypeTableIF tablaTipos = scope.getTypeTable();
         TypeSimple tipoBooleano = new TypeSimple(scope);
         tipoBooleano.setName(TypeSimple.LOGICO);
@@ -247,70 +246,92 @@ cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
         TypeSimple tipoString = new TypeSimple(scope);
         tipoString.setName(TypeSimple.CADENA);
         tablaTipos.addType(tipoString);
-        RESULT = id.getLexema();        
+        RESULT = name;        
     :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de cabecera."); :};
 
 tipo ::= IDENTIFICADOR:id  
 {:
+    semanticErrorManager.semanticDebug("4: tipo ::= IDENTIFICADOR:id  ");
     // semanticErrorManager.semanticInfo("Tipo " + id.getLexema() + ", linea:" + id.getLine());
     RESULT=id.getLexema();
 :}
         | INTEGER:t 
 {:
+	semanticErrorManager.semanticDebug("5: tipo ::= INTEGER:t");
     // semanticErrorManager.semanticInfo("Tipo " + t.getLexema() + ", linea:" + t.getLine());
     RESULT=TypeSimple.NUMERO; 
 :} 
         | BOOLEAN:t 
 {:
+semanticErrorManager.semanticDebug("6");
     // semanticErrorManager.semanticInfo("Tipo " + t.getLexema() + ", linea:" + t.getLine());
     RESULT=TypeSimple.LOGICO; 
 :};
 
 tipo_primitivo ::= INTEGER:t 
 {: 
+semanticErrorManager.semanticDebug("7: tipo_primitivo ::= INTEGER:t ");
 //    semanticErrorManager.semanticInfo("Tipo primitivo " + t.getLexema() + ", linea:" + t.getLine());
     RESULT=TypeSimple.NUMERO; 
 :} 
         | BOOLEAN:t 
 {: 
+semanticErrorManager.semanticDebug("8: tipo_primitivo ::= BOOLEAN:t  ");
 //    semanticErrorManager.semanticInfo("Tipo primitivo " + t.getLexema() + ", linea:" + t.getLine());
     RESULT=TypeSimple.LOGICO; 
 :};
         
 valor ::= NUMERO:n
 {:
+	semanticErrorManager.semanticDebug("9: valor ::= NUMERO:n");
     //    semanticErrorManager.semanticInfo("Valor numerico " + n.getLexema() + ", linea:" + n.getLine());
     Valor v = new Valor(scopeManager.searchType(TypeSimple.NUMERO), n.getLexema(), n.getLine(), new Value(Integer.parseInt(n.getLexema())));
     RESULT =v; 
 :}
         | TRUE:t 
 {:
+	semanticErrorManager.semanticDebug("10: valor ::= TRUE:t ");
     //    semanticErrorManager.semanticInfo("Valor logico " + t.getLexema() + ", linea:" + t.getLine()); 
     Valor v = new Valor(scopeManager.searchType(TypeSimple.LOGICO), t.getLexema(), t.getLine(), new Value(Boolean.TRUE));
     RESULT =v; 
 :}
         | FALSE:f 
 {:
+	semanticErrorManager.semanticDebug("11 valor ::= FALSE:f  ");
     //    semanticErrorManager.semanticInfo("Valor logico " + f.getLexema() + ", linea:" + f.getLine()); 
     Valor v = new Valor(scopeManager.searchType(TypeSimple.LOGICO), f.getLexema(), f.getLine(), new Value(Boolean.FALSE));
     RESULT =v; 
 :}
         | CADENA:c 
 {:
+	semanticErrorManager.semanticDebug("12: CADENA:c ");
     //    semanticErrorManager.semanticInfo("Valor string " + c.getLexema() + ", linea:" + c.getLine());
     Valor v = new Valor(scopeManager.searchType(TypeSimple.CADENA), c.getLexema(), c.getLine(), new Value(c.getLexema()));
     RESULT =v; 
 :};             
 
-declaraciones ::= declaracion_constantes;
+declaraciones ::= declaracion_constantes:dc
+{:
+	semanticErrorManager.semanticDebug("12b: declaraciones ::= declaracion_constantes " + dc);
+	RESULT =dc;
+:};
 
-declaracion_constantes ::= constante declaracion_constantes 
-        | declaracion_registros;
+declaracion_constantes ::= constante:c declaracion_constantes:declaraciones 
+{:
+	semanticErrorManager.semanticDebug("12c: declaracion_constantes ::= constante declaracion_constantes ");
+	RESULT=declaraciones.addDeclaracion(c);
+:}
+        | declaracion_registros:dr
+{:
+	semanticErrorManager.semanticDebug("12d: declaracion_constantes ::= declaracion_registros");
+	RESULT = dr;
+:};
 
 
 constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v PUNTO_COMA
     {:
+    semanticErrorManager.semanticDebug("13");
         ScopeIF scope = scopeManager.getCurrentScope();
         String nombreConstante = (String)((ListaObjetos)listaNombres).get(0);
         //    semanticErrorManager.semanticInfo("Declaracion de constante " + nombreConstante);
@@ -321,14 +342,18 @@ constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v 
             // Creo la constante en el ambito
             SymbolTableIF tablaSimbolos = scope.getSymbolTable();
             SymbolConstant simboloCte = new SymbolConstant(scope,nombreConstante,v.getType());
+			simboloCte.setValue(v.getValue());
             // La guardo en la tabla de simbolos
             tablaSimbolos.addSymbol(nombreConstante, simboloCte);
-            //    semanticErrorManager.semanticInfo("Constante " + nombreConstante + " guardada en la tabla de simbolos");
+            
+			Declaraciones dc = new Declaraciones();
+			RESULT = dc;
         }
     :};
     
 lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres
     {:
+		semanticErrorManager.semanticDebug("14");
         ListaObjetos listaResultado = new ListaObjetos((ListaObjetos)listaNombres);
         listaResultado.add(id.getLexema().toUpperCase());
         //    semanticErrorManager.semanticInfo("Se encuentra el nombre " + id.getLexema()); 
@@ -337,17 +362,27 @@ lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres
     :}
     | IDENTIFICADOR:id
     {:
+		semanticErrorManager.semanticDebug("15: Lista_nombres ::= identificador");
         // semanticErrorManager.semanticInfo("Se encuentra el identificador " + id.getLexema() + ", Linea: " + id.getLexema());
         ListaObjetos listaNombres = new ListaObjetos();
         listaNombres.add(id.getLexema().toUpperCase());
         RESULT = listaNombres;
     :};
 
-declaracion_registros ::= registro declaracion_registros 
-        | declaracion_variables;
+declaracion_registros ::= registro declaracion_registros:dr 
+{:
+	semanticErrorManager.semanticDebug("15b: declaracion_registros ::= registro declaracion_registros");
+	RESULT = dr;
+:}
+        | declaracion_variables:dv
+{:
+	semanticErrorManager.semanticDebug("15c: declaracion_registros ::= declaracion_variables");
+	RESULT = dv;
+:};
         
 registro ::= TYPE IDENTIFICADOR:idRegistro IS RECORD lista_campos:listaCamposRegistro END RECORD PUNTO_COMA
     {:
+    semanticErrorManager.semanticDebug("16");
         //syntaxErrorManager.syntaxInfo("Declaracion de registro " + idRegistro.getLexema() + ". Linea " + idRegistro.getLine());
         // Comprueba en la tabla de tipos si el tipo ya está declarado
         ScopeIF scope = scopeManager.getCurrentScope();
@@ -379,6 +414,7 @@ registro ::= TYPE IDENTIFICADOR:idRegistro IS RECORD lista_campos:listaCamposReg
 
 lista_campos ::= IDENTIFICADOR:idCampo DOS_PUNTOS tipo:tipoCampo PUNTO_COMA lista_campos:listaCampos
 {:
+semanticErrorManager.semanticDebug("17");
     // Añadir ID + tipo a lista de campos del registro registro
     ScopeIF scope = scopeManager.getCurrentScope();
     TypeTableIF tablaTipos = scope.getTypeTable();
@@ -398,16 +434,20 @@ lista_campos ::= IDENTIFICADOR:idCampo DOS_PUNTOS tipo:tipoCampo PUNTO_COMA list
     | vacio;
    
 
-declaracion_variables ::= variable declaracion_variables
+declaracion_variables ::= variable:v declaracion_variables:declaraciones
 {:
+	semanticErrorManager.semanticDebug("18: declaracion_variables ::= variable declaracion_variables");
+	RESULT=declaraciones.addDeclaracion(v);
     //    semanticErrorManager.semanticInfo("Comienza declaracion de variables ");
 :}
-        | declaracion_subprogramas;
-/**
-    CAMBIO: sustituyo lista_nombres por su produccion
-**/
+        | declaracion_subprogramas:declaracionSubprogramas
+{:
+	RESULT=declaracionSubprogramas;
+:};
+
 variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
 {:
+	semanticErrorManager.semanticDebug("19: variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA");
     String tipoVariable = ((String)objTipo).toUpperCase();
     ListaObjetos listaNombres = (ListaObjetos)objListaNombres; 
 //    semanticErrorManager.semanticDebug("Declaracion variables de tipo " + tipoVariable);
@@ -440,17 +480,29 @@ variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
 :};
 
 
-declaracion_subprogramas ::= subprograma declaracion_subprogramas
+declaracion_subprogramas ::= subprograma:s declaracion_subprogramas:ds
 {:
+	semanticErrorManager.semanticDebug("20");
     semanticErrorManager.semanticInfo("Comienza declaracion de subprogramas ");
+    if (ds == null) {
+        ds = new Declaraciones();
+    }
+	RESULT = ds.addDeclaracionSubprograma(s);
 :} 
         | vacio;
         
-subprograma ::= funcion
-    | procedimiento; 
+subprograma ::= funcion:f
+{:
+	RESULT = f;
+:}	
+    | procedimiento:p
+	{:
+	RESULT = p;
+:}	; 
 
 funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS RETURN tipo_primitivo:tipoRetorno
 {:
+semanticErrorManager.semanticDebug("21");
     String nombreFuncion = (idFuncion.getLexema()).toUpperCase();
         
     // Comprueba si la funcion ha sido declarada
@@ -464,45 +516,45 @@ funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprogr
         SymbolTableIF tablaSimbolos = scope.getSymbolTable();
             
         //Creo un tipo y un simbolo para la funcion y los añado a la tabla
-        TypeFunction tipoFuncion = new TypeFunction(scope, nombreFuncion);
+        TypeFunction tipoFuncion = new TypeFunction(scope, nombreFuncion.toUpperCase());
+		semanticErrorManager.semanticInfo("Crea el tipo para la funcion " + tipoFuncion);
         TypeIF tipoResultado = scopeManager.searchType(((String)tipoRetorno).toUpperCase());
             
         //    semanticErrorManager.semanticInfo("Retorna " + tipoResultado.getName());
         tipoFuncion.setTipoResultado(tipoResultado);
         tablaTipos.addType(nombreFuncion, tipoFuncion);
+		semanticErrorManager.semanticInfo("Guarda la funcion en la tabla de tipos " + tablaTipos);
         SymbolFunction simboloFuncion = new SymbolFunction(scope, nombreFuncion, tipoFuncion);
         tablaSimbolos.addSymbol(nombreFuncion, simboloFuncion);
             
         // Abro un nuevo ambito para la funcion, con una nueva tabla simbolos y tipos
-        //    semanticErrorManager.semanticInfo("Nuevo ambito " + nombreFuncion);
+        semanticErrorManager.semanticInfo("Nuevo ambito " + nombreFuncion);
             
         ScopeIF scopeFuncion = scopeManager.openScope(nombreFuncion);
         TypeTableIF tablaTiposFuncion = scopeFuncion.getTypeTable();
         SymbolTableIF tablaSimbolosFuncion = scopeFuncion.getSymbolTable();
         
-        //    semanticErrorManager.semanticInfo("Procesa la lista de parametros" + listaParametros);
         for (SymbolParameter parametro:listaParametros.getListaParametros()) {
-            //    semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
-             //                   + " de tipo " + parametro.getType().getName());
             tablaSimbolosFuncion.addSymbol(parametro.getName().toUpperCase(),parametro);
             tipoFuncion.addTipoParametro(parametro.getType());
+			tipoFuncion.addParametro(parametro);
         }
+		semanticErrorManager.semanticInfo(tipoFuncion);
     } else {
         semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " +  idFuncion.getLexema()
             +" en linea: "+idFuncion.getLine());        
     }
         
-:} IS declaraciones cuerpo_funcion:cf
+:} IS declaraciones:declaraciones cuerpo_funcion:cf
 {:
-    //    semanticErrorManager.semanticInfo("Comprueba sentencias return");   
+	semanticErrorManager.semanticDebug("22"); 
     // Comprueba que existe al menos una sentencia return y que todas son del mismo tipo que el retorno de la funcion
     List<TypeIF> listaSentenciasReturn = cf.getListaSentenciasReturn();
     if (listaSentenciasReturn == null || listaSentenciasReturn.size() == 0) {
         semanticErrorManager.semanticFatalError("ERROR: la funcion " + idFuncion.getLexema()
             +" debe proporcionar alguna sentencia RETURN"); 
     } else {
-        //    semanticErrorManager.semanticInfo("Numero sentencias return" + listaSentenciasReturn.size()); 
-        TypeFunction function = (TypeFunction)scopeManager.searchType(idFuncion.getLexema());
+        TypeFunction function = (TypeFunction)scopeManager.searchType(idFuncion.getLexema().toUpperCase());
         TypeIF tipoResultado = function.getTipoResultado();
         for (TypeIF s:listaSentenciasReturn) {
             if (!s.equals(tipoResultado)) {
@@ -514,18 +566,23 @@ funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprogr
     
     // Comprueba que el identificador de apertura de la funcion coincide con el de cierre
     String idCierre = cf.getNombreFuncion().toUpperCase();
+	semanticErrorManager.semanticInfo("Comprueba el id de cierre"); 
     if (!idCierre.equalsIgnoreCase(idFuncion.getLexema())) {
         semanticErrorManager.semanticFatalError("ERROR: El identificador de apertura debe coincidir con el de cierre, apertura: " + idFuncion.getLexema()
                     +", cierre: " + idCierre); 
     } 
     
-    //    semanticErrorManager.semanticDebug("Cierro ambito " + idCierre);
+	DeclaracionSubprograma declaracionFuncion = new DeclaracionSubprograma(idFuncion.getLexema(), declaraciones, cf);
+	declaracionFuncion.generarCodigoIntermedio();
+    
     scopeManager.closeScope();
+	RESULT = declaracionFuncion;
 :};
 
        
 procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS
 {:
+  semanticErrorManager.semanticDebug("23");
     // El procedimiento es igual que la funcion, pero crea un tipo procedure que no tiene retorno
     String nombreProcedimiento = idProcedimiento.getLexema().toUpperCase();
         
@@ -555,11 +612,11 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parame
         TypeTableIF tablaTiposProcedimiento = scopeProcedimiento.getTypeTable();
         SymbolTableIF tablaSimbolosProcedimiento = scopeProcedimiento.getSymbolTable();
             
-        //    semanticErrorManager.semanticInfo("Procesa los parametros " + listaParametros);
+        semanticErrorManager.semanticInfo("Procesa los parametros " + listaParametros);
         // Almaceno los parametros en la tabla de simbolos y la de tipos
         for (SymbolParameter parametro:listaParametros.getListaParametros()) {
-            //    semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
-            //                    + " de tipo " + parametro.getType().getName());
+            semanticErrorManager.semanticInfo("Declaracion de parametro " + parametro.getName() 
+                                + " de tipo " + parametro.getType().getName());
             tablaSimbolosProcedimiento.addSymbol(parametro.getName().toUpperCase(),parametro);
             tipoProcedimiento.addTipoParametro(parametro.getType());
         }
@@ -568,8 +625,9 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parame
                                                     +" en linea: "+idProcedimiento.getLine());        
     }
         
-:}  IS declaraciones cuerpo:cp
+:}  IS declaraciones:declaraciones cuerpo:cp
 {:
+	semanticErrorManager.semanticDebug("24");
     // Comprueba que el identificador que cierra el cuerpo del procedimiento es equivalente al de apertura
     String idCierre = cp.getIdProcedimiento().toUpperCase();
     //    semanticErrorManager.semanticInfo("Cierre procedimiento " + idCierre);
@@ -578,11 +636,16 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parame
                                                     +" . Cierre: "+idCierre);       
     }
     //    semanticErrorManager.semanticDebug("Cierro ambito " + idCierre);
+	DeclaracionSubprograma declaracionProcedimiento = new DeclaracionSubprograma(idProcedimiento.getLexema(), declaraciones, cp);
+	declaracionProcedimiento.generarCodigoIntermedio();
+    
     scopeManager.closeScope();
+	RESULT = declaracionProcedimiento;
 :};
     
 parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO_COMA parametros_subprograma:listaParametrosPrevios
 {:
+semanticErrorManager.semanticDebug("25");
     ScopeIF scope = scopeManager.getCurrentScope();
 	TypeTableIF tablaTipos = scope.getTypeTable();
 	SymbolTableIF tablaSimbolos = scope.getSymbolTable();
@@ -613,6 +676,7 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
 	    :}
         | lista_nombres:listaNombres DOS_PUNTOS tipo:tipo 
         {:
+        semanticErrorManager.semanticDebug("26");
             ScopeIF scope = scopeManager.getCurrentScope();
             TypeTableIF tablaTipos = scope.getTypeTable();
             SymbolTableIF tablaSimbolos = scope.getSymbolTable();
@@ -642,7 +706,12 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
 
 cuerpo_funcion::= BEGIN lista_sentencias_funcion:listaSentenciasReturn END IDENTIFICADOR:idFuncion PUNTO_COMA
 {:
+	semanticErrorManager.semanticDebug("27");
     CuerpoFuncion cf = new CuerpoFuncion();
+	if (listaSentenciasReturn == null) {
+        listaSentenciasReturn = new ListaSentenciasReturn();
+		semanticErrorManager.semanticInfo("Inicializa listaSentenciasReturn" + listaSentenciasReturn);        
+    }
     cf.setListaSentenciasReturn(listaSentenciasReturn.getListaTiposReturn());
     cf.setNombreFuncion(idFuncion.getLexema());
     RESULT = cf;
@@ -650,27 +719,32 @@ cuerpo_funcion::= BEGIN lista_sentencias_funcion:listaSentenciasReturn END IDENT
 
 lista_sentencias_funcion ::=  sentencia_funcion:posibleReturn PUNTO_COMA lista_sentencias_funcion:listaReturns
 {:
+semanticErrorManager.semanticDebug("28");
     if (listaReturns == null) {
+		semanticErrorManager.semanticInfo("Inicializa listaReturn" + listaReturns);        
         listaReturns = new ListaSentenciasReturn();
     }
     if (posibleReturn != null) {
         listaReturns.addReturnType(posibleReturn.getType());
-        //    semanticErrorManager.semanticInfo("Añade return a la list " + posibleReturn.getType().getName());        
+        semanticErrorManager.semanticInfo("Añade return a la list " + posibleReturn.getType().getName());        
     }
     RESULT = listaReturns;
 :} |  vacio
 {:
+	semanticErrorManager.semanticDebug("29");
     RESULT = new ListaSentenciasReturn();
 :};
 
 sentencia_funcion ::= sentencia 
     | sentencia_return:sent_return
 {:
+semanticErrorManager.semanticDebug("30");
     RESULT = sent_return;
 :};
 
 sentencia_return ::= RETURN expresion:e
 {:
+semanticErrorManager.semanticDebug("31");
     //    semanticErrorManager.semanticInfo("Encontrada sentencia return de tipo " + e.getType().getName());
     RESULT = e;
 :};
@@ -679,10 +753,15 @@ sentencia_return ::= RETURN expresion:e
 
 cuerpo ::=  BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR:idProcedimiento PUNTO_COMA
     {:
-        //    semanticErrorManager.semanticInfo("Cierre procedimiento " + idProcedimiento.getLexema());
+		semanticErrorManager.semanticDebug("32 : CUERPO");
+        semanticErrorManager.semanticInfo("Cierre procedimiento " + idProcedimiento.getLexema());
         Cuerpo cuerpo = new Cuerpo();
         cuerpo.setIdProcedimiento(idProcedimiento.getLexema().toUpperCase());
-        cuerpo.setIntermediateCode(listaSentencias.getIntermediateCode());
+        if (listaSentencias != null) {
+			semanticErrorManager.semanticInfo("listaSentencias.getIntermediateCode()");
+            cuerpo.setIntermediateCode(listaSentencias.getIntermediateCode());			
+        }
+        
         semanticErrorManager.semanticInfo("Codigo de procedimiento: " + idProcedimiento.getLexema() + cuerpo.getIntermediateCode());
         RESULT = cuerpo;
     :}
@@ -697,6 +776,7 @@ cuerpo ::=  BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR:idProcedimi
 *******************************************************************************/
 expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     {:
+    semanticErrorManager.semanticDebug("33");
         Expresion e1 = (Expresion)exp1;
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
@@ -721,6 +801,7 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     :}
         | expresion:exp1 MAYOR:operador expresion:exp2
     {:
+    semanticErrorManager.semanticDebug("34");
         Expresion e1 = (Expresion)exp1;
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
@@ -744,6 +825,7 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     :}            
         | expresion:exp1 IGUAL:operador expresion:exp2
     {:
+    semanticErrorManager.semanticDebug("35");
         Expresion e1 = (Expresion)exp1;
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
@@ -766,6 +848,7 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     :}         
         | expresion:exp1 OR:operador expresion:exp2 
     {:
+    semanticErrorManager.semanticDebug("36");
         Expresion e1 = (Expresion)exp1;
         Expresion e2 = (Expresion)exp2;
         TypeIF type1 = e1.getType();
@@ -790,14 +873,17 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     :}            
         | ABRE_PARENTESIS:a expresion:exp CIERRA_PARENTESIS:b
 {:
+semanticErrorManager.semanticDebug("37 : expresion ::= ABRE_PARENTESIS:a expresion:exp CIERRA_PARENTESIS:b");
     RESULT = exp;
 :}        
         | llamada_subprograma:l
 {:  
-    
+    semanticErrorManager.semanticDebug("38: expresion ::= llamada_subprograma:l");
     if (l != null && l.getType() != null) {
         // Si existe devolucion es que es una funcion y no un procedimiento
         Expresion expresionResultado = new Expresion(l.getType(), l.getLexema());
+        expresionResultado.generarCodigoIntermedio(l);
+
         RESULT = expresionResultado;
     } else {
        semanticErrorManager.semanticFatalError("ERROR: uso de un procedimiento en una expresion "); 
@@ -805,10 +891,11 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 :}        
         | referencia:r
 {:
+semanticErrorManager.semanticDebug("39: expresion ::= referencia:r");
     TypeIF tipo = r.getType();
     String lexema = r.getLexema().toUpperCase();
     Expresion expresion = new Expresion(tipo, lexema);
-    
+    semanticErrorManager.semanticDebug("Creo el objeto expresion " + expresion);
     expresion.generarCodigoIntermedio(r);
     
     semanticErrorManager.semanticDebug("Expresion referencia: " + expresion.getIntermediateCode());
@@ -816,7 +903,7 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 :}              
         | valor:valor
 {:
-    
+    semanticErrorManager.semanticDebug("40: expresion ::= valor:valor");
     Expresion expresion = new Expresion(valor.getType(), valor.getLexema().toUpperCase());
     expresion.generarCodigoIntermedio(valor);
     semanticErrorManager.semanticDebug("Expresion valor: " + expresion.getIntermediateCode());
@@ -825,16 +912,16 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 
 referencia ::= IDENTIFICADOR:id 
 {:
+	semanticErrorManager.semanticDebug("41: referencia ::= IDENTIFICADOR:id");
     String name = id.getLexema().toUpperCase();
-//    semanticErrorManager.semanticInfo("Produce referencia a partir de identificador " + name);
     if (scopeManager.containsSymbol(name)) {
         SymbolIF simbolo = scopeManager.searchSymbol(name);
-//        semanticErrorManager.semanticInfo("Simbolo " + name + " " + simbolo);
+		semanticErrorManager.semanticInfo("Simbolo " + name + " " + simbolo);
         TypeIF tipo = simbolo.getType();
         Referencia r = new Referencia(tipo, name, id.getLine()); 
+		semanticErrorManager.semanticDebug("Objeto referencia creado");
         r.generarCodigoIntermedio();
-        // semanticErrorManager.semanticInfo(r);
-        semanticErrorManager.semanticDebug("Codigo referencia: " + r.getIntermediateCode());
+        semanticErrorManager.semanticDebug("Codigo referencia generado: " + r.getIntermediateCode());
         RESULT = r;
     } else {
        semanticErrorManager.semanticFatalError("ERROR: uso de una referencia desconocida " + id.getLine() + " " + name);         
@@ -842,11 +929,13 @@ referencia ::= IDENTIFICADOR:id
 :}
         | acceso_registro:a
 {:
+semanticErrorManager.semanticDebug("42: referencia ::= acceso_registro:a");
     RESULT = a;
 :};
 
 acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
 {:
+	semanticErrorManager.semanticDebug("43 acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:");
     String nombreRegistro = registro.getLexema().toUpperCase();
     String nombreCampo = campo.getLexema().toUpperCase();
     TypeIF tipoRegistro = registro.getType();
@@ -855,6 +944,13 @@ acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
         if (tRec.containsCampo(nombreCampo)) {
             TypeIF innerType = tRec.getCampo(nombreCampo).getType();
             Referencia r = new Referencia(innerType, nombreRegistro + "." + nombreCampo, campo.getLine());
+			r.setAccesoRegistro(true);
+			SymbolVariable variableRegistro = (SymbolVariable)scopeManager.searchSymbol(nombreRegistro);
+			r.setVariableRegistro(variableRegistro);
+			
+			SymbolVariable campoRegistro = new SymbolVariable(variableRegistro.getScope(), nombreCampo, innerType);
+			r.setCampoRegistro(campoRegistro);
+			
             r.generarCodigoIntermedio(registro, nombreCampo);
             semanticErrorManager.semanticDebug("Codigo acceso registro: " + r.getIntermediateCode());
              
@@ -870,6 +966,7 @@ acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
        
 lista_sentencias ::=  sentencia:sentencia PUNTO_COMA lista_sentencias:listaSentencias 
     {:
+		semanticErrorManager.semanticDebug("44: LISTA_SENTENCIAS");
         if (listaSentencias == null) {
             listaSentencias = new ListaSentencias();
         }
@@ -879,32 +976,38 @@ lista_sentencias ::=  sentencia:sentencia PUNTO_COMA lista_sentencias:listaSente
         RESULT = listaSentencias;
     :}
         |  vacio {:
-        // semanticErrorManager.semanticInfo("VACIO");
+			semanticErrorManager.semanticDebug("45: LISTA_SENTENCIAS: VACIO");
         :};
 
 sentencia ::= sentencia_entrada_salida:sentencia
 {:
+semanticErrorManager.semanticDebug("46");
     RESULT = sentencia;
 :} 
         | sentencia_if:sentencia
 {:
+semanticErrorManager.semanticDebug("47");
     RESULT = sentencia;
 :}
         | sentencia_for:sentencia
 {:
+semanticErrorManager.semanticDebug("48");
     RESULT = sentencia;
 :}
         | sentencia_asignacion:sentencia
 {:
+semanticErrorManager.semanticDebug("49");
     RESULT = sentencia;
 :}
         | llamada_subprograma:sentencia
 {:
+semanticErrorManager.semanticDebug("50");
     RESULT = sentencia;
 :};
 
 sentencia_if ::= IF expresion:objExp THEN lista_sentencias:listaSentencias END IF
 {:
+semanticErrorManager.semanticDebug("51");
     Expresion expCondicion = (Expresion)objExp;
     if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
         semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
@@ -916,6 +1019,7 @@ sentencia_if ::= IF expresion:objExp THEN lista_sentencias:listaSentencias END I
 :}
         | IF expresion:objExp THEN lista_sentencias:listaSentencias ELSE lista_sentencias:listaSentenciasElse END IF
 {:
+semanticErrorManager.semanticDebug("52");
     Expresion expCondicion = (Expresion)objExp;
     if (!expCondicion.getType().getName().equalsIgnoreCase(TypeSimple.LOGICO)) {
         semanticErrorManager.semanticFatalError("ERROR: la condicion debe devolver un tipo boolean" );
@@ -932,6 +1036,7 @@ sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio
     DELIMITADOR_RANGO expresion:expFin LOOP lista_sentencias:listaSentencias 
     END LOOP
 {:
+semanticErrorManager.semanticDebug("53");
     //Indice debe corresponder con una variable de tipo entero
     List<SymbolIF> posiblesIndices = scopeManager.searchSymbols(indice.getLexema().toUpperCase());
     if (posiblesIndices == null || posiblesIndices.size() == 0) {
@@ -961,8 +1066,8 @@ sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio
         
 sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
 {:
-    // semanticErrorManager.semanticInfo("Asignacion");
-    // semanticErrorManager.semanticInfo(referencia);
+	semanticErrorManager.semanticDebug("54: sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion");
+    
     // Debo comprobar que tanto referencia como expresion coinciden en tipo y que este es uno de los tipos simples
     if (!(referencia.getType() instanceof TypeSimple)) {
         semanticErrorManager.semanticFatalError("ERROR: no se permiten asignaciones a tipos compuestos, linea: " + referencia.getLine());
@@ -979,29 +1084,40 @@ sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
 
 sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS expresion:parametro CIERRA_PARENTESIS
 {:
+	semanticErrorManager.semanticDebug("55: sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS expresion:parametro CIERRA_PARENTESIS");
     if (!(parametro.getType() instanceof TypeSimple)) {
         semanticErrorManager.semanticFatalError("ERROR: parametros no compatibles en put_line " + parametro.getLexema());
     }
-    semanticErrorManager.semanticInfo("invocacion a put_line");
     SentenciaPutLine sent = new SentenciaPutLine();
     sent.generarCodigoIntermedio(parametro);
     semanticErrorManager.semanticInfo(sent.getIntermediateCode());
+    RESULT = sent;
+:}
+		| PUT_LINE ABRE_PARENTESIS CADENA:cadena CIERRA_PARENTESIS
+{:
+	semanticErrorManager.semanticDebug("55b: sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS CADENA:cadena CIERRA_PARENTESIS");
+	SentenciaPutLine sent = new SentenciaPutLine();
+    sent.generarCodigoIntermedio(cadena.getLexema());
+	semanticErrorManager.semanticInfo(sent.getIntermediateCode());
     RESULT = sent;
 :};
 
 parametro ::= valor:valor
 {:
+	semanticErrorManager.semanticDebug("56: parametro ::= valor:valor");
     Parametro parametro =  new Parametro(valor.getType(), valor.getLexema().toUpperCase(), valor.getLine());
     RESULT = parametro;
 :}
         | referencia:referencia
 {:
+semanticErrorManager.semanticDebug("57: referencia:referencia");
     Parametro parametro = new Parametro(referencia.getType(),referencia.getLexema().toUpperCase(),referencia.getLine());
     RESULT = parametro;
 :};
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIERRA_PARENTESIS
 {:
+semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIERRA_PARENTESIS");
     String name = id.getLexema().toUpperCase();
     if (!scopeManager.containsSymbol(name)) {
         semanticErrorManager.semanticFatalError("ERROR: subprograma desconocido " + name + ", linea: " + id.getLine());    
@@ -1049,7 +1165,9 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
 
 lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista
 {:
+	semanticErrorManager.semanticDebug("59: lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista");
     lista.addParameterType(e.getType());
+	lista.addParametro(e);
     ScopeIF scope = scopeManager.getCurrentScope();
     IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
     cb.addQuadruples(lista.getIntermediateCode());
@@ -1059,8 +1177,10 @@ lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista
 :}
         | expresion:e
 {:
+semanticErrorManager.semanticDebug("60: lista_parametros ::= expresion:e");
 	ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
 	lista.addParameterType(e.getType());
+	lista.addParametro(e);
     ScopeIF scope = scopeManager.getCurrentScope();
     IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
     cb.addQuadruples(e.getIntermediateCode());
@@ -1069,6 +1189,7 @@ lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista
 :}  
         | vacio
 {:
+semanticErrorManager.semanticDebug("61: lista_parametros ::= vacio");
     ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
     RESULT = lista;
 :};

@@ -3,6 +3,8 @@
  */
 package compiler.code.translator;
 
+import compiler.intermediate.Value;
+
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -24,8 +26,17 @@ public class TranslatorLabel extends Translator {
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append(q.getResult() + " : ");
+		if (q.getFirstOperand() != null) {
+			// En las etiquetas que marcan el inicio de un subprograma, se
+			// incluye el nivel de
+			// ámbito como primer operando.
+			Value v = (Value) q.getFirstOperand();
+			scopeCount = (int) v.getValue();
+			sb.append(" ; Ambito ").append(scopeCount).append(" \n");
+		}
+		return sb.toString();
 	}
 
 }

@@ -1,14 +1,28 @@
--- variables y aritmetica simple 
+-- funciones paso por valor
 
-procedure testCase04 () is
 
-    x, y, z: Integer;
-    a,b,c:Boolean;
+procedure testCase08 () is
+
+z: Integer;
+
+a,b: Integer;
+
+function suma (x,y: Integer) return Integer is
 begin
-    --y := 2;
-    --z := 1;
-    --x := y + z;
-    -- a := True;
-    -- B := False;
-    c := True;
-end TestCase04;
+        
+    return x+y; 
+
+end suma;
+
+
+begin
+
+    Put_line ("SUBPROGRAMAS FUNCIONES");
+    a:= 5;
+    b:= 3;
+    z:= suma (a,b);
+    Put_line("z(8):");
+    Put_line(z);
+            
+
+end testCase08;

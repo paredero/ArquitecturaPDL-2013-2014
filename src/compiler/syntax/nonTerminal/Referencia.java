@@ -4,10 +4,15 @@ package compiler.syntax.nonTerminal;
 
 import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
+import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
+import compiler.semantic.symbol.SymbolConstant;
+import compiler.semantic.symbol.SymbolParameter;
+import compiler.semantic.symbol.SymbolVariable;
 import compiler.semantic.type.TypeRecord;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.TemporalFactory;
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -23,6 +28,9 @@ public class Referencia extends NonTerminal {
 	private TemporalIF temporal;
 	private TemporalIF temporalIndex;
 	private TemporalIF temporalOffset;
+	private Boolean accesoRegistro = false;
+	SymbolVariable variableRegistro;
+	SymbolVariable campoRegistro;
 	
 	public Referencia() {
 	}
@@ -75,6 +83,13 @@ public class Referencia extends NonTerminal {
 	 * @param line
 	 */
 	public Referencia(TypeIF type, String lexema, int line) {
+		super();
+		this.type = type;
+		this.lexema = lexema;
+		this.line = line;
+	}
+	
+	public Referencia(TypeIF type, String lexema, int line, boolean accesoRegistro) {
 		super();
 		this.type = type;
 		this.lexema = lexema;
@@ -135,12 +150,29 @@ public class Referencia extends NonTerminal {
         TemporalIF temp = tF.create();
         
         // Puede ser un SymbolVariable o un SymbolParameter
-        SymbolIF sv = scopeManager.searchSymbol(this.getLexema());
+        SymbolIF symbol = scopeManager.searchSymbol(this.getLexema());
+        OperandIF o;
         
-        Variable var = new Variable(this.getLexema(), sv.getScope());
-        cb.addQuadruple(InstructionSet.MV, temp, var);
+        CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol);
+        if (symbol instanceof SymbolVariable) {
+        	o = new Variable(this.getLexema(), symbol.getScope());
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Variable creada " + o);    
+            
+        } else if (symbol instanceof SymbolParameter) {
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
+        	o = new Variable(this.getLexema(), symbol);
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Parametro creado " + o);      
+        	((Variable) o).setParameter(true);       	            
+        } else {
+        	SymbolConstant constante = (SymbolConstant)symbol;
+            o = new Value(constante.getValue());
+            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada " + o);  
+        }
+        
+        cb.addQuadruple (InstructionSet.MV, temp, o);        
         this.setTemporal(temp);
         this.setIntermediateCode(cb.create());
+        CompilerContext.getSemanticErrorManager().semanticDebug(this);
 	}
 	
 	public void generarCodigoIntermedio(Referencia r, String campo) {
@@ -148,20 +180,64 @@ public class Referencia extends NonTerminal {
 		ScopeIF scope = scopeManager.getCurrentScope();
         TemporalFactory tf = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        TemporalIF temp = tf.create();
         
-        TemporalIF rTemp = r.getTemporal();
-        TemporalIF rTempI = r.getTemporalIndex();
-        TemporalIF rTempO = tf.create();
         
-        cb.addQuadruples(r.getIntermediateCode());
-        TypeRecord rType = (TypeRecord)r.getType();
-        int idOffSet = rType.getOffset(campo);
-        
-        cb.addQuadruple(InstructionSet.MV, rTempO, idOffSet);
-        this.setTemporal(rTemp);
-        this.setTemporalIndex(rTempI);
-        this.setTemporalOffset(rTempO);
+        TypeRecord tipo = (TypeRecord)variableRegistro.getType();
+        CompilerContext.getSemanticErrorManager().semanticDebug("Obtiene el tipo "+tipo);
+        int idOffset = tipo.getOffset(campoRegistro.getName());
+        CompilerContext.getSemanticErrorManager().semanticDebug("Obtiene el offset "+idOffset);
+        Variable var = new Variable(variableRegistro.getName(), variableRegistro.getScope());
+        CompilerContext.getSemanticErrorManager().semanticDebug("Crez la variable "+var);
+        var.setSimbolo(variableRegistro);
+        CompilerContext.getSemanticErrorManager().semanticDebug("Le asigna el simbolo "+variableRegistro);
+
+        cb.addQuadruple(InstructionSet.MOVE_REG, temp, idOffset, var);
+        this.setTemporal(temp);
         this.setIntermediateCode(cb.create());
 	}
+
+	/**
+	 * @return the accesoRegistro
+	 */
+	public Boolean getAccesoRegistro() {
+		return accesoRegistro;
+	}
+
+	/**
+	 * @param accesoRegistro the accesoRegistro to set
+	 */
+	public void setAccesoRegistro(Boolean accesoRegistro) {
+		this.accesoRegistro = accesoRegistro;
+	}
+
+	/**
+	 * @return the variableRegistro
+	 */
+	public SymbolVariable getVariableRegistro() {
+		return variableRegistro;
+	}
+
+	/**
+	 * @param variableRegistro the variableRegistro to set
+	 */
+	public void setVariableRegistro(SymbolVariable variableRegistro) {
+		this.variableRegistro = variableRegistro;
+	}
+
+	/**
+	 * @return the campoRegistro
+	 */
+	public SymbolVariable getCampoRegistro() {
+		return campoRegistro;
+	}
+
+	/**
+	 * @param campoRegistro the campoRegistro to set
+	 */
+	public void setCampoRegistro(SymbolVariable campoRegistro) {
+		this.campoRegistro = campoRegistro;
+	}
+
 	
 }

@@ -3,6 +3,8 @@ package compiler.semantic.type;
 import java.util.ArrayList;
 import java.util.List;
 
+import compiler.semantic.symbol.SymbolParameter;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
@@ -19,6 +21,7 @@ public class TypeProcedure
 {   
 	// Almacena el listado de parametros
    private List<TypeIF> tipoParametros;
+   protected List<SymbolParameter> parametros;
 
 /**
      * Constructor for TypeProcedure.
@@ -69,5 +72,27 @@ public class TypeProcedure
 			this.tipoParametros = new ArrayList<TypeIF>();
 		}
 		this.tipoParametros.add(tipoParametro);
+	}
+
+	/**
+	 * @return the parametros
+	 */
+	public List<SymbolParameter> getParametros() {
+		return parametros;
+	}
+
+	/**
+	 * @param parametros the parametros to set
+	 */
+	public void setParametros(List<SymbolParameter> parametros) {
+		this.parametros = parametros;
+	}
+	
+	
+	public void addParametro(SymbolParameter parametro) {
+		if (this.parametros == null) {
+			this.parametros = new ArrayList<SymbolParameter>();
+		}
+		this.parametros.add(parametro);
 	}
 }

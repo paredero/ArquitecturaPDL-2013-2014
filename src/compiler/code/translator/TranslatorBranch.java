@@ -3,6 +3,8 @@
  */
 package compiler.code.translator;
 
+import compiler.intermediate.InstructionSet;
+
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -24,8 +26,9 @@ public class TranslatorBranch extends Translator {
 	 */
 	@Override
 	public String translate() {
-		// TODO Auto-generated method stub
-		return null;
+		sb.append("BR /" + q.getResult()).append(" \n");
+		
+		return sb.toString();
 	}
 
 }
