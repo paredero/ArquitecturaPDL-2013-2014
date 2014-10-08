@@ -1,8 +1,8 @@
 package compiler.intermediate;
 
-import compiler.CompilerContext;
 import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolVariable;
+
 import es.uned.lsi.compiler.intermediate.VariableIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
@@ -141,8 +141,8 @@ public class Variable
 	 */
 	@Override
 	public String toString() {
-		return "Variable [name=" + name + ", scope=" + scope + ", isParameter="
-				+ isParameter + ", simbolo=" + simbolo + "]";
+		return "Variable [name=" + name + ", scope=" + scope.getName() + ", isParameter="
+				+ isParameter + "]";
 	}
 
 	/**

@@ -101,7 +101,7 @@ public class Referencia extends NonTerminal {
 	 */
 	@Override
 	public String toString() {
-		return "Referencia [type=" + type + ", lexema=" + lexema + ", line="
+		return "Referencia [type=" + type.getName() + ", lexema=" + lexema + ", line="
 				+ line + "]";
 	}
 
@@ -153,20 +153,19 @@ public class Referencia extends NonTerminal {
         SymbolIF symbol = scopeManager.searchSymbol(this.getLexema());
         OperandIF o;
         
-        CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol);
+        CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol.getName());
         if (symbol instanceof SymbolVariable) {
         	o = new Variable(this.getLexema(), symbol.getScope());
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Variable creada " + o);    
-            
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Variable creada ");               
         } else if (symbol instanceof SymbolParameter) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
         	o = new Variable(this.getLexema(), symbol);
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Parametro creado " + o);      
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Parametro creado ");      
         	((Variable) o).setParameter(true);       	            
         } else {
         	SymbolConstant constante = (SymbolConstant)symbol;
             o = new Value(constante.getValue());
-            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada " + o);  
+            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada ");  
         }
         
         cb.addQuadruple (InstructionSet.MV, temp, o);        

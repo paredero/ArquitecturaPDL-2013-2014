@@ -3,6 +3,11 @@ package compiler.syntax.nonTerminal;
 import java.util.ArrayList;
 import java.util.List;
 
+import compiler.CompilerContext;
+import compiler.intermediate.InstructionSet;
+
+import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class ListaParametrosEjecucion extends NonTerminal {
@@ -50,7 +55,20 @@ public class ListaParametrosEjecucion extends NonTerminal {
 		if (parametros == null) {
 			parametros = new ArrayList<Expresion>();
 		}
-		this.parametros.add(parametro);
+		this.parametros.add(parametro);		
+		
+		generarCodigoIntermedio(parametro);
+		
+	}
+
+	private void generarCodigoIntermedio(Expresion parametro) {
+		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        cb.addQuadruples(this.getIntermediateCode());
+        cb.addQuadruples(parametro.getIntermediateCode());
+        cb.addQuadruple(InstructionSet.PARAM, null, parametro.getTemporal());
+        
+        this.setIntermediateCode(cb.create());
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -60,6 +78,6 @@ public class ListaParametrosEjecucion extends NonTerminal {
 		return "ListaParametrosEjecucion [parametros=" + parametros + "]";
 	}
 
-	
+
 	
 }

@@ -24,9 +24,9 @@ public class TranslatorMV extends Translator {
 			}
 		}
 		sb.append("MOVE ");
-		sb.append(translate(q.getFirstOperand()));
+		sb.append(traducirOperando(q.getFirstOperand()));
 		sb.append(", ");
-		sb.append(translate(q.getResult()));
+		sb.append(traducirOperando(q.getResult()));
 		sb.append(" \n");
 		return sb.toString();
 	}

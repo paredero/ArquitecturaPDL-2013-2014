@@ -158,7 +158,7 @@ public class Expresion extends NonTerminal {
 	 */
 	@Override
 	public String toString() {
-		return "Expresion [type=" + type + ", lexema=" + lexema + ", temporal="
+		return "Expresion [type=" + type.getName() + ", lexema=" + lexema + ", temporal="
 				+ temporal + "]";
 	}
 	public void generarCodigoIntermedio(LlamadaSubprograma l) {

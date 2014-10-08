@@ -6,7 +6,8 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class CuerpoFuncion extends NonTerminal {
 
-	List<TypeIF> listaSentenciasReturn;
+	List<TypeIF> listaTiposReturn;
+	ListaSentencias listaSentencias;
 	String nombreFuncion;
 	
 	public CuerpoFuncion() {
@@ -14,17 +15,17 @@ public class CuerpoFuncion extends NonTerminal {
 	}
 
 	/**
-	 * @return the listaSentenciasReturn
+	 * @return the listaTiposReturn
 	 */
-	public List<TypeIF> getListaSentenciasReturn() {
-		return listaSentenciasReturn;
+	public List<TypeIF> getListaTiposReturn() {
+		return listaTiposReturn;
 	}
 
 	/**
-	 * @param listaSentenciasReturn the listaSentenciasReturn to set
+	 * @param listaTiposReturn the listaTiposReturn to set
 	 */
-	public void setListaSentenciasReturn(List<TypeIF> listaSentenciasReturn) {
-		this.listaSentenciasReturn = listaSentenciasReturn;
+	public void getListaTiposReturn(List<TypeIF> listaTiposReturn) {
+		this.listaTiposReturn = listaTiposReturn;
 	}
 
 	/**
@@ -41,14 +42,40 @@ public class CuerpoFuncion extends NonTerminal {
 		this.nombreFuncion = nombreFuncion;
 	}
 
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "CuerpoFuncion [listaSentenciasReturn=" + listaSentenciasReturn
-				+ ", nombreFuncion=" + nombreFuncion + "]";
+		return "CuerpoFuncion [listaTiposReturn=" + listaTiposReturn.size()
+				+ ", listaSentencias=" + listaSentencias + ", nombreFuncion="
+				+ nombreFuncion + "]";
 	}
+
+	/**
+	 * @return the listaSentencias
+	 */
+	public ListaSentencias getListaSentencias() {
+		return listaSentencias;
+	}
+
+	/**
+	 * @param listaSentencias the listaSentencias to set
+	 */
+	public void setListaSentencias(ListaSentencias listaSentencias) {
+		this.listaSentencias = listaSentencias;
+	}
+
+	/**
+	 * @param listaTiposReturn the listaTiposReturn to set
+	 */
+	public void setListaTiposReturn(List<TypeIF> listaTiposReturn) {
+		this.listaTiposReturn = listaTiposReturn;
+	}
+
+	
 
 	
 }

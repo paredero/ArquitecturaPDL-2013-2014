@@ -8,16 +8,8 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 public abstract class Translator {
 	public static final String PUNTERO_MARCO = ".IY";
-	public static final String VINCULO_CONTROL = ".IX";
 	public static final String STACK_POINTER = ".SP";
 	public static final String ACUMULADOR = ".A";
-	public static final String CONTADOR_PROGRAMA = ".PC";
-
-	public final String DISPLAY_ADDRESS = "#65001";
-	public final int STACK_ADDRESS = 65000;
-	public final String FRAME_POINTER_ADDRESS = "#64999";// la posicion (#65000)
-															// es para el valor
-															// de retorno
 
 	protected QuadrupleIF q;
 	protected StringBuilder sb;
@@ -39,8 +31,9 @@ public abstract class Translator {
 		return (var.getScope().getLevel() != scopeCount);
 	}
 
-	public String translate(OperandIF o) {
+	public String traducirOperando(OperandIF o) {
 		if (o instanceof Variable) {
+			// Si se trata de una variable global direcciona directo a memoria
 			Variable v = (Variable) o;
 			if (v.isGlobal()) {
 				return "/" + v.getAddress();
@@ -57,7 +50,7 @@ public abstract class Translator {
 				// Esta dirección se calcula en la clase TranslatorMove cuando
 				// se detecta
 				// que la variable es no local
-				return getNoLocalAddress(v);
+				return "[.R1]";
 			}
 			return "#-" + v.getAddress() + "[.IX]";
 		} else if (o instanceof Temporal) {
@@ -78,8 +71,5 @@ public abstract class Translator {
 		return "NO IMPLEMENTADO: " + o;
 	}
 
-	private String getNoLocalAddress(Variable var) {
-		// return "#-" + var.getAddress() + "[.R1]";
-		return "[.R1]";
-	}
+
 }

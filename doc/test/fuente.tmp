@@ -1,8 +1,8 @@
-;Quadruple - [INICIO null, 3, L_testCase08] 
-RES 3;Reservo memoria para variables globales 
+;Quadruple - [INICIO null, 2, L_testCase08] 
+RES 2;Reservo memoria para variables globales 
 MOVE #65535, .SP;Situo el puntero de pila al final del espacio de memoria 
 MOVE .SP , .IY;Inicializo el puntero de marco 
-SUB  .SP , #3 
+SUB  .SP , #2 
 MOVE .A, .SP 
 MOVE .IY , /0 
 BR /L_testCase08; Salto a la etiqueta del procedimiento principal 
@@ -10,86 +10,93 @@ BR /L_testCase08; Salto a la etiqueta del procedimiento principal
 ;Quadruple - [INL L_SUMA, 1, null] 
 L_SUMA :  ; Ambito 1 
 
-;Quadruple - [RET null, null, null] 
+;Quadruple - [MV T_0, Variable [name=X, scope=testCase08, isParameter=true], null] 
+MOVE #65001, .R1 
+SUB [.R1], #0 
+MOVE .A, .R1 
+MOVE /0, #-1[.IX] 
+
+;Quadruple - [MV T_1, T_0, null] 
+MOVE #-1[.IX], #-2[.IX] 
+
+;Quadruple - [ESCRIBEVAL T_1, null, null] 
+WRINT #-2[.IX] 
+WRCHAR #10
+WRCHAR #13
+;Quadruple - [MV T_2, Variable [name=X, scope=testCase08, isParameter=true], null] 
+MOVE #65001, .R1 
+SUB [.R1], #0 
+MOVE .A, .R1 
+MOVE /0, #-3[.IX] 
+
+;Quadruple - [MV T_3, T_2, null] 
+MOVE #-3[.IX], #-4[.IX] 
+
+;Quadruple - [RET T_3, null, null] 
+DEC .R0;decremento el display para que R0 apunte al ambito padre 
+ADD #1, [.R0] 
+MOVE #-4[.IX], [.A] ; Muevo el valor de retorno a su posición del RA (#1[.IX]) para tenerlo accesible desde el llamador 
+INC .R0; restauro el valor del display 
 RET 
 
 ;Quadruple - [INL L_testCase08, 0, null] 
 L_testCase08 :  ; Ambito 0 
 
-;Quadruple - [ESCRIBE "SUBPROGRAMAS FUNCIONES", null, null] 
-WRSTR /txt0
-WRCHAR #10
-WRCHAR #13
-;Quadruple - [MV T_1, 5, null] 
-MOVE #5, #-2[.IX] 
+;Quadruple - [MV T_1, 6, null] 
+MOVE #6, #-2[.IX] 
 
-;Quadruple - [MV Variable [name=A, scope=Scope - [Id = 0, name = testCase08, level = 0], isParameter=false, simbolo=Symbol - SymbolVariable [scope = testCase08, name = A, type = INTEGER] - {address=0}], T_1, null] 
+;Quadruple - [MV Variable [name=A, scope=testCase08, isParameter=false], T_1, null] 
 MOVE #-2[.IX], /0 
 
-;Quadruple - [MV T_3, 3, null] 
-MOVE #3, #-4[.IX] 
+;Quadruple - [MV T_2, Variable [name=A, scope=testCase08, isParameter=false], null] 
+MOVE /0, #-3[.IX] 
 
-;Quadruple - [MV Variable [name=B, scope=Scope - [Id = 0, name = testCase08, level = 0], isParameter=false, simbolo=Symbol - SymbolVariable [scope = testCase08, name = B, type = INTEGER] - {address=1}], T_3, null] 
-MOVE #-4[.IX], /1 
+;Quadruple - [MV T_3, T_2, null] 
+MOVE #-3[.IX], #-4[.IX] 
 
-;Quadruple - [MV T_7, Variable [name=B, scope=Scope - [Id = 0, name = testCase08, level = 0], isParameter=false, simbolo=Symbol - SymbolVariable [scope = testCase08, name = B, type = INTEGER] - {address=1}], null] 
-MOVE /1, #-8[.IX] 
-
-;Quadruple - [MV T_8, T_7, null] 
-MOVE #-8[.IX], #-9[.IX] 
-
-;Quadruple - [MV T_5, Variable [name=A, scope=Scope - [Id = 0, name = testCase08, level = 0], isParameter=false, simbolo=Symbol - SymbolVariable [scope = testCase08, name = A, type = INTEGER] - {address=0}], null] 
-MOVE /0, #-6[.IX] 
-
-;Quadruple - [MV T_6, T_5, null] 
-MOVE #-6[.IX], #-7[.IX] 
+;Quadruple - [ESCRIBEVAL T_3, null, null] 
+WRINT #-4[.IX] 
+WRCHAR #10
+WRCHAR #13
+;Quadruple - [MV T_5, 5, null] 
+MOVE #5, #-6[.IX] 
 
 ;Quadruple - [CALL SUMA, null, null] 
 ;Registro de activacion 
-MOVE .SP, .IY ;posiciono el puntero IY en la primera posicion libre de la pila 
+MOVE .SP,.IY ;Guardo en A el valor de retorno
 SUB .IY, #1  ;avanzo el puntero IY con - 1 espacio del valor de retorno(sentido decreciente) 
 MOVE .A,.IY  ;ahora IY apunta a la posición que va a contener vinculo de control del RA
 MOVE .IX,[.R0]  ;Se guarda la direccion del RA anterior en el display
 INC .R0  ;incremento el display a la siguiente posición libre
 MOVE .IY,.IX  ;Ahora el puntero de marco (FP) apunta al RA actual
-SUB .IX, #7 ;Muevo el SP a la primera posición libre, contando las variables y temporales.
+SUB .IX, #6 ;Muevo el SP a la primera posición libre, contando las variables y temporales.
 MOVE .A,.SP
-CALL /L_SUMA ;Salto al código del procedimiento, agregando la direccion de retorno al RA
+CALL /L_SUMA ;Salto a la etiqueta establecida para el procedimiento
 ; Fin Registro Activacion 
-ADD .SP, #10 ;Devuelvo el puntero de pila a la dirección inicial del RA padre
-MOVE .A,.SP
-DEC .R0  ;decremento el display para que apunte al ambito padre 
-MOVE [.R0],.IX
 
-;Quadruple - [RET T_9, null, null] 
+;Quadruple - [RET T_6, null, null] 
 DEC .R0;decremento el display para que R0 apunte al ambito padre 
 ADD #1, [.R0] 
-MOVE #-10[.IX], [.A] ; Muevo el valor de retorno a su posición del RA (#1[.IX]) para tenerlo accesible desde el llamador 
+MOVE #-7[.IX], [.A] ; Muevo el valor de retorno a su posición del RA (#1[.IX]) para tenerlo accesible desde el llamador 
 INC .R0; restauro el valor del display 
 RET 
 
-;Quadruple - [MV Variable [name=Z, scope=Scope - [Id = 0, name = testCase08, level = 0], isParameter=false, simbolo=Symbol - SymbolVariable [scope = testCase08, name = Z, type = INTEGER] - {address=2}], T_9, null] 
-MOVE #-10[.IX], /2 
+;Quadruple - [MV Variable [name=Z, scope=testCase08, isParameter=false], T_6, null] 
+MOVE #-7[.IX], /1 
 
-;Quadruple - [ESCRIBE "z(8):", null, null] 
-WRSTR /txt1
-WRCHAR #10
-WRCHAR #13
-;Quadruple - [MV T_10, Variable [name=Z, scope=Scope - [Id = 0, name = testCase08, level = 0], isParameter=false, simbolo=Symbol - SymbolVariable [scope = testCase08, name = Z, type = INTEGER] - {address=2}], null] 
-MOVE /2, #-11[.IX] 
+;Quadruple - [MV T_7, Variable [name=Z, scope=testCase08, isParameter=false], null] 
+MOVE /1, #-8[.IX] 
 
-;Quadruple - [MV T_11, T_10, null] 
-MOVE #-11[.IX], #-12[.IX] 
+;Quadruple - [MV T_8, T_7, null] 
+MOVE #-8[.IX], #-9[.IX] 
 
-;Quadruple - [ESCRIBEVAL T_11, null, null] 
-WRINT #-12[.IX] 
+;Quadruple - [ESCRIBEVAL T_8, null, null] 
+WRINT #-9[.IX] 
 WRCHAR #10
 WRCHAR #13
 ;Quadruple - [FINAL null, null, null] 
 HALT
 ORG 32768
-txt0: DATA "SUBPROGRAMAS FUNCIONES" 
-txt1: DATA "z(8):" 
 END 
 
 

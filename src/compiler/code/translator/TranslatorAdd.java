@@ -10,9 +10,9 @@ public class TranslatorAdd extends Translator {
 
 	@Override
 	public String translate() {
-		sb.append("ADD ").append(translate(q.getFirstOperand())).append(", ")
-				.append(translate(q.getSecondOperand())).append(" \n");
-		sb.append("MOVE .A, ").append(translate(q.getResult()))
+		sb.append("ADD ").append(traducirOperando(q.getFirstOperand())).append(", ")
+				.append(traducirOperando(q.getSecondOperand())).append(" \n");
+		sb.append("MOVE .A, ").append(traducirOperando(q.getResult()))
 				.append(" \n");
 		return sb.toString();
 	}

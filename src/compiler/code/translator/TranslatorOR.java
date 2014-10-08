@@ -26,9 +26,9 @@ public class TranslatorOR extends Translator {
 	 */
 	@Override
 	public String translate() {
-		sb.append("OR ").append(translate(q.getFirstOperand())).append(", ")
-				.append(translate(q.getSecondOperand())).append("\n");
-		sb.append("MOVE .A, ").append(translate(q.getResult()));
+		sb.append("OR ").append(traducirOperando(q.getFirstOperand())).append(", ")
+				.append(traducirOperando(q.getSecondOperand())).append("\n");
+		sb.append("MOVE .A, ").append(traducirOperando(q.getResult()));
 		return sb.toString();
 	}
 }

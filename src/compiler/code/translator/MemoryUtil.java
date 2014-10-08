@@ -12,7 +12,7 @@ import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 
-public class MemoryManager {
+public class MemoryUtil {
 
 	private static int gAddress = 0;
 	private static List<Integer> sizeOfScopes = new ArrayList<Integer>();
@@ -29,35 +29,44 @@ public class MemoryManager {
 	 *            the gAddress to set
 	 */
 	public static void setgAddress(int gAddress) {
-		MemoryManager.gAddress = gAddress;
+		MemoryUtil.gAddress = gAddress;
 	}
 
-	public static void assignAddresses() {
+	public static void asignarDirecciones() {
 		int lOffset = 0;
 		int parameterOffset = 0;
 		List<ScopeIF> scopes = CompilerContext.getScopeManager().getAllScopes();
 		for (ScopeIF scope : scopes) {
 			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
-			CompilerContext.getSemanticErrorManager().semanticDebug("Símbolos: " + symbols);
+			CompilerContext.getSemanticErrorManager().semanticDebug(
+					"Símbolos: " + symbols);
 			for (SymbolIF s : symbols) {
 				if (s instanceof SymbolVariable) {
 					SymbolVariable symbol = (SymbolVariable) s;
-					
+
 					if (scope.getLevel() == 0) {
 						symbol.setAddress(gAddress);
 						gAddress += symbol.getType().getSize();
-						CompilerContext.getSemanticErrorManager().semanticDebug("Simbolo " + symbol + " Direccion: " + gAddress);
+						CompilerContext.getSemanticErrorManager()
+								.semanticDebug(
+										"Simbolo " + symbol + " Direccion: "
+												+ gAddress);
 					} else {
 						symbol.setAddress(lOffset + symbol.getType().getSize());
 						lOffset += symbol.getType().getSize();
-						CompilerContext.getSemanticErrorManager().semanticDebug("Simbolo " + symbol + " Offset: " + lOffset);
+						CompilerContext.getSemanticErrorManager()
+								.semanticDebug(
+										"Simbolo " + symbol + " Offset: "
+												+ lOffset);
 					}
 				} else if (s instanceof SymbolParameter) {
 					SymbolParameter symbol = (SymbolParameter) s;
 					symbol.setAddress(parameterOffset
 							+ symbol.getType().getSize());
 					parameterOffset += symbol.getType().getSize();
-					CompilerContext.getSemanticErrorManager().semanticDebug("PArametro " + symbol + " parameterOffset: " + parameterOffset);
+					CompilerContext.getSemanticErrorManager().semanticDebug(
+							"PArametro " + symbol + " parameterOffset: "
+									+ parameterOffset);
 				}
 			}
 			List<TemporalIF> temporals = scope.getTemporalTable()

@@ -3,26 +3,18 @@
 
 procedure testCase08 () is
 
-z: Integer;
+a, z: Integer;
 
-a,b: Integer;
-
-function suma (x,y: Integer) return Integer is
-begin
-        
-    return x+y; 
-
+function suma (x: Integer) return Integer is
+begin    
+    Put_line(x);
+    return x; 
 end suma;
 
 
 begin
-
-    Put_line ("SUBPROGRAMAS FUNCIONES");
-    a:= 5;
-    b:= 3;
-    z:= suma (a,b);
-    Put_line("z(8):");
+    a := 6;
+    Put_line(a);
+    z:= suma (5);
     Put_line(z);
-            
-
 end testCase08;

@@ -25,7 +25,7 @@ public class TranslatorIncrement extends Translator {
 	 */
 	@Override
 	public String translate() {
-		sb.append("INC ").append(translate(q.getResult())).append(" \n");
+		sb.append("INC ").append(traducirOperando(q.getResult())).append(" \n");
 		return sb.toString();
 	}
 

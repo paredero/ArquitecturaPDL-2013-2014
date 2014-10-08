@@ -25,15 +25,15 @@ public class TranslatorEqual extends Translator {
 	 */
 	@Override
 	public String translate() {
-		sb.append("CMP ").append(translate(q.getFirstOperand())).append(", ")
-				.append(translate(q.getSecondOperand())).append("\n");
+		sb.append("CMP ").append(traducirOperando(q.getFirstOperand())).append(", ")
+				.append(traducirOperando(q.getSecondOperand())).append("\n");
 		String label = LabelManager.getLabelText();
 		String label2 = LabelManager.getLabelText();
 		sb.append("BNZ /").append(label).append("\n");
-		sb.append("MOVE #1, ").append(translate(q.getResult())).append("\n");
+		sb.append("MOVE #1, ").append(traducirOperando(q.getResult())).append("\n");
 		sb.append("BR /").append(label2).append("\n");
 		sb.append(label).append(" : ").append("\n");
-		sb.append("MOVE #0, ").append(translate(q.getResult())).append("\n");
+		sb.append("MOVE #0, ").append(traducirOperando(q.getResult())).append("\n");
 		sb.append(label2).append(" : ").append("\n");
 		return sb.toString();
 	}

@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
-import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeRecord.

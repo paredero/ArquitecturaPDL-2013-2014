@@ -19,10 +19,10 @@ import compiler.code.translator.TranslatorLabel;
 import compiler.code.translator.TranslatorMV;
 import compiler.code.translator.TranslatorMVReg;
 import compiler.code.translator.TranslatorOR;
+import compiler.code.translator.TranslatorParam;
 import compiler.code.translator.TranslatorRet;
 import compiler.intermediate.InstructionSet;
 import compiler.semantic.type.TypeSimple;
-
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
@@ -146,6 +146,8 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				trans = new TranslatorOR(quadruple);
 			} else if (op.equals(InstructionSet.RET)) {
 				trans = new TranslatorRet(quadruple);
+			}  else if (op.equals(InstructionSet.PARAM)) {
+				trans = new TranslatorParam(quadruple);
 			} else {
 				return quadruple.toString();
 			}

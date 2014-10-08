@@ -39,4 +39,5 @@ public class InstructionSet {
 	
 	public static final String FINAL = "FINAL";
 	public static final String MOVE_REG = "MOVE_REG";
+	public static final String PARAM = "PARAM";
 }

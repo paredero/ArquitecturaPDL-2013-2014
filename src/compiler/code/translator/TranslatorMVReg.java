@@ -18,7 +18,7 @@ public class TranslatorMVReg extends Translator {
 	public String translate() {
 		Variable var;
 
-			String offset = translate(q.getFirstOperand());
+			String offset = traducirOperando(q.getFirstOperand());
 			if (q.getSecondOperand() instanceof Variable) {
 
 				var = (Variable) q.getSecondOperand();
@@ -33,7 +33,7 @@ public class TranslatorMVReg extends Translator {
 						.append(" ;Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo")
 						.append("\n");
 				// Guardo el temporal en la direccion del campo
-				sb.append("MOVE [.A], ").append(translate(q.getResult()))
+				sb.append("MOVE [.A], ").append(traducirOperando(q.getResult()))
 						.append(" ;Guardo el campo en el temporal").append("\n");
 			} else {				
 				var = (Variable) q.getResult();
@@ -49,7 +49,7 @@ public class TranslatorMVReg extends Translator {
 						.append(" ; Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo")
 						.append("\n");
 				// Guardo el temporal en la direccion del campo
-				sb.append("MOVE ").append(translate(q.getSecondOperand()))
+				sb.append("MOVE ").append(traducirOperando(q.getSecondOperand()))
 						.append(", [.A]")
 						.append(" ;Guardo el temporal en la direccion del campo")
 						.append("\n");

@@ -6,11 +6,12 @@ import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
 import compiler.intermediate.Procedure;
 import compiler.intermediate.Temporal;
+import compiler.intermediate.Variable;
 import compiler.semantic.symbol.SymbolFunction;
 import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolProcedure;
-import compiler.semantic.type.TypeFunction;
 import compiler.semantic.type.TypeProcedure;
+
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -83,8 +84,10 @@ public class LlamadaSubprograma extends NonTerminal {
 			ListaParametrosEjecucion pa) {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        Procedure p = this.creaProcedure(sf.getName(), scope, pa);       
-        cb.addQuadruples(pa.getIntermediateCode());
+        cb.addQuadruples(pa.getIntermediateCode());     
+        CompilerContext.getSemanticErrorManager().semanticDebug(
+				"------------************ --> " + pa.getIntermediateCode());
+        Procedure p = creaProcedure(sf.getName().toUpperCase(), scope, pa);
         cb.addQuadruple (InstructionSet.CALL, p);
         this.setIntermediateCode(cb.create());
 	}
@@ -98,25 +101,22 @@ public class LlamadaSubprograma extends NonTerminal {
 			ListaParametrosEjecucion pa) {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        Procedure p = this.creaProcedure(sp.getName(), scope, pa); 
-        		
-        cb.addQuadruples(pa.getIntermediateCode());
+        cb.addQuadruples(pa.getIntermediateCode());            
+        Procedure p = creaProcedure(sp.getName().toUpperCase(), scope, pa);
         cb.addQuadruple (InstructionSet.CALL, p);
         this.setIntermediateCode(cb.create());
 	}
 
+	
 	private Procedure creaProcedure(String nombre, ScopeIF scope, ListaParametrosEjecucion parametrosEjecucion) {
 		TypeIF tipo = scope.getScopeManager().searchType(nombre.toUpperCase());
 		TypeProcedure tProc = (TypeProcedure) tipo;
-		List<SymbolParameter> parametrosDeclaracion =  tProc.getParametros();
-		
-		CompilerContext.getSemanticErrorManager().semanticDebug(
-				"parameters decl --> " + parametrosDeclaracion.size());
+		List<SymbolParameter> parametrosDeclaracion = tProc.getParametros();
 		CompilerContext.getSemanticErrorManager().semanticDebug(
 				"parameters ejec --> " + parametrosEjecucion.getParametros().size());
 		for (int i = 0; i < parametrosDeclaracion.size(); i++) {
 			Temporal temp = (Temporal) parametrosEjecucion.getParametros().get(i).getTemporal();
-			CompilerContext.getSemanticErrorManager().semanticDebug("temp" + temp);
+			CompilerContext.getSemanticErrorManager().semanticDebug("Temporal Procedimiento " + temp);
 			parametrosDeclaracion.get(i).setTemporal(temp);
 		}
 		
@@ -124,4 +124,5 @@ public class LlamadaSubprograma extends NonTerminal {
         proc.setParams(parametrosDeclaracion);
 		return proc;
 	}
+	
 }
