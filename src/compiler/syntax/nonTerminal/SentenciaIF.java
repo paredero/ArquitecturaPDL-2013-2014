@@ -10,7 +10,7 @@ import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
-public class SentenciaIF extends NonTerminal {
+public class SentenciaIF extends Sentencia {
 
 	/**
 	 * Codigo intermedio para if sin else

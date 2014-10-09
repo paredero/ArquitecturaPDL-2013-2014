@@ -1,31 +1,12 @@
 package compiler.syntax.nonTerminal;
 
-import java.util.List;
-
-import es.uned.lsi.compiler.semantic.type.TypeIF;
-
 public class CuerpoFuncion extends NonTerminal {
 
-	List<TypeIF> listaTiposReturn;
-	ListaSentencias listaSentencias;
+	ListaSentenciasFuncion listaSentencias;
 	String nombreFuncion;
-	
+
 	public CuerpoFuncion() {
-		
-	}
 
-	/**
-	 * @return the listaTiposReturn
-	 */
-	public List<TypeIF> getListaTiposReturn() {
-		return listaTiposReturn;
-	}
-
-	/**
-	 * @param listaTiposReturn the listaTiposReturn to set
-	 */
-	public void getListaTiposReturn(List<TypeIF> listaTiposReturn) {
-		this.listaTiposReturn = listaTiposReturn;
 	}
 
 	/**
@@ -36,46 +17,36 @@ public class CuerpoFuncion extends NonTerminal {
 	}
 
 	/**
-	 * @param nombreFuncion the nombreFuncion to set
+	 * @param nombreFuncion
+	 *            the nombreFuncion to set
 	 */
 	public void setNombreFuncion(String nombreFuncion) {
 		this.nombreFuncion = nombreFuncion;
 	}
 
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "CuerpoFuncion [listaTiposReturn=" + listaTiposReturn.size()
-				+ ", listaSentencias=" + listaSentencias + ", nombreFuncion="
-				+ nombreFuncion + "]";
+		return "CuerpoFuncion [listaSentencias=" + listaSentencias
+				+ ", nombreFuncion=" + nombreFuncion + "]";
 	}
 
 	/**
 	 * @return the listaSentencias
 	 */
-	public ListaSentencias getListaSentencias() {
+	public ListaSentenciasFuncion getListaSentencias() {
 		return listaSentencias;
 	}
 
 	/**
-	 * @param listaSentencias the listaSentencias to set
+	 * @param listaSentencias
+	 *            the listaSentencias to set
 	 */
-	public void setListaSentencias(ListaSentencias listaSentencias) {
+	public void setListaSentencias(ListaSentenciasFuncion listaSentencias) {
 		this.listaSentencias = listaSentencias;
 	}
-
-	/**
-	 * @param listaTiposReturn the listaTiposReturn to set
-	 */
-	public void setListaTiposReturn(List<TypeIF> listaTiposReturn) {
-		this.listaTiposReturn = listaTiposReturn;
-	}
-
-	
-
-	
 }

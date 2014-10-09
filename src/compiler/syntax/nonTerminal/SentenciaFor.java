@@ -4,6 +4,7 @@ import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
 import compiler.intermediate.Variable;
 import compiler.semantic.symbol.SymbolVariable;
+
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelFactoryIF;
@@ -13,7 +14,7 @@ import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
 
-public class SentenciaFor extends NonTerminal {
+public class SentenciaFor extends Sentencia {
 
 	public void generarCodigoIntermedio(SymbolVariable indice, Expresion expInicio,
 			Expresion expFin, ListaSentencias listaSentencias) {

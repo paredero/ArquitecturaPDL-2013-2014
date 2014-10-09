@@ -10,7 +10,7 @@ import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelFactoryIF;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 
-public class SentenciaPutLine extends NonTerminal {
+public class SentenciaPutLine extends Sentencia {
 
 	public void generarCodigoIntermedio(Expresion exp) {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(CompilerContext.getScopeManager().getCurrentScope());

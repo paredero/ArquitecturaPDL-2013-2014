@@ -11,7 +11,7 @@ import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.ScopeManagerIF;
 
-public class SentenciaAsignacion extends NonTerminal {
+public class SentenciaAsignacion extends Sentencia {
 	
 	public void generarCodigoIntermedio(Referencia referencia, Expresion expresion) {
 		ScopeManagerIF scopeManager = CompilerContext.getScopeManager();

@@ -120,11 +120,13 @@ non terminal    tipo;
 non terminal    Declaraciones variable;
 non terminal    Cuerpo cuerpo;
 non terminal    ListaSentencias lista_sentencias;
-non terminal    sentencia;
+non terminal    Sentencia sentencia;
+non terminal    Sentencia sentencia_funcion;
 non terminal    SentenciaPutLine sentencia_entrada_salida;
 non terminal    SentenciaAsignacion sentencia_asignacion;
-non terminal    sentencia_if;
-non terminal    sentencia_for;
+non terminal    SentenciaIF sentencia_if;
+non terminal    SentenciaFor sentencia_for;
+non terminal    SentenciaReturn sentencia_return;
 non terminal    Referencia referencia;
 non terminal    Referencia acceso_registro;
 non terminal    Expresion expresion;
@@ -137,12 +139,9 @@ non terminal    DeclaracionSubprograma procedimiento;
 non terminal    ListaParametrosDeclaracion parametros_subprograma;
 non terminal    tipo_primitivo;
 non terminal    CuerpoFuncion cuerpo_funcion;
-non terminal    ListaSentenciasReturn lista_sentencias_funcion;
-non terminal    sentencia_funcion;
-non terminal    SentenciaReturn sentencia_return;
+non terminal    ListaSentenciasFuncion lista_sentencias_funcion;
 
 // Declaración de relaciones de precedencia, SEPARADOS POR COMAS
-
 precedence left OR;
 precedence left IGUAL;
 precedence left MAYOR;
@@ -509,7 +508,7 @@ funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprogr
 :} IS declaraciones:declaraciones cuerpo_funcion:cf
 {:
     // Comprueba que existe al menos una sentencia return y que todas son del mismo tipo que el retorno de la funcion
-    List<TypeIF> listaTiposReturn = cf.getListaTiposReturn();
+    List<TypeIF> listaTiposReturn = cf.getListaSentencias().getListaTiposReturn();
     if (listaTiposReturn == null || listaTiposReturn.size() == 0) {
         semanticErrorManager.semanticFatalError("ERROR: la funcion " + idFuncion.getLexema()
             +" debe proporcionar alguna sentencia RETURN"); 
@@ -642,41 +641,40 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
     | vacio;
  
 
-cuerpo_funcion::= BEGIN lista_sentencias_funcion:listaSentenciasReturn END IDENTIFICADOR:idFuncion PUNTO_COMA
+cuerpo_funcion::= BEGIN lista_sentencias_funcion:listaSentenciasFuncion END IDENTIFICADOR:idFuncion PUNTO_COMA
 {:
     CuerpoFuncion cf = new CuerpoFuncion();
-	if (listaSentenciasReturn == null) {
-        listaSentenciasReturn = new ListaSentenciasReturn();
-		semanticErrorManager.semanticInfo("Inicializa listaSentenciasReturn" + listaSentenciasReturn);        
+	if (listaSentenciasFuncion == null) {
+        listaSentenciasFuncion = new ListaSentenciasFuncion();
+		semanticErrorManager.semanticInfo("Inicializa listaSentenciasFuncion" + listaSentenciasFuncion);        
     }
-    cf.setListaTiposReturn(listaSentenciasReturn.getListaTiposReturn());
-	cf.setListaSentencias(listaSentenciasReturn.getListaSentencias());
+	
+	cf.setListaSentencias(listaSentenciasFuncion);
     cf.setNombreFuncion(idFuncion.getLexema().toUpperCase());
 	
-	if (listaSentenciasReturn != null) {
-		semanticErrorManager.semanticInfo("listaSentenciasReturn.getIntermediateCode()" + listaSentenciasReturn.getIntermediateCode());
-		cf.setIntermediateCode(listaSentenciasReturn.getIntermediateCode());			
+	if (listaSentenciasFuncion != null) {
+		semanticErrorManager.semanticInfo("listaSentenciasFuncion.getIntermediateCode()" + listaSentenciasFuncion.getIntermediateCode());
+		cf.setIntermediateCode(listaSentenciasFuncion.getIntermediateCode());			
     }
         
     RESULT = cf;
 :};
 
-lista_sentencias_funcion ::=  sentencia_funcion:posibleReturn PUNTO_COMA lista_sentencias_funcion:listaReturns
+lista_sentencias_funcion ::=  sentencia_funcion:sentenciaFuncion PUNTO_COMA lista_sentencias_funcion:listaSentenciasFuncion
 {:
-    if (listaReturns == null) {
-        listaReturns = new ListaSentenciasReturn();
+    if (listaSentenciasFuncion == null) {
+        listaSentenciasFuncion = new ListaSentenciasFuncion();
     }
-    if (posibleReturn != null && posibleReturn instanceof SentenciaReturn) {
-		SentenciaReturn s = (SentenciaReturn)posibleReturn;
-        listaReturns.addReturnType(s.getType());
+    if (sentenciaFuncion != null && sentenciaFuncion instanceof SentenciaReturn) {
+		listaSentenciasFuncion.addReturnType(((SentenciaReturn)sentenciaFuncion).getType());
     }
-	listaReturns.addSentencia((NonTerminal)posibleReturn);
-	listaReturns.generarCodigoIntermedio();
-    RESULT = listaReturns;
+	listaSentenciasFuncion.addSentencia(sentenciaFuncion);
+	listaSentenciasFuncion.generarCodigoIntermedio();
+    RESULT = listaSentenciasFuncion;
 :} 
     |  vacio
 {:
-    RESULT = new ListaSentenciasReturn();
+    RESULT = new ListaSentenciasFuncion();
 :};
 
 sentencia_funcion ::= sentencia:sentencia
@@ -881,7 +879,7 @@ lista_sentencias ::=  sentencia:sentencia PUNTO_COMA lista_sentencias:listaSente
         if (listaSentencias == null) {
             listaSentencias = new ListaSentencias();
         }
-        listaSentencias.addSentencia((NonTerminal)sentencia);
+        listaSentencias.addSentencia(sentencia);
         listaSentencias.generarCodigoIntermedio();
         RESULT = listaSentencias;
     :}

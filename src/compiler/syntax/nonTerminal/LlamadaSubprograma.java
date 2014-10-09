@@ -6,7 +6,6 @@ import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
 import compiler.intermediate.Procedure;
 import compiler.intermediate.Temporal;
-import compiler.intermediate.Variable;
 import compiler.semantic.symbol.SymbolFunction;
 import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolProcedure;
@@ -17,7 +16,7 @@ import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
-public class LlamadaSubprograma extends NonTerminal {
+public class LlamadaSubprograma extends Sentencia {
 
 	
 	private TypeIF returnType;

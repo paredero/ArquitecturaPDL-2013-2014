@@ -8,12 +8,9 @@ import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
-public class SentenciaReturn extends NonTerminal {
+public class SentenciaReturn extends Sentencia {
 	
 	Expresion expresion;
-	
-	
-
 	/**
 	 * @param type
 	 */
@@ -47,8 +44,4 @@ public class SentenciaReturn extends NonTerminal {
 	public TemporalIF getTemporal() {
 		return expresion.getTemporal();
 	}
-	
-	
-	
-
 }
