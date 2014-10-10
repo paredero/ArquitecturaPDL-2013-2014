@@ -22,9 +22,9 @@ public class SentenciaPutLine extends Sentencia {
 	        cb.addQuadruple(InstructionSet.BRANCH_FALSE, exp.getTemporal(), l1);
 	        cb.addQuadruple(InstructionSet.ESCRIBE, new Value("\"true\""));
 	        cb.addQuadruple(InstructionSet.BRANCH, l2);
-	        cb.addQuadruple(InstructionSet.LABEL, l1);
+	        cb.addQuadruple(InstructionSet.INL, l1);
 	        cb.addQuadruple(InstructionSet.ESCRIBE, new Value("\"false\""));
-	        cb.addQuadruple(InstructionSet.LABEL, l2);
+	        cb.addQuadruple(InstructionSet.INL, l2);
         } else {
         	cb.addQuadruple(InstructionSet.ESCRIBE_VALOR, exp.getTemporal());
         }

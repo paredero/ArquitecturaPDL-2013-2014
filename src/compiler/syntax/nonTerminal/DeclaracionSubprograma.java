@@ -34,7 +34,7 @@ public class DeclaracionSubprograma extends NonTerminal {
         if (declaraciones != null) {
         	cb.addQuadruples(declaraciones.getIntermediateCode());
         }
-        cb.addQuadruple(InstructionSet.LABEL, sub.getCodeLabel(), scope.getLevel());
+        cb.addQuadruple(InstructionSet.INL, sub.getCodeLabel(), scope.getLevel());
         if (cuerpoFuncion != null) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Declaracion de funcion" +  sub.getCodeLabel());
         	cb.addQuadruples(cuerpoFuncion.getIntermediateCode());

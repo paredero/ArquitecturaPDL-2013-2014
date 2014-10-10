@@ -13,7 +13,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class ListaParametrosEjecucion extends NonTerminal {
 	private List<TypeIF> parameterTypes;
 	private List<Expresion> parametros;
-	
+	private Expresion ultimoParametro;
 	public ListaParametrosEjecucion() {
 		parameterTypes = new ArrayList<TypeIF>();
 		parametros = new ArrayList<Expresion>();
@@ -55,19 +55,16 @@ public class ListaParametrosEjecucion extends NonTerminal {
 		if (parametros == null) {
 			parametros = new ArrayList<Expresion>();
 		}
+		this.ultimoParametro = parametro;
 		this.parametros.add(parametro);		
-		
-		generarCodigoIntermedio(parametro);
-		
 	}
 
-	private void generarCodigoIntermedio(Expresion parametro) {
+	public void generarCodigoIntermedio() {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         cb.addQuadruples(this.getIntermediateCode());
-        cb.addQuadruples(parametro.getIntermediateCode());
-        cb.addQuadruple(InstructionSet.PARAM, null, parametro.getTemporal());
-        
+        cb.addQuadruples(ultimoParametro.getIntermediateCode());
+        cb.addQuadruple(InstructionSet.PARAM, null, ultimoParametro.getTemporal());        
         this.setIntermediateCode(cb.create());
 	}
 	/* (non-Javadoc)

@@ -206,7 +206,7 @@ axiom ::= cabecera:apertura declaraciones:declaraciones cuerpo:cierre
 	if(declaraciones != null) {
 		ax.getIntermediateCode().addAll(declaraciones.getIntermediateCode());
     }            
-    cb.addQuadruple(InstructionSet.LABEL, label, 0);
+    cb.addQuadruple(InstructionSet.INL, label, 0);
     ax.getIntermediateCode().addAll(cb.create());
     ax.getIntermediateCode().addAll(cierre.getIntermediateCode());
 	scopeManager.closeScope();
@@ -797,9 +797,9 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     
     | llamada_subprograma:l
 {:  
-    if (l != null && l.getType() != null) {
+    if (l != null && l.getReturnType() != null) {
         // Si existe devolucion es que es una funcion y no un procedimiento
-        Expresion expresionResultado = new Expresion(l.getType(), l.getLexema());
+        Expresion expresionResultado = new Expresion(l.getReturnType(), l.getNombre());
         expresionResultado.generarCodigoIntermedio(l);
 
         RESULT = expresionResultado;
@@ -1039,7 +1039,9 @@ semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id
                 //OK
                 TypeIF returnType = tf.getTipoResultado();
                 
-                LlamadaSubprograma funcion = new LlamadaSubprograma(returnType, name);
+                LlamadaSubprograma funcion = new LlamadaSubprograma();
+				funcion.setReturnType(returnType);
+				funcion.setNombre(name);
                 funcion.generarCodigoIntermedio(sf, pa);
                 RESULT = funcion;
             } else {
@@ -1068,11 +1070,12 @@ semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id
     }
 :};
 
-lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista
+lista_parametros ::= lista_parametros:lista SEPARADOR_COMA expresion:e
 {:
 	semanticErrorManager.semanticDebug("59: lista_parametros ::= expresion:e SEPARADOR_COMA lista_parametros:lista");
     lista.addParameterType(e.getType());
 	lista.addParametro(e);
+	lista.generarCodigoIntermedio();
     RESULT = lista;
 :}
         | expresion:e
@@ -1081,6 +1084,7 @@ semanticErrorManager.semanticDebug("60: lista_parametros ::= expresion:e");
 	ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
 	lista.addParameterType(e.getType());
 	lista.addParametro(e);
+	lista.generarCodigoIntermedio();
 	semanticErrorManager.semanticDebug("59b: Parametros " +  lista.getIntermediateCode());
     RESULT = lista;
 :}  
