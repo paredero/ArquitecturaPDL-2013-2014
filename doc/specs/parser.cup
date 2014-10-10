@@ -159,19 +159,45 @@ program ::=
    :}
   axiom:ax
   {:
-        List<ScopeIF> scopes = scopeManager.getAllScopes();
-        semanticErrorManager.semanticDebug("Numero de entornos: " + scopes.size());
-		MemoryUtil.asignarDirecciones();
 		
-        ScopeIF scopeActual = null;
-        for (ScopeIF scope:scopes) {
+		 //	Asigno direcciones a variables globales	
+		semanticErrorManager.semanticDebug("************************************* ASIGNACION DIRECCIONES");
+		int globalAddress = 0;
+		int lOffset = 0;
+		List<ScopeIF> todosAmbitos = scopeManager.getAllScopes();
+		ScopeIF scopeActual = null;
+		for (ScopeIF scope: todosAmbitos){
 			if (scope.getLevel() == 0) {
 				scopeActual = scope;
+			}
+			List<SymbolIF> simbolosAmbito = scope.getSymbolTable().getSymbols();
+			for (SymbolIF simbolo:simbolosAmbito){
+				if (simbolo instanceof SymbolVariable) {
+					SymbolVariable simboloVar = (SymbolVariable)simbolo;
+					if (scope.getLevel() == 0) {
+						simboloVar.setAddress(globalAddress);
+						globalAddress += simboloVar.getType().getSize();
+					} else {
+						simboloVar.setAddress(lOffset);
+						lOffset += simboloVar.getType().getSize();
+					}
+					semanticErrorManager.semanticDebug("Var: "+ simboloVar.getName() 
+														+ " tipo: " +simboloVar.getType().getName()
+														+ " -------------> direccion " + simboloVar.getAddress());
+				}
+			}
+			
+			List<TemporalIF> temporalesAmbito = scope.getTemporalTable().getTemporals();
+			for (TemporalIF t:temporalesAmbito) {
+				t.setAddress(lOffset);
+				lOffset++;
+				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() 
+														+ " -------------> direccion " + t.getAddress());
 			}
 		}
         
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
-        cb.addQuadruple("INICIO", null,MemoryUtil.getgAddress(), ax.getLabel());
+        cb.addQuadruple("DATA", globalAddress);
         
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);
@@ -196,8 +222,8 @@ axiom ::= cabecera:apertura declaraciones:declaraciones cuerpo:cierre
     if (!idApertura.equalsIgnoreCase(idCierre)) {
         semanticErrorManager.semanticFatalError("ERROR semantico: el identificador de apertura debe ser el mismo que el de cierre: "
             + idApertura + " " + idCierre);
-    }
-    
+    }	
+	
     Axiom ax = new Axiom();
 	LabelFactoryIF labelFactory = new LabelFactory ();
     LabelIF label = labelFactory.create (idApertura);
@@ -408,6 +434,11 @@ lista_campos ::= IDENTIFICADOR:idCampo DOS_PUNTOS tipo:tipoCampo PUNTO_COMA list
 
 declaracion_variables ::= variable:v declaracion_variables:declaraciones
 {:
+	semanticErrorManager.semanticDebug("declaracion_variables ::= variable:v declaracion_variables:declaraciones");
+	if (declaraciones == null) {
+		declaraciones = new Declaraciones();
+	}
+	semanticErrorManager.semanticDebug(declaraciones);
 	RESULT=declaraciones.addDeclaracion(v);
 :}
         | declaracion_subprogramas:declaracionSubprogramas
@@ -444,6 +475,8 @@ variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
             }
         }
     }
+	semanticErrorManager.semanticDebug("variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA");
+
 :};
 
 
@@ -454,7 +487,11 @@ declaracion_subprogramas ::= subprograma:s declaracion_subprogramas:ds
     }
 	RESULT = ds.addDeclaracionSubprograma(s);
 :} 
-        | vacio;
+        | vacio
+{:
+semanticErrorManager.semanticDebug("declaracion_subprogramas ::= vacio");
+:}
+		;
         
 subprograma ::= funcion:f
 {:

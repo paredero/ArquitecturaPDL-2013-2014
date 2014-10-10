@@ -136,7 +136,7 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				trans = new TranslatorGT(quadruple);
 			} else if (op.equals(InstructionSet.INCREMENT)) {
 				trans = new TranslatorIncrement(quadruple);
-			} else if (op.equals(InstructionSet.LABEL)) {
+			} else if (op.equals(InstructionSet.INL)) {
 				trans = new TranslatorLabel(quadruple);
 			} else if (op.equals(InstructionSet.MV)) {
 				trans = new TranslatorMV(quadruple);
@@ -152,7 +152,8 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				return quadruple.toString();
 			}
 			sb.append(trans.translate());
-			return sb.toString();
+// TODO descomentar			return sb.toString();
+			return quadruple.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "Excepcion en el proceso de traduccion " +quadruple + e.getMessage();

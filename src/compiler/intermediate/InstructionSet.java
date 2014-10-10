@@ -25,7 +25,7 @@ public class InstructionSet {
 	public static final String BRANCH_FALSE = "BRF";
 	
 	// INL L		Insertar L
-	public static final String LABEL = "INL";
+	public static final String INL = "INL";
 	
 	// BR L			Salto a L
 	public static final String BRANCH = "BR";
