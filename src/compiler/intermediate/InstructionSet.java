@@ -44,4 +44,5 @@ public class InstructionSet {
 	public static final String PARAM = "PARAM";
 	public static final String MVA = "MVA";
 	public static final String MUL = "MUL";
+	public static final String STP = "STP";
 }
