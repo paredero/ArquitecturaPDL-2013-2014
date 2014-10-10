@@ -720,8 +720,7 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
     if (Expresion.tiposCompatibles(operador.getLexema(),type1,type2)) {
         TypeIF tipoExpresion = type1;   // No hay conversion de tipos
         String lexema = e1.getLexema() + " " + operador.getLexema() + " " + e2.getLexema();
-        Expresion expresionResultado = new Expresion(tipoExpresion, lexema);
-                                    
+        Expresion expresionResultado = new Expresion(tipoExpresion, lexema);                                    
         expresionResultado.generarCodigoIntermedio(e1, e2, operador.getLexema());
         RESULT = expresionResultado;
     } else {
@@ -792,6 +791,7 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
   
     | ABRE_PARENTESIS:a expresion:exp CIERRA_PARENTESIS:b
 {:
+	// Ya dispone de codigo intermedio anterior, asi que lo propago
     RESULT = exp;
 :}        
     
@@ -833,7 +833,10 @@ referencia ::= IDENTIFICADOR:id
     if (scopeManager.containsSymbol(name)) {
         SymbolIF simbolo = scopeManager.searchSymbol(name);
         TypeIF tipo = simbolo.getType();
-        Referencia r = new Referencia(tipo, name, id.getLine()); 
+		Referencia r = new Referencia();
+		r.setType(tipo);
+		r.setLexema(name);
+		r.setLine(id.getLine());
         r.generarCodigoIntermedio();
         RESULT = r;
     } else {
@@ -850,19 +853,23 @@ acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
     String nombreRegistro = registro.getLexema().toUpperCase();
     String nombreCampo = campo.getLexema().toUpperCase();
     TypeIF tipoRegistro = registro.getType();
+	
     if (tipoRegistro instanceof TypeRecord) {
         TypeRecord tRec = (TypeRecord)tipoRegistro;
         if (tRec.containsCampo(nombreCampo)) {
-            TypeIF innerType = tRec.getCampo(nombreCampo).getType();
-            Referencia r = new Referencia(innerType, nombreRegistro + "." + nombreCampo, campo.getLine());
+            TypeIF fieldType = tRec.getCampo(nombreCampo).getType();
+			Referencia r = new Referencia();
+			r.setType(fieldType);
+			r.setLexema(nombreRegistro + "." + nombreCampo);
+			r.setLine(campo.getLine());
 			r.setAccesoRegistro(true);
 			SymbolVariable variableRegistro = (SymbolVariable)scopeManager.searchSymbol(nombreRegistro);
 			r.setVariableRegistro(variableRegistro);
 			
-			SymbolVariable campoRegistro = new SymbolVariable(variableRegistro.getScope(), nombreCampo, innerType);
+			SymbolVariable campoRegistro = new SymbolVariable(variableRegistro.getScope(), nombreCampo, fieldType);
 			r.setCampoRegistro(campoRegistro);
 			
-            r.generarCodigoIntermedio(registro, nombreCampo);
+            r.generarCodigoIntermedioAccesoRegistro(registro, nombreCampo);
              
             RESULT = r;
         } else {

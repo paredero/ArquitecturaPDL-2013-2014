@@ -32,9 +32,80 @@ public class Referencia extends NonTerminal {
 	SymbolVariable variableRegistro;
 	SymbolVariable campoRegistro;
 	
+
+
+	/**
+	 * Genera el codigo intermedio de referencia ::= IDENTIFICADOR:id
+	 */
+	public void generarCodigoIntermedio() {
+		ScopeManagerIF scopeManager = CompilerContext.getScopeManager();
+		ScopeIF scope = scopeManager.getCurrentScope();
+        TemporalFactory tF = new TemporalFactory (scope);
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        
+        TemporalIF temp = tF.create();
+        
+        //Obtengo el simbolo correspondiente al lexema
+        SymbolIF symbol = scopeManager.searchSymbol(lexema);
+        OperandIF o;
+        
+        CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol.getName());
+        if (symbol instanceof SymbolVariable) {
+        	// Se trata de una variable
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Es Variable");  
+        	Variable variable = new Variable(lexema, symbol.getScope());
+        	cb.addQuadruple (InstructionSet.MVA, temp, variable);             
+        } else if (symbol instanceof SymbolParameter) {
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
+        	o = new Variable(lexema, symbol);
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Parametro creado ");      
+        	((Variable) o).setParameter(true);      
+        	//TODO El codigo de un parametro
+        } else {
+        	SymbolConstant constante = (SymbolConstant)symbol;
+            o = new Value(constante.getValue());
+            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada ");  
+        	//TODO El codigo de una constante
+        }       
+                
+        this.temporal = temp;
+        this.setIntermediateCode(cb.create());
+	}
+	
+	/**
+	 * Genera el codigo intermedio del acceso a campo de registro
+	 * @param r
+	 * @param campo
+	 */
+	public void generarCodigoIntermedioAccesoRegistro(Referencia r, String campo) {
+		ScopeManagerIF scopeManager = CompilerContext.getScopeManager();
+		ScopeIF scope = scopeManager.getCurrentScope();
+        TemporalFactory tf = new TemporalFactory (scope);
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        
+        TemporalIF tempRegistro = r.getTemporal();
+        this.temporalIndex = r.getTemporalIndex();
+        this.temporalOffset = tf.create();        
+        
+        cb.addQuadruples(r.getIntermediateCode());        
+        TypeRecord tipoRegistro = (TypeRecord)variableRegistro.getType();
+        
+        CompilerContext.getSemanticErrorManager().semanticDebug("Obtiene el tipo del registro "+tipoRegistro);
+        int idOffset = tipoRegistro.getOffset(campoRegistro.getName());
+        
+        cb.addQuadruple(InstructionSet.MV, temporalOffset, idOffset);
+        this.temporal = tempRegistro;
+        
+        this.setIntermediateCode(cb.create());
+	}
+	
+	
+	//-------------------------------------------------------------------------
+	//----------CONSTRUCTOR & GETTER & SETTER & TOSTRING METHODS---------------
+	//-------------------------------------------------------------------------
+
 	public Referencia() {
 	}
-
 	/**
 	 * @return the type
 	 */
@@ -78,34 +149,6 @@ public class Referencia extends NonTerminal {
 	}
 
 	/**
-	 * @param type
-	 * @param lexema
-	 * @param line
-	 */
-	public Referencia(TypeIF type, String lexema, int line) {
-		super();
-		this.type = type;
-		this.lexema = lexema;
-		this.line = line;
-	}
-	
-	public Referencia(TypeIF type, String lexema, int line, boolean accesoRegistro) {
-		super();
-		this.type = type;
-		this.lexema = lexema;
-		this.line = line;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Referencia [type=" + type.getName() + ", lexema=" + lexema + ", line="
-				+ line + "]";
-	}
-
-	/**
 	 * @return the temporal
 	 */
 	public TemporalIF getTemporal() {
@@ -119,12 +162,18 @@ public class Referencia extends NonTerminal {
 		this.temporal = temporal;
 	}
 
+	/**
+	 * @return the temporalIndex
+	 */
 	public TemporalIF getTemporalIndex() {
-		return this.temporalIndex;
+		return temporalIndex;
 	}
 
-	public void setTemporalIndex(TemporalIF temporalReferenciaIndex) {
-		this.temporalIndex = temporalReferenciaIndex;
+	/**
+	 * @param temporalIndex the temporalIndex to set
+	 */
+	public void setTemporalIndex(TemporalIF temporalIndex) {
+		this.temporalIndex = temporalIndex;
 	}
 
 	/**
@@ -139,61 +188,6 @@ public class Referencia extends NonTerminal {
 	 */
 	public void setTemporalOffset(TemporalIF temporalOffset) {
 		this.temporalOffset = temporalOffset;
-	}
-
-	public void generarCodigoIntermedio() {
-		ScopeManagerIF scopeManager = CompilerContext.getScopeManager();
-		ScopeIF scope = scopeManager.getCurrentScope();
-        TemporalFactory tF = new TemporalFactory (scope);
-        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        
-        TemporalIF temp = tF.create();
-        
-        // Puede ser un SymbolVariable o un SymbolParameter
-        SymbolIF symbol = scopeManager.searchSymbol(this.getLexema());
-        OperandIF o;
-        
-        CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol.getName());
-        if (symbol instanceof SymbolVariable) {
-        	o = new Variable(this.getLexema(), symbol.getScope());
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Variable creada ");               
-        } else if (symbol instanceof SymbolParameter) {
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
-        	o = new Variable(this.getLexema(), symbol);
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Parametro creado ");      
-        	((Variable) o).setParameter(true);       	            
-        } else {
-        	SymbolConstant constante = (SymbolConstant)symbol;
-            o = new Value(constante.getValue());
-            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada ");  
-        }
-        
-        cb.addQuadruple (InstructionSet.MV, temp, o);        
-        this.setTemporal(temp);
-        this.setIntermediateCode(cb.create());
-        CompilerContext.getSemanticErrorManager().semanticDebug(this);
-	}
-	
-	public void generarCodigoIntermedio(Referencia r, String campo) {
-		ScopeManagerIF scopeManager = CompilerContext.getScopeManager();
-		ScopeIF scope = scopeManager.getCurrentScope();
-        TemporalFactory tf = new TemporalFactory (scope);
-        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        TemporalIF temp = tf.create();
-        
-        
-        TypeRecord tipo = (TypeRecord)variableRegistro.getType();
-        CompilerContext.getSemanticErrorManager().semanticDebug("Obtiene el tipo "+tipo);
-        int idOffset = tipo.getOffset(campoRegistro.getName());
-        CompilerContext.getSemanticErrorManager().semanticDebug("Obtiene el offset "+idOffset);
-        Variable var = new Variable(variableRegistro.getName(), variableRegistro.getScope());
-        CompilerContext.getSemanticErrorManager().semanticDebug("Crez la variable "+var);
-        var.setSimbolo(variableRegistro);
-        CompilerContext.getSemanticErrorManager().semanticDebug("Le asigna el simbolo "+variableRegistro);
-
-        cb.addQuadruple(InstructionSet.MOVE_REG, temp, idOffset, var);
-        this.setTemporal(temp);
-        this.setIntermediateCode(cb.create());
 	}
 
 	/**
@@ -238,5 +232,24 @@ public class Referencia extends NonTerminal {
 		this.campoRegistro = campoRegistro;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Referencia [fieldType=" + type + ", lexema=" + lexema + ", line="
+				+ line + ", temporal=" + temporal + ", temporalIndex="
+				+ temporalIndex + ", temporalOffset=" + temporalOffset
+				+ ", accesoRegistro=" + accesoRegistro + ", variableRegistro="
+				+ variableRegistro + ", campoRegistro=" + campoRegistro + "]";
+	}
+
+
+	
+	
+	
 	
 }
+
+
+

@@ -17,7 +17,9 @@ public class InstructionSet {
 	public static final String OR = "OR";
 
 	// MV x y 		x := y
-	public static final String MV = "MV"; 
+	public static final String MV = "MV";
+	
+	public static final String MVP = "MVP"; 
 	
 	// BRF x L		si !x, salto a L
 	public static final String BRANCH_FALSE = "BRF";
@@ -40,4 +42,6 @@ public class InstructionSet {
 	public static final String FINAL = "FINAL";
 	public static final String MOVE_REG = "MOVE_REG";
 	public static final String PARAM = "PARAM";
+	public static final String MVA = "MVA";
+	public static final String MUL = "MUL";
 }
