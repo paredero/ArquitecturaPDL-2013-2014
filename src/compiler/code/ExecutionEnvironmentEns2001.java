@@ -14,7 +14,7 @@ import compiler.code.translator.TranslatorEscribeValor;
 import compiler.code.translator.TranslatorGE;
 import compiler.code.translator.TranslatorGT;
 import compiler.code.translator.TranslatorIncrement;
-import compiler.code.translator.TranslatorInicio;
+import compiler.code.translator.TranslatorData;
 import compiler.code.translator.TranslatorLabel;
 import compiler.code.translator.TranslatorMV;
 import compiler.code.translator.TranslatorMVReg;
@@ -112,8 +112,10 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 		try {
 			String op = quadruple.getOperation();
 			Translator trans;
-			if (op.equals(InstructionSet.INICIO)) {
-				trans = new TranslatorInicio(quadruple);
+			if (op.equals(InstructionSet.DATA)) {
+				trans = new TranslatorData(quadruple);
+				sb.append(trans.translate());
+				return sb.toString();
 			} else if (op.equals(InstructionSet.FINAL)) {
 				trans = new TranslatorFinal(quadruple);
 			} else if (op.equals(InstructionSet.ADD)) {

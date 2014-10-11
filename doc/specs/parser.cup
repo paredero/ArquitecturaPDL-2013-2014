@@ -197,7 +197,9 @@ program ::=
 		}
         
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
-        cb.addQuadruple("DATA", globalAddress);
+		
+		semanticErrorManager.semanticDebug("Para variables globales reservo: "+ globalAddress);
+        cb.addQuadruple("DATA", null, globalAddress);
         
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);

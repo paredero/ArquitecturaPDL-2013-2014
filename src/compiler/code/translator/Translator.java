@@ -34,28 +34,29 @@ public abstract class Translator {
 	public String traducirOperando(OperandIF o) {
 		if (o instanceof Variable) {
 			// Si se trata de una variable global direcciona directo a memoria
+			// en el espacio que se ha reservado inicialmente
 			Variable v = (Variable) o;
 			if (v.isGlobal()) {
 				return "/" + v.getAddress();
+			} else {
+				// Si se trata de una variable local se direcciona relativo al registro [.IX]
+				// En v.address tenemos el desplazamiento
+				return "#" + v.getAddress() + "[.IX]";
 			}
 			// Los parámetros se posicionan en las direcciones superiores al
 			// puntero de marco.
 			// Se deja un espacio para el valor de retorno en las funciones
-			if (v.isParameter()) {
-				return "#" + (v.getAddress() + 1) + "[.IX]";
-			}
-			if (isNoLocal(v)) {
-				// Si la variable es no local su direción está en el registro
-				// R1.
-				// Esta dirección se calcula en la clase TranslatorMove cuando
-				// se detecta
-				// que la variable es no local
-				return "[.R1]";
-			}
-			return "#-" + v.getAddress() + "[.IX]";
+//			if (v.isParameter()) {
+//				return "#" + (v.getAddress() + 1) + "[.IX]";
+//			}
+//			if (isNoLocal(v)) {
+//				return "[.R1]";
+//			}
+//			return "#-" + v.getAddress() + "[.IX]";
 		} else if (o instanceof Temporal) {
+			// En temporales se emplea direccionamiento relativo a registro indice
 			Temporal t = (Temporal) o;
-			return "#-" + t.getAddress() + "[.IX]";
+			return "#" + t.getAddress() + "[.IX]";
 		} else if (o instanceof Value) {
 			Value v = (Value) o;
 			if (v.getValue().toString().equals("true")) {

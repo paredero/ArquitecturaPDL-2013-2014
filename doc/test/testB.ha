@@ -1,20 +1,21 @@
--- funciones paso por valor
+-- variables y aritmetica simple 
 
+procedure testCase04 () is
 
-procedure testCase08 () is
-
-a, z: Integer;
-
-function suma (x: Integer) return Integer is
-begin    
-    Put_line(x);
-    return x; 
-end suma;
-
+    x: Integer;
+    t: Boolean;
 
 begin
-    a := 6;
-    Put_line(a);
-    z:= suma (5);
-    Put_line(z);
-end testCase08;
+
+    Put_line("VARIABLES Y ARITMETICA SIMPLE");
+
+        x := 2+1;
+        Put_line("x(3):");
+        Put_line(x);
+
+    t := False;
+        Put_line("t(false):");
+        Put_line(t);
+
+
+end testCase04;

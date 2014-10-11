@@ -37,7 +37,7 @@ public class InstructionSet {
 	public static final String CALL = "CALL";
 	public static final String RET = "RET";
 	
-	public static final String INICIO = "INICIO";
+	public static final String DATA = "DATA";
 	
 	public static final String FINAL = "FINAL";
 	public static final String MOVE_REG = "MOVE_REG";
