@@ -30,11 +30,13 @@ public class SentenciaAsignacion extends Sentencia {
         } else {
         	cb.addQuadruples(expresion.getIntermediateCode());
         	cb.addQuadruples(referencia.getIntermediateCode());
-
-        	cb.addQuadruple(InstructionSet.MUL, temporal, temporalIndexReferencia);
-        	cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalReferencia);
-        	cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalOffsetReferencia);
+        	if (temporalIndexReferencia != null) {
+        		cb.addQuadruple(InstructionSet.MUL, temporal, temporalIndexReferencia);
+        		cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalReferencia);
+        		cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalOffsetReferencia);
+        	}
         	cb.addQuadruple(InstructionSet.STP, temporal, temporalExpresion);
+        	cb.addQuadruple(InstructionSet.MV, referencia.getVariable(), temporal);
         }
         this.setIntermediateCode(cb.create()); 
 	}

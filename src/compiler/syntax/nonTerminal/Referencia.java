@@ -31,6 +31,7 @@ public class Referencia extends NonTerminal {
 	private Boolean accesoRegistro = false;
 	SymbolVariable variableRegistro;
 	SymbolVariable campoRegistro;
+	private Variable variable;
 	
 
 
@@ -54,7 +55,8 @@ public class Referencia extends NonTerminal {
         	// Se trata de una variable
         	CompilerContext.getSemanticErrorManager().semanticDebug("Es Variable");  
         	Variable variable = new Variable(lexema, symbol.getScope());
-        	cb.addQuadruple (InstructionSet.MVA, temp, variable);             
+        	cb.addQuadruple (InstructionSet.MVA, temp, variable);   
+        	this.setVariable(variable);
         } else if (symbol instanceof SymbolParameter) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
         	o = new Variable(lexema, symbol);
@@ -72,6 +74,9 @@ public class Referencia extends NonTerminal {
         this.setIntermediateCode(cb.create());
 	}
 	
+
+	
+
 	/**
 	 * Genera el codigo intermedio del acceso a campo de registro
 	 * @param r
@@ -231,6 +236,27 @@ public class Referencia extends NonTerminal {
 	public void setCampoRegistro(SymbolVariable campoRegistro) {
 		this.campoRegistro = campoRegistro;
 	}
+
+	
+	/**
+	 * @return the variable
+	 */
+	public Variable getVariable() {
+		return variable;
+	}
+
+
+
+
+	/**
+	 * @param variable2 the variable to set
+	 */
+	public void setVariable(Variable variable2) {
+		this.variable = variable2;
+	}
+
+
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

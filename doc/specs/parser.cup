@@ -199,7 +199,7 @@ program ::=
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
 		
 		semanticErrorManager.semanticDebug("Para variables globales reservo: "+ globalAddress);
-        cb.addQuadruple("DATA", null, globalAddress);
+        cb.addQuadruple("DATA", null, globalAddress + lOffset, globalAddress);
         
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);
@@ -930,6 +930,7 @@ lista_sentencias ::=  sentencia:sentencia PUNTO_COMA lista_sentencias:listaSente
         RESULT = listaSentencias;
     :}
         |  vacio {:
+			RESULT = new ListaSentencias();
         :};
 
 sentencia ::= sentencia_entrada_salida:sentencia

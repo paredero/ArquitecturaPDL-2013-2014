@@ -1,7 +1,5 @@
-package compiler.code;
+package compiler.code.translator;
 
-import compiler.code.translator.LabelManager;
-import compiler.code.translator.Translator;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 public class TranslatorFinal extends Translator {

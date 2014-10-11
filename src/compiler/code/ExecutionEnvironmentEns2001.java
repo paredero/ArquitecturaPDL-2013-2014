@@ -11,16 +11,20 @@ import compiler.code.translator.TranslatorCall;
 import compiler.code.translator.TranslatorEqual;
 import compiler.code.translator.TranslatorEscribe;
 import compiler.code.translator.TranslatorEscribeValor;
+import compiler.code.translator.TranslatorFinal;
 import compiler.code.translator.TranslatorGE;
 import compiler.code.translator.TranslatorGT;
 import compiler.code.translator.TranslatorIncrement;
 import compiler.code.translator.TranslatorData;
 import compiler.code.translator.TranslatorLabel;
 import compiler.code.translator.TranslatorMV;
+import compiler.code.translator.TranslatorMVA;
 import compiler.code.translator.TranslatorMVReg;
+import compiler.code.translator.TranslatorMul;
 import compiler.code.translator.TranslatorOR;
 import compiler.code.translator.TranslatorParam;
 import compiler.code.translator.TranslatorRet;
+import compiler.code.translator.TranslatorStp;
 import compiler.intermediate.InstructionSet;
 import compiler.semantic.type.TypeSimple;
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
@@ -114,12 +118,12 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 			Translator trans;
 			if (op.equals(InstructionSet.DATA)) {
 				trans = new TranslatorData(quadruple);
-				sb.append(trans.translate());
-				return sb.toString();
 			} else if (op.equals(InstructionSet.FINAL)) {
 				trans = new TranslatorFinal(quadruple);
 			} else if (op.equals(InstructionSet.ADD)) {
 				trans = new TranslatorAdd(quadruple);
+			}  else if (op.equals(InstructionSet.MUL)) {
+				trans = new TranslatorMul(quadruple);
 			} else if (op.equals(InstructionSet.BRANCH)) {
 				trans = new TranslatorBranch(quadruple);
 			} else if (op.equals(InstructionSet.BRANCH_FALSE)) {
@@ -142,6 +146,10 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				trans = new TranslatorLabel(quadruple);
 			} else if (op.equals(InstructionSet.MV)) {
 				trans = new TranslatorMV(quadruple);
+			} else if (op.equals(InstructionSet.MVA)) {
+				trans = new TranslatorMVA(quadruple);
+			} else if (op.equals(InstructionSet.STP)) {
+				trans = new TranslatorStp(quadruple);
 			} else if(op.equals(InstructionSet.MOVE_REG)){	    		
 	    		trans = new TranslatorMVReg(quadruple);
 	    	} else if (op.equals(InstructionSet.OR)) {
@@ -154,8 +162,8 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				return quadruple.toString();
 			}
 			sb.append(trans.translate());
-// TODO descomentar			return sb.toString();
-			return quadruple.toString();
+			return sb.toString();
+//			return quadruple.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "Excepcion en el proceso de traduccion " +quadruple + e.getMessage();

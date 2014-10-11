@@ -28,7 +28,9 @@ public class TranslatorData extends Translator {
 		try {
 		// TODO Si le pongo una etiqueta a RES, podré referenciar el comienzo del programa
 			sb.append("RES ").append(q.getFirstOperand())
-					.append(";Reservo memoria para variables globales \n");
+					.append(" ;Reservo memoria para variables globales y temporales \n");
+			sb.append("MOVE ").append(traducirOperando(q.getSecondOperand())).append(", .IX")
+				.append("  ;Situo IX en la posicion en la que va el primer temporal> globalAddress \n");
 //			sb.append("MOVE #65535, ").append(STACK_POINTER).append(";Situo el puntero de pila al final del espacio de memoria \n");
 //			sb.append("MOVE ").append(STACK_POINTER).append(" , ").append( PUNTERO_MARCO).append(";Inicializo el puntero de marco \n");
 ////			sb.append("SUB  ").append(STACK_POINTER).append(" , #").append(tra).append(" \n");
