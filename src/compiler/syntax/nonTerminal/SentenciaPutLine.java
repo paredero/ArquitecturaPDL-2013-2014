@@ -34,7 +34,7 @@ public class SentenciaPutLine extends Sentencia {
 	public void generarCodigoIntermedio(String cadena) {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(
 				CompilerContext.getScopeManager().getCurrentScope());
-		cb.addQuadruple(InstructionSet.ESCRIBE, new Value(cadena));
+		cb.addQuadruple(InstructionSet.ESCRIBE, null, new Value(cadena));
 		this.setIntermediateCode(cb.create());
 	}
 	

@@ -163,13 +163,12 @@ program ::=
 		 //	Asigno direcciones a variables globales	
 		semanticErrorManager.semanticDebug("************************************* ASIGNACION DIRECCIONES");
 		int globalAddress = 0;
-		int lOffset = 0;
+		int desplazamientoGlobal = 0;
 		List<ScopeIF> todosAmbitos = scopeManager.getAllScopes();
 		ScopeIF scopeActual = null;
 		for (ScopeIF scope: todosAmbitos){
-			if (scope.getLevel() == 0) {
-				scopeActual = scope;
-			}
+			int desplazamientoAmbito = 0;
+			boolean ambitoGlobal = false;
 			List<SymbolIF> simbolosAmbito = scope.getSymbolTable().getSymbols();
 			for (SymbolIF simbolo:simbolosAmbito){
 				if (simbolo instanceof SymbolVariable) {
@@ -178,8 +177,8 @@ program ::=
 						simboloVar.setAddress(globalAddress);
 						globalAddress += simboloVar.getType().getSize();
 					} else {
-						simboloVar.setAddress(lOffset);
-						lOffset += simboloVar.getType().getSize();
+						simboloVar.setAddress(desplazamientoAmbito);
+						desplazamientoAmbito += simboloVar.getType().getSize();
 					}
 					semanticErrorManager.semanticDebug("Var: "+ simboloVar.getName() 
 														+ " tipo: " +simboloVar.getType().getName()
@@ -189,22 +188,26 @@ program ::=
 			
 			List<TemporalIF> temporalesAmbito = scope.getTemporalTable().getTemporals();
 			for (TemporalIF t:temporalesAmbito) {
-				t.setAddress(lOffset);
-				lOffset++;
+				t.setAddress(desplazamientoAmbito);
+				desplazamientoAmbito++;
 				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() 
 														+ " -------------> direccion " + t.getAddress());
 			}
+			if (scope.getLevel() == 0) {
+				scopeActual = scope;
+				desplazamientoGlobal = desplazamientoAmbito;
+			}
+			
 		}
         
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
 		
 		semanticErrorManager.semanticDebug("Para variables globales reservo: "+ globalAddress);
-        cb.addQuadruple("DATA", null, globalAddress + lOffset, globalAddress);
+        cb.addQuadruple("DATA", null, globalAddress + desplazamientoGlobal, globalAddress);
         
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);
 		cb.addQuadruple (InstructionSet.FINAL);
-        syntaxErrorManager.syntaxInfo ("Codigo intermedio generado " + cb.create());
 
         ExecutionEnvironmentEns2001 e = new ExecutionEnvironmentEns2001();
         finalCodeFactory.setEnvironment(e); 
@@ -218,7 +221,6 @@ program ::=
 
 axiom ::= cabecera:apertura declaraciones:declaraciones cuerpo:cierre
 {:
-    semanticErrorManager.semanticDebug("1 axiom ::= cabecera:apertura declaraciones cuerpo:cierre");
     String idApertura = (String)apertura;
     String idCierre = cierre.getIdProcedimiento();
     if (!idApertura.equalsIgnoreCase(idCierre)) {
@@ -248,8 +250,7 @@ vacio ::= {:
 
 cabecera ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS
     {:
-		semanticErrorManager.semanticDebug("3: CABECERA");
-        //Crear el ámbito global del programa asociado al nombre del procedimiento.
+		//Crear el ámbito global del programa asociado al nombre del procedimiento.
         String name = id.getLexema();
         scopeManager.openScope(name);
 
@@ -328,12 +329,12 @@ declaraciones ::= declaracion_constantes:dc
 
 declaracion_constantes ::= constante:c declaracion_constantes:declaraciones 
 {:
-	semanticErrorManager.semanticDebug("declaracion_constantes ::= constante declaracion_constantes ");
+	semanticErrorManager.semanticDebug("declaracion_constantes ::= constante declaracion_constantes " + declaraciones + c);
 	RESULT=declaraciones.addDeclaracion(c);
 :}
         | declaracion_registros:dr
 {:
-	semanticErrorManager.semanticDebug("declaracion_constantes ::= declaracion_registros");
+	semanticErrorManager.semanticDebug("declaracion_constantes ::= declaracion_registros " + dr);
 	RESULT = dr;
 :};
 
@@ -363,6 +364,7 @@ constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v 
 lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres
     {:
 		semanticErrorManager.semanticDebug("lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres");
+		semanticErrorManager.semanticDebug("id: " + id + "listaNombres: " + listaNombres);
         ListaObjetos listaResultado = new ListaObjetos((ListaObjetos)listaNombres);
         listaResultado.add(id.getLexema().toUpperCase());
         RESULT = listaResultado;
@@ -436,7 +438,7 @@ lista_campos ::= IDENTIFICADOR:idCampo DOS_PUNTOS tipo:tipoCampo PUNTO_COMA list
 
 declaracion_variables ::= variable:v declaracion_variables:declaraciones
 {:
-	semanticErrorManager.semanticDebug("declaracion_variables ::= variable:v declaracion_variables:declaraciones");
+	semanticErrorManager.semanticDebug("declaracion_variables ::= variable:v declaracion_variables:declaraciones" + v + declaraciones);
 	if (declaraciones == null) {
 		declaraciones = new Declaraciones();
 	}
@@ -450,6 +452,10 @@ declaracion_variables ::= variable:v declaracion_variables:declaraciones
 
 variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
 {:
+	
+	semanticErrorManager.semanticDebug("variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA");
+	
+	semanticErrorManager.semanticDebug("objListaNombres: " + objListaNombres +"objTipo: "+objTipo);
     // Se declara una serie de variables
     String tipoVariable = ((String)objTipo).toUpperCase();
     ListaObjetos listaNombres = (ListaObjetos)objListaNombres; 
@@ -477,7 +483,6 @@ variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA
             }
         }
     }
-	semanticErrorManager.semanticDebug("variable ::= lista_nombres:objListaNombres DOS_PUNTOS tipo:objTipo PUNTO_COMA");
 
 :};
 

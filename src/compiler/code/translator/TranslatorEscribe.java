@@ -16,7 +16,6 @@ public class TranslatorEscribe extends Translator {
 	 */
 	public TranslatorEscribe(QuadrupleIF quadruple) {
 		super(quadruple);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)
@@ -26,8 +25,11 @@ public class TranslatorEscribe extends Translator {
 	public String translate() {
 		sb.append("WRSTR ");
 		String label = LabelManager.getLabelText();
-		sb.append("/").append(label).append( "\nWRCHAR #10\nWRCHAR #13");
-		LabelManager.addLabel(label, "DATA "+ q.getResult());
+		sb.append("/").append(label).append(" \n");
+		sb.append("WRCHAR #10 ").append(" \n");
+		sb.append("WRCHAR #13 ").append(" \n");
+		sb.append(label).append(": DATA ").append(q.getFirstOperand()).append(" \n");
+//		LabelManager.addLabel(label, "DATA "+ q.getResult());
 		return sb.toString();
 	}
 
