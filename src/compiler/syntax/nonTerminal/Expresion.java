@@ -89,7 +89,7 @@ public class Expresion extends NonTerminal {
         } else {
 	        TemporalIF tempReferencia = r.getTemporal();
 	        TemporalIF temp = tF.create();
-	        cb.addQuadruple(InstructionSet.MVP, temp, tempReferencia);
+	        cb.addQuadruple(InstructionSet.MVA, temp, tempReferencia);
 	        this.setTemporal(temp);
         }
         this.setIntermediateCode(cb.create());

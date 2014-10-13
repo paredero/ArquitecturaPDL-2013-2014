@@ -166,6 +166,7 @@ program ::=
 		int desplazamientoGlobal = 0;
 		List<ScopeIF> todosAmbitos = scopeManager.getAllScopes();
 		ScopeIF scopeActual = null;
+		List<SymbolConstant> listaConstantes = new ArrayList<SymbolConstant>();
 		for (ScopeIF scope: todosAmbitos){
 			int desplazamientoAmbito = 0;
 			boolean ambitoGlobal = false;
@@ -183,6 +184,8 @@ program ::=
 					semanticErrorManager.semanticDebug("Var: "+ simboloVar.getName() 
 														+ " tipo: " +simboloVar.getType().getName()
 														+ " -------------> direccion " + simboloVar.getAddress());
+				} else {
+					semanticErrorManager.semanticDebug("Simbolo no procesado: "+ simbolo);
 				}
 			}
 			
@@ -203,8 +206,8 @@ program ::=
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
 		
 		semanticErrorManager.semanticDebug("Para variables globales reservo: "+ globalAddress);
-        cb.addQuadruple("DATA", null, globalAddress + desplazamientoGlobal, globalAddress);
-        
+        cb.addQuadruple("DATA", null, globalAddress + desplazamientoGlobal, globalAddress);		
+		
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);
 		cb.addQuadruple (InstructionSet.FINAL);
@@ -330,6 +333,9 @@ declaraciones ::= declaracion_constantes:dc
 declaracion_constantes ::= constante:c declaracion_constantes:declaraciones 
 {:
 	semanticErrorManager.semanticDebug("declaracion_constantes ::= constante declaracion_constantes " + declaraciones + c);
+	if (declaraciones == null) {
+		declaraciones = new Declaraciones();
+	}
 	RESULT=declaraciones.addDeclaracion(c);
 :}
         | declaracion_registros:dr

@@ -66,7 +66,8 @@ public class Referencia extends NonTerminal {
         } else {
         	SymbolConstant constante = (SymbolConstant)symbol;
             o = new Value(constante.getValue());
-            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada ");  
+            cb.addQuadruple(InstructionSet.MV, temp, o);
+            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada " + o);  
         	//TODO El codigo de una constante
         }       
                 
