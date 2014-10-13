@@ -20,10 +20,10 @@ public class SentenciaPutLine extends Sentencia {
 	        LabelIF l1 = lF.create();
 	        LabelIF l2 = lF.create();
 	        cb.addQuadruple(InstructionSet.BRANCH_FALSE, exp.getTemporal(), l1);
-	        cb.addQuadruple(InstructionSet.ESCRIBE, new Value("\"true\""));
+	        cb.addQuadruple(InstructionSet.ESCRIBE, null, new Value("\"true\""));
 	        cb.addQuadruple(InstructionSet.BRANCH, l2);
 	        cb.addQuadruple(InstructionSet.INL, l1);
-	        cb.addQuadruple(InstructionSet.ESCRIBE, new Value("\"false\""));
+	        cb.addQuadruple(InstructionSet.ESCRIBE, null, new Value("\"false\""));
 	        cb.addQuadruple(InstructionSet.INL, l2);
         } else {
         	cb.addQuadruple(InstructionSet.ESCRIBE_VALOR, exp.getTemporal());
