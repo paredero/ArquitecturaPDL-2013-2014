@@ -217,7 +217,10 @@ program ::=
           
         finalCodeFactory.create(cb.create());               
         
-        syntaxErrorManager.syntaxInfo ("Codigo intermedio generado  " + cb.create());
+        syntaxErrorManager.syntaxInfo ("Codigo intermedio generado; \n  ");
+		for (QuadrupleIF q:cb.create()) {
+			syntaxErrorManager.syntaxInfo (q.toString());
+		}
         syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
