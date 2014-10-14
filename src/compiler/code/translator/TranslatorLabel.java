@@ -33,7 +33,7 @@ public class TranslatorLabel extends Translator {
 			// incluye el nivel de
 			// ámbito como primer operando.
 			Value v = (Value) q.getFirstOperand();
-			scopeCount = (int) v.getValue();
+			scopeCount = (Integer) v.getValue();
 			sb.append(" ; Ambito ").append(scopeCount).append(" \n");
 		}
 		return sb.toString();
