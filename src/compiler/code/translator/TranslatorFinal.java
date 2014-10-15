@@ -12,7 +12,6 @@ public class TranslatorFinal extends Translator {
 	public String translate() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("HALT\n");
-		sb.append("ORG 32768\n");
 		String labels = LabelManager.getLabels();
 		if(labels != null)
 		{

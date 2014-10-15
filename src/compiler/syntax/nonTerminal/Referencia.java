@@ -27,10 +27,10 @@ public class Referencia extends NonTerminal {
 	private int line;
 	private TemporalIF temporal;
 	private TemporalIF temporalIndex;
-	private TemporalIF temporalOffset;
-	private Boolean accesoRegistro = false;
-	SymbolVariable variableRegistro;
-	SymbolVariable campoRegistro;
+//	private TemporalIF temporalOffset;
+//	private Boolean accesoRegistro = false;
+//	SymbolVariable variableRegistro;
+//	SymbolVariable campoRegistro;
 	private Variable variable;
 	
 
@@ -89,18 +89,23 @@ public class Referencia extends NonTerminal {
         TemporalFactory tf = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         
-        TemporalIF tempRegistro = r.getTemporal();
-        this.temporalIndex = r.getTemporalIndex();
-        this.temporalOffset = tf.create();        
+        String nombreRegistro = r.getLexema().toUpperCase();
+        SymbolVariable symbol = (SymbolVariable)scopeManager.searchSymbol(nombreRegistro);
+        TypeRecord tRec = (TypeRecord) r.getType();
+        if (symbol instanceof SymbolVariable) {
+        	// Se trata de una variable
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Es Variable");  
+        	Variable variable = new Variable(nombreRegistro, symbol.getScope());
+        	
+        	int desplazamiento = tRec.getDesplazamiento(campo);
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Es Variable *Campo: " + campo + " Desplazamiento: " + desplazamiento);
+        	variable.setDesplazamiento(desplazamiento);
+        	TemporalIF temp = tf.create();
+        	cb.addQuadruple (InstructionSet.MVA, temp, variable);   
+        	this.setVariable(variable);
+        	this.setTemporal(temp);
+        } 
         
-        cb.addQuadruples(r.getIntermediateCode());        
-        TypeRecord tipoRegistro = (TypeRecord)variableRegistro.getType();
-        
-        CompilerContext.getSemanticErrorManager().semanticDebug("Obtiene el tipo del registro "+tipoRegistro);
-        int idOffset = tipoRegistro.getOffset(campoRegistro.getName());
-        
-        cb.addQuadruple(InstructionSet.MV, temporalOffset, idOffset);
-        this.temporal = tempRegistro;
         
         this.setIntermediateCode(cb.create());
 	}
@@ -182,62 +187,6 @@ public class Referencia extends NonTerminal {
 		this.temporalIndex = temporalIndex;
 	}
 
-	/**
-	 * @return the temporalOffset
-	 */
-	public TemporalIF getTemporalOffset() {
-		return temporalOffset;
-	}
-
-	/**
-	 * @param temporalOffset the temporalOffset to set
-	 */
-	public void setTemporalOffset(TemporalIF temporalOffset) {
-		this.temporalOffset = temporalOffset;
-	}
-
-	/**
-	 * @return the accesoRegistro
-	 */
-	public Boolean getAccesoRegistro() {
-		return accesoRegistro;
-	}
-
-	/**
-	 * @param accesoRegistro the accesoRegistro to set
-	 */
-	public void setAccesoRegistro(Boolean accesoRegistro) {
-		this.accesoRegistro = accesoRegistro;
-	}
-
-	/**
-	 * @return the variableRegistro
-	 */
-	public SymbolVariable getVariableRegistro() {
-		return variableRegistro;
-	}
-
-	/**
-	 * @param variableRegistro the variableRegistro to set
-	 */
-	public void setVariableRegistro(SymbolVariable variableRegistro) {
-		this.variableRegistro = variableRegistro;
-	}
-
-	/**
-	 * @return the campoRegistro
-	 */
-	public SymbolVariable getCampoRegistro() {
-		return campoRegistro;
-	}
-
-	/**
-	 * @param campoRegistro the campoRegistro to set
-	 */
-	public void setCampoRegistro(SymbolVariable campoRegistro) {
-		this.campoRegistro = campoRegistro;
-	}
-
 	
 	/**
 	 * @return the variable
@@ -264,11 +213,9 @@ public class Referencia extends NonTerminal {
 	 */
 	@Override
 	public String toString() {
-		return "Referencia [fieldType=" + type + ", lexema=" + lexema + ", line="
-				+ line + ", temporal=" + temporal + ", temporalIndex="
-				+ temporalIndex + ", temporalOffset=" + temporalOffset
-				+ ", accesoRegistro=" + accesoRegistro + ", variableRegistro="
-				+ variableRegistro + ", campoRegistro=" + campoRegistro + "]";
+		return "Referencia [fieldType=" + type + ", lexema=" + lexema
+				+ ", line=" + line + ", temporal=" + temporal
+				+ ", temporalIndex=" + temporalIndex + "]";
 	}
 
 

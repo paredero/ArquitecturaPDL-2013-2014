@@ -18,6 +18,8 @@ public class Variable
     private ScopeIF scope    = null;
     private boolean isParameter = false;
     private SymbolIF simbolo = null;
+    // Para calcular el desplazamiento de un campo de un registro
+    private int desplazamiento = 0;
         
     /**
 	 * @return the simbolo
@@ -136,13 +138,16 @@ public class Variable
 
 
 
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Variable [name=" + name + ", scope=" + scope.getName() + ", isParameter="
-				+ isParameter + "]";
+		return "Variable [name=" + name + ", scope=" + scope.getLevel() + ", isParameter="
+				+ isParameter + ", desplazamiento="
+				+ desplazamiento + "]";
 	}
 
 	/**
@@ -159,5 +164,20 @@ public class Variable
 		this.isParameter = isParameter;
 	}
 
+	/**
+	 * @return the desplazamiento
+	 */
+	public int getDesplazamiento() {
+		return desplazamiento;
+	}
+
+	/**
+	 * @param desplazamiento the desplazamiento to set
+	 */
+	public void setDesplazamiento(int desplazamiento) {
+		this.desplazamiento = desplazamiento;
+	}
+
+	
     
 }

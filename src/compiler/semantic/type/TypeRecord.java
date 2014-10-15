@@ -1,8 +1,10 @@
 package compiler.semantic.type;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+
+import compiler.CompilerContext;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
@@ -16,7 +18,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 
 public class TypeRecord extends TypeBase {
 	// Campos del registro
-	private HashMap<String, SymbolIF> tablaCampos = new HashMap<String, SymbolIF>();
+	private LinkedHashMap<String, SymbolIF> tablaCampos = new LinkedHashMap<String, SymbolIF>();
 
 	/**
 	 * Constructor for TypeRecord.
@@ -67,7 +69,7 @@ public class TypeRecord extends TypeBase {
 	/**
 	 * @return the tablaCampos
 	 */
-	public HashMap<String, SymbolIF> getTablaCampos() {
+	public LinkedHashMap<String, SymbolIF> getTablaCampos() {
 		return tablaCampos;
 	}
 
@@ -75,7 +77,7 @@ public class TypeRecord extends TypeBase {
 	 * @param tablaCampos
 	 *            the tablaCampos to set
 	 */
-	public void setTablaCampos(HashMap<String, SymbolIF> tablaCampos) {
+	public void setTablaCampos(LinkedHashMap<String, SymbolIF> tablaCampos) {
 		this.tablaCampos = tablaCampos;
 	}
 
@@ -98,17 +100,20 @@ public class TypeRecord extends TypeBase {
 		return tablaCampos.get(nombre);
 	}
 
-	public int getOffset(String nombre) {
-		Iterator<Entry<String, SymbolIF>> it = tablaCampos.entrySet()
-				.iterator();
-		int i = 0;
-		while (it.hasNext()) {
-			Entry<String, SymbolIF> entry = it.next();
-			if (entry.getKey().equals(nombre)) {
-				return i;
+	
+	public int getDesplazamiento(String campo) {
+		int desplazamiento = 0;
+		boolean seguir = true;
+		Iterator<Entry<String, SymbolIF>> itCampos = this.getTablaCampos()
+				.entrySet().iterator();
+		while (itCampos.hasNext() && seguir) {
+			String campoEncontrado = itCampos.next().getKey();
+			if (campoEncontrado.equalsIgnoreCase(campo)) {
+				seguir = false;
+			} else {
+				desplazamiento++;
 			}
-			i++;
 		}
-		return -1;
+		return desplazamiento;
 	}
 }

@@ -194,7 +194,7 @@ program ::=
 				t.setAddress(desplazamientoAmbito);
 				desplazamientoAmbito++;
 				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() 
-														+ " -------------> direccion " + t.getAddress());
+														+ " -------------> direccion " + (globalAddress + t.getAddress()));
 			}
 			if (scope.getLevel() == 0) {
 				scopeActual = scope;
@@ -915,12 +915,12 @@ acceso_registro ::= referencia:registro ACCESO IDENTIFICADOR:campo
 			r.setType(fieldType);
 			r.setLexema(nombreRegistro + "." + nombreCampo);
 			r.setLine(campo.getLine());
-			r.setAccesoRegistro(true);
-			SymbolVariable variableRegistro = (SymbolVariable)scopeManager.searchSymbol(nombreRegistro);
-			r.setVariableRegistro(variableRegistro);
 			
-			SymbolVariable campoRegistro = new SymbolVariable(variableRegistro.getScope(), nombreCampo, fieldType);
-			r.setCampoRegistro(campoRegistro);
+			//SymbolVariable variableRegistro = (SymbolVariable)scopeManager.searchSymbol(nombreRegistro);
+			//r.setVariableRegistro(variableRegistro);
+			
+			//SymbolVariable campoRegistro = new SymbolVariable(variableRegistro.getScope(), nombreCampo, fieldType);
+			//r.setCampoRegistro(campoRegistro);
 			
             r.generarCodigoIntermedioAccesoRegistro(registro, nombreCampo);
              

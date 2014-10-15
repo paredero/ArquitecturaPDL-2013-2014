@@ -26,7 +26,7 @@ public class TranslatorEscribeValor extends Translator {
 	public String translate() {
 		sb.append("WRINT ");
 		sb.append(traducirOperando(q.getResult())).append(" \n");
-		sb.append("WRCHAR #10\nWRCHAR #13");
+		sb.append("WRCHAR #10 \n").append("WRCHAR #13 \n");
 		return sb.toString();
 	}
 

@@ -36,12 +36,13 @@ public abstract class Translator {
 			// Si se trata de una variable global direcciona directo a memoria
 			// en el espacio que se ha reservado inicialmente
 			Variable v = (Variable) o;
-			if (v.isGlobal()) {
-				return "/" + v.getAddress();
+			int dirVar = v.getAddress() + v.getDesplazamiento();
+			if (v.isGlobal()) {	
+				return "/" + dirVar;
 			} else {
 				// Si se trata de una variable local se direcciona relativo al registro [.IX]
 				// En v.address tenemos el desplazamiento
-				return "#" + v.getAddress() + "[.IX]";
+				return "#" + dirVar + "[.IX]";
 			}
 			// Los parámetros se posicionan en las direcciones superiores al
 			// puntero de marco.
