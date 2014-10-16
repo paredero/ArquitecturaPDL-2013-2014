@@ -3,22 +3,19 @@
  */
 package compiler.code.translator;
 
-import compiler.intermediate.InstructionSet;
-
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
  * @author jgarcia
  *
  */
-public class TranslatorBranch extends Translator {
+public class TranslatorBR extends Translator {
 
 	/**
 	 * @param quadruple
 	 */
-	public TranslatorBranch(QuadrupleIF quadruple) {
+	public TranslatorBR(QuadrupleIF quadruple) {
 		super(quadruple);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

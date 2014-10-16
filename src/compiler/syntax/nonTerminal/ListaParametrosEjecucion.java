@@ -64,7 +64,11 @@ public class ListaParametrosEjecucion extends NonTerminal {
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         cb.addQuadruples(this.getIntermediateCode());
         cb.addQuadruples(ultimoParametro.getIntermediateCode());
-        cb.addQuadruple(InstructionSet.PARAM, null, ultimoParametro.getTemporal());        
+        if (this.getParametros().size() == 1) {
+        	cb.addQuadruple(InstructionSet.PARAM, null, ultimoParametro.getTemporal(),1);        
+        } else {
+        	cb.addQuadruple(InstructionSet.PARAM, null, ultimoParametro.getTemporal());
+        }
         this.setIntermediateCode(cb.create());
 	}
 	/* (non-Javadoc)

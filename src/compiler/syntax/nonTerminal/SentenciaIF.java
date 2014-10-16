@@ -52,7 +52,7 @@ public class SentenciaIF extends Sentencia {
 		cb.addQuadruples(expCondicion.getIntermediateCode());
 		cb.addQuadruple(InstructionSet.BRANCH_FALSE, temporalExpresion, l1);
 		cb.addQuadruples(listaSentencias.getIntermediateCode());
-		cb.addQuadruple(InstructionSet.BRANCH, l2);
+		cb.addQuadruple(InstructionSet.BR, l2);
 		cb.addQuadruple(InstructionSet.INL, l1);
 		cb.addQuadruples(listaSentenciasElse.getIntermediateCode());
 		cb.addQuadruple(InstructionSet.INL, l2);

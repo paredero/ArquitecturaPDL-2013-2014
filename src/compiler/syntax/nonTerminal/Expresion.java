@@ -17,6 +17,7 @@ public class Expresion extends NonTerminal {
 	public static String OR = "OR";
 	
 	private TypeIF type;
+	private TypeIF returnType;// El tipo de devolucion de una funcion
 	private String lexema;
 	private TemporalIF temporal;
 	
@@ -200,16 +201,33 @@ public class Expresion extends NonTerminal {
 		this.temporal = temporal;
 	}
 
+	
+	
+	/**
+	 * @return the returnType
+	 */
+	public TypeIF getReturnType() {
+		return returnType;
+	}
+
+	/**
+	 * @param returnType the returnType to set
+	 */
+	public void setReturnType(TypeIF returnType) {
+		this.returnType = returnType;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Expresion [type=" + type.getName() + ", lexema=" + lexema + ", temporal="
-				+ temporal + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("Expresion [type=").append(type.getName());
+		if (returnType != null) {
+			sb.append(", returnType=").append(returnType.getName());
+		}
+		sb.append(", lexema=").append(lexema).append(", temporal=").append(temporal).append("\n");
+		return sb.toString();
 	}
-
-
-	
-	
 }

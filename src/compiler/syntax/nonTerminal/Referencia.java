@@ -59,8 +59,7 @@ public class Referencia extends NonTerminal {
         	this.setVariable(variable);
         } else if (symbol instanceof SymbolParameter) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
-        	o = new Variable(lexema, symbol);
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Parametro creado ");      
+        	o = new Variable(lexema, symbol);     
         	((Variable) o).setParameter(true);      
         	//TODO El codigo de un parametro
         } else {
@@ -213,9 +212,9 @@ public class Referencia extends NonTerminal {
 	 */
 	@Override
 	public String toString() {
-		return "Referencia [fieldType=" + type + ", lexema=" + lexema
+		return "Referencia [fieldType=" + type.toString() + ", lexema=" + lexema
 				+ ", line=" + line + ", temporal=" + temporal
-				+ ", temporalIndex=" + temporalIndex + "]";
+				+ ", temporalIndex=" + temporalIndex + "] \n";
 	}
 
 

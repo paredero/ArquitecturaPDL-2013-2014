@@ -29,7 +29,7 @@ public class SentenciaFor extends Sentencia {
         cb.addQuadruples(expFin.getIntermediateCode());
         cb.addQuadruple(InstructionSet.BRANCH_FALSE, tempExpresionFin, l2);
         cb.addQuadruples(listaSentencias.getIntermediateCode());
-        cb.addQuadruple(InstructionSet.BRANCH, l1);
+        cb.addQuadruple(InstructionSet.BR, l1);
         cb.addQuadruple(InstructionSet.INL, l2);
         this.setIntermediateCode(cb.create());		
 	}

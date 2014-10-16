@@ -13,7 +13,6 @@ import compiler.semantic.symbol.SymbolProcedure;
 import compiler.semantic.type.TypeProcedure;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
-import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -22,7 +21,6 @@ public class LlamadaSubprograma extends Sentencia {
 	
 	private TypeIF returnType;
 	private String nombre;
-	private OperandIF operacion;
 	
 	/**
 	 * Genera el codigo intermedio para una llamada a funcion
@@ -106,20 +104,4 @@ public class LlamadaSubprograma extends Sentencia {
 		this.nombre = nombre;
 	}
 
-	/**
-	 * @return the operacion
-	 */
-	public OperandIF getOperacion() {
-		return operacion;
-	}
-
-	/**
-	 * @param operacion the operacion to set
-	 */
-	public void setOperacion(OperandIF operacion) {
-		this.operacion = operacion;
-	}
-
-	
-	
 }

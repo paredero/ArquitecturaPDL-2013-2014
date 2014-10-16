@@ -28,7 +28,7 @@ public class InstructionSet {
 	public static final String INL = "INL";
 	
 	// BR L			Salto a L
-	public static final String BRANCH = "BR";
+	public static final String BR = "BR";
 	
 	public static final String GREATER_EQUAL = "GE";
 	

@@ -207,7 +207,7 @@ program ::=
 		
 		semanticErrorManager.semanticDebug("Para variables globales reservo: "+ globalAddress);
         cb.addQuadruple("DATA", null, globalAddress + desplazamientoGlobal, globalAddress);		
-		
+		cb.addQuadruple("BR", ax.getLabel());
         List intermediateCode = ax.getIntermediateCode();
         cb.addQuadruples(intermediateCode);
 		cb.addQuadruple (InstructionSet.FINAL);
@@ -372,15 +372,12 @@ constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v 
     
 lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres
     {:
-		semanticErrorManager.semanticDebug("lista_nombres ::= IDENTIFICADOR:id SEPARADOR_COMA lista_nombres:listaNombres");
-		semanticErrorManager.semanticDebug("id: " + id + "listaNombres: " + listaNombres);
         ListaObjetos listaResultado = new ListaObjetos((ListaObjetos)listaNombres);
         listaResultado.add(id.getLexema().toUpperCase());
         RESULT = listaResultado;
     :}
     | IDENTIFICADOR:id
     {:
-		semanticErrorManager.semanticDebug("15: Lista_nombres ::= identificador");
         ListaObjetos listaNombres = new ListaObjetos();
         listaNombres.add(id.getLexema().toUpperCase());
         RESULT = listaNombres;
@@ -852,7 +849,9 @@ expresion ::= expresion:exp1 PLUS:operador expresion:exp2
 {:  
     if (l != null && l.getReturnType() != null) {
         // Si existe devolucion es que es una funcion y no un procedimiento
-        Expresion expresionResultado = new Expresion(l.getReturnType(), l.getNombre());
+		TypeIF tipoFuncion = scopeManager.searchType(l.getNombre().toUpperCase());
+        Expresion expresionResultado = new Expresion(tipoFuncion, l.getNombre());		
+		expresionResultado.setReturnType(l.getReturnType());
         expresionResultado.generarCodigoIntermedio(l);
 
         RESULT = expresionResultado;
@@ -1025,18 +1024,36 @@ semanticErrorManager.semanticDebug("53");
         
 sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
 {:
-	semanticErrorManager.semanticDebug("54: sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion");
-    
-    // Debo comprobar que tanto referencia como expresion coinciden en tipo y que este es uno de los tipos simples
-    if (!(referencia.getType() instanceof TypeSimple)) {
+	// Debo comprobar que tanto referencia como expresion coinciden en tipo y que este es uno de los tipos simples
+	
+    if (expresion.getType() instanceof TypeFunction) {
+		semanticErrorManager.semanticInfo("Asignacion de una funcion: " + referencia + expresion);
+		if (!referencia.getType().equals(expresion.getReturnType())) {
+			semanticErrorManager.semanticFatalError("ERROR: tipos distintos en asignacion, linea: " + referencia.getLine()); 
+		} else {
+			SentenciaAsignacion s = new SentenciaAsignacion();
+			s.generarCodigoIntermedio(referencia, expresion);
+			semanticErrorManager.semanticDebug("**********************");
+			semanticErrorManager.semanticDebug("Codigo asignacion: ");
+			for (QuadrupleIF q:s.getIntermediateCode()) {
+				syntaxErrorManager.syntaxInfo (q.toString());
+			}
+			semanticErrorManager.semanticDebug("**********************");
+			RESULT = s;
+		}
+	} else if (!(referencia.getType() instanceof TypeSimple)) {
         semanticErrorManager.semanticFatalError("ERROR: no se permiten asignaciones a tipos compuestos, linea: " + referencia.getLine());
     } else if (!referencia.getType().equals(expresion.getType())) {
         semanticErrorManager.semanticFatalError("ERROR: tipos distintos en asignacion, linea: " + referencia.getLine()); 
     } else {
-        // semanticErrorManager.semanticInfo("Asignacion valida");
         SentenciaAsignacion s = new SentenciaAsignacion();
         s.generarCodigoIntermedio(referencia, expresion);
-        semanticErrorManager.semanticDebug("Codigo asignacion: " + s.getIntermediateCode());
+        semanticErrorManager.semanticDebug("**********************");
+		semanticErrorManager.semanticDebug("Codigo asignacion: ");
+		for (QuadrupleIF q:s.getIntermediateCode()) {
+			syntaxErrorManager.syntaxInfo (q.toString());
+		}
+		semanticErrorManager.semanticDebug("**********************");
         RESULT = s;
     }
 :};
@@ -1054,7 +1071,6 @@ sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS expresion:parametro CIERRA
 :}
 		| PUT_LINE ABRE_PARENTESIS CADENA:cadena CIERRA_PARENTESIS
 {:
-	semanticErrorManager.semanticDebug("55b: sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS CADENA:cadena CIERRA_PARENTESIS");
 	SentenciaPutLine sent = new SentenciaPutLine();
     sent.generarCodigoIntermedio(cadena.getLexema());
 	semanticErrorManager.semanticInfo(sent.getIntermediateCode());
@@ -1076,7 +1092,7 @@ semanticErrorManager.semanticDebug("57: referencia:referencia");
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIERRA_PARENTESIS
 {:
-semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIERRA_PARENTESIS");
+
     String name = id.getLexema().toUpperCase();
     if (!scopeManager.containsSymbol(name)) {
         semanticErrorManager.semanticFatalError("ERROR: subprograma desconocido " + name + ", linea: " + id.getLine());    
@@ -1096,6 +1112,7 @@ semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id
                 LlamadaSubprograma funcion = new LlamadaSubprograma();
 				funcion.setReturnType(returnType);
 				funcion.setNombre(name);
+				semanticErrorManager.semanticDebug("Llamada a la funcion " + name);
                 funcion.generarCodigoIntermedio(sf, pa);
                 RESULT = funcion;
             } else {
@@ -1105,8 +1122,8 @@ semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id
         } else if (s instanceof SymbolProcedure) {
             // Se trata de un procedimiento
             // Se trata de una funcion
-            SymbolProcedure sf = (SymbolProcedure)s;
-            TypeProcedure tf = (TypeProcedure)sf.getType();
+            SymbolProcedure sp = (SymbolProcedure)s;
+            TypeProcedure tf = (TypeProcedure)sp.getType();
             
             List<TypeIF> paramInvocacion = pa.getParameterTypes();
             List<TypeIF> paramTeoricos = tf.getTipoParametros();
@@ -1115,7 +1132,9 @@ semanticErrorManager.semanticDebug("58: llamada_subprograma ::= IDENTIFICADOR:id
             }
             
             LlamadaSubprograma procedimiento = new LlamadaSubprograma();
-            procedimiento.generarCodigoIntermedio(sf, pa);
+			semanticErrorManager.semanticDebug("Llamada al procedimiento: " + name);
+			procedimiento.setNombre(name);
+            procedimiento.generarCodigoIntermedio(sp, pa);
             RESULT = procedimiento;
         } else {
             semanticErrorManager.semanticFatalError("ERROR: El simbolo " + name 
@@ -1134,7 +1153,7 @@ lista_parametros ::= lista_parametros:lista SEPARADOR_COMA expresion:e
 :}
         | expresion:e
 {:
-semanticErrorManager.semanticDebug("60: lista_parametros ::= expresion:e");
+	semanticErrorManager.semanticDebug("60: lista_parametros ::= expresion:e");
 	ListaParametrosEjecucion lista = new ListaParametrosEjecucion();
 	lista.addParameterType(e.getType());
 	lista.addParametro(e);

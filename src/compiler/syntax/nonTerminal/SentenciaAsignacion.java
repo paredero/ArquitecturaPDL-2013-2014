@@ -24,16 +24,18 @@ public class SentenciaAsignacion extends Sentencia {
         TemporalIF temporalIndexReferencia = referencia.getTemporalIndex();
 //        TemporalIF temporalOffsetReferencia = referencia.getTemporalOffset();
         TemporalIF temporal = tF.create();
-        if (referencia.getType() instanceof TypeFunction) {
+        if (expresion.getType() instanceof TypeFunction) {
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Codigo intermedio de una asignacion de funcion ");
         	cb.addQuadruples(expresion.getIntermediateCode());
-        	cb.addQuadruple(InstructionSet.RET, temporalExpresion);
+        	cb.addQuadruple(InstructionSet.STP, temporal, temporalExpresion);
+        	cb.addQuadruple(InstructionSet.MV, referencia.getVariable(), temporal);
+//        	cb.addQuadruple(InstructionSet.RET, temporalExpresion);
         } else {
         	cb.addQuadruples(expresion.getIntermediateCode());
         	cb.addQuadruples(referencia.getIntermediateCode());   	
-        	CompilerContext.getSemanticErrorManager().semanticDebug("*temporalIndexReferencia* " + temporalIndexReferencia);
-        		if (temporalIndexReferencia != null) {
-        			cb.addQuadruple(InstructionSet.MUL, temporal, temporalIndexReferencia);
-        		}
+        	if (temporalIndexReferencia != null) {
+        		cb.addQuadruple(InstructionSet.MUL, temporal, temporalIndexReferencia);
+        	}
 //        		cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalReferencia);
 //        		cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalOffsetReferencia);
         	

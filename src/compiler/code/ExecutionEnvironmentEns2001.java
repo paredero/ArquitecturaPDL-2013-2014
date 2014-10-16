@@ -5,7 +5,7 @@ import java.util.List;
 
 import compiler.code.translator.Translator;
 import compiler.code.translator.TranslatorAdd;
-import compiler.code.translator.TranslatorBranch;
+import compiler.code.translator.TranslatorBR;
 import compiler.code.translator.TranslatorBranchFalse;
 import compiler.code.translator.TranslatorCall;
 import compiler.code.translator.TranslatorEqual;
@@ -124,8 +124,8 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				trans = new TranslatorAdd(quadruple);
 			}  else if (op.equals(InstructionSet.MUL)) {
 				trans = new TranslatorMul(quadruple);
-			} else if (op.equals(InstructionSet.BRANCH)) {
-				trans = new TranslatorBranch(quadruple);
+			} else if (op.equals(InstructionSet.BR)) {
+				trans = new TranslatorBR(quadruple);
 			} else if (op.equals(InstructionSet.BRANCH_FALSE)) {
 				trans = new TranslatorBranchFalse(quadruple);
 			} else if (op.equals(InstructionSet.CALL)) {
