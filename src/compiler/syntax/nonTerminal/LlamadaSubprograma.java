@@ -6,13 +6,15 @@ import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
 import compiler.intermediate.Procedure;
 import compiler.intermediate.Temporal;
-import compiler.intermediate.Variable;
 import compiler.semantic.symbol.SymbolFunction;
 import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolProcedure;
 import compiler.semantic.type.TypeProcedure;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.LabelFactory;
+import es.uned.lsi.compiler.intermediate.LabelFactoryIF;
+import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -31,9 +33,11 @@ public class LlamadaSubprograma extends Sentencia {
 			ListaParametrosEjecucion pa) {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        LabelFactoryIF labelFactory = new LabelFactory ();
+        
         
         cb.addQuadruples(pa.getIntermediateCode());    
-        Variable funcion = new Variable(nombre, scope);
+        Procedure funcion = new Procedure(nombre, scope);
         cb.addQuadruple (InstructionSet.CALL, funcion);
         this.setIntermediateCode(cb.create());
 	}

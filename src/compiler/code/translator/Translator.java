@@ -1,5 +1,6 @@
 package compiler.code.translator;
 
+import compiler.intermediate.Procedure;
 import compiler.intermediate.Temporal;
 import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
@@ -32,7 +33,9 @@ public abstract class Translator {
 	}
 
 	public String traducirOperando(OperandIF o) {
-		if (o instanceof Variable) {
+		if (o instanceof Procedure) {
+			return "/" + ((Procedure)o).getCodeLabel();
+		} if (o instanceof Variable) {
 			// Si se trata de una variable global direcciona directo a memoria
 			// en el espacio que se ha reservado inicialmente
 			Variable v = (Variable) o;
