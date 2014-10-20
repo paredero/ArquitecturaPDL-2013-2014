@@ -184,8 +184,15 @@ program ::=
 					semanticErrorManager.semanticDebug("Var: "+ simboloVar.getName() 
 														+ " tipo: " +simboloVar.getType().getName()
 														+ " -------------> direccion " + simboloVar.getAddress());
-				} else {
-					semanticErrorManager.semanticDebug("Simbolo no procesado: "+ simbolo);
+				} else if (simbolo instanceof SymbolFunction) {
+					semanticErrorManager.semanticDebug("Funcion: "+ simbolo.getName() + " scope: " + simbolo.getScope()
+														+ " tipo: " +simbolo.getType().getName());
+				}  else if (simbolo instanceof SymbolParameter) {
+					semanticErrorManager.semanticDebug("Parametro: "+ simbolo.getName() + " scope: " + simbolo.getScope()
+														+ " tipo: " +simbolo.getType().getName());
+				} 
+				else {
+					semanticErrorManager.semanticDebug("Simbolo no procesado: "+ simbolo.getName() + " " + simbolo.getClass());
 				}
 			}
 			
@@ -193,7 +200,7 @@ program ::=
 			for (TemporalIF t:temporalesAmbito) {
 				t.setAddress(desplazamientoAmbito);
 				desplazamientoAmbito++;
-				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() 
+				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() + " " + t.getScope()
 														+ " -------------> direccion " + (globalAddress + t.getAddress()));
 			}
 			if (scope.getLevel() == 0) {
@@ -517,9 +524,7 @@ subprograma ::= funcion:f
 
 funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprograma:listaParametros CIERRA_PARENTESIS RETURN tipo_primitivo:tipoRetorno
 {:
-    String nombreFuncion = (idFuncion.getLexema()).toUpperCase();
-    semanticErrorManager.semanticDebug("Declaracion de la funcion" + nombreFuncion);      
-    
+    String nombreFuncion = (idFuncion.getLexema()).toUpperCase();   
     // Comprueba si la funcion ha sido declarada
     if (!(scopeManager.containsSymbol(nombreFuncion)
             && scopeManager.containsType(nombreFuncion))) {            
@@ -543,9 +548,14 @@ funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprogr
         
         TypeTableIF tablaTiposFuncion = scopeFuncion.getTypeTable();
         SymbolTableIF tablaSimbolosFuncion = scopeFuncion.getSymbolTable();
-        
         // Almacena los parámetros en la propia funcion
         for (SymbolParameter parametro:listaParametros.getListaParametros()) {
+			semanticErrorManager.semanticDebug("Gestiono el parametro " + parametro.getName() + "scope: " + parametro.getScope());      
+			parametro.setScope(scopeFuncion);
+			semanticErrorManager.semanticDebug("Nuevo scope " + parametro.getName() + "scope: " + parametro.getScope());    
+			if (scopeManager.containsSymbol(parametro.getName().toUpperCase())) {
+		        semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + parametro.getName());
+	        } 			
             tablaSimbolosFuncion.addSymbol(parametro.getName().toUpperCase(),parametro);
             tipoFuncion.addTipoParametro(parametro.getType());
 			tipoFuncion.addParametro(parametro);
@@ -615,6 +625,10 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parame
             
         // Almaceno los parametros en la tabla de simbolos y la de tipos
         for (SymbolParameter parametro:listaParametros.getListaParametros()) {
+			parametro.setScope(scopeProcedimiento);
+			if (scopeManager.containsSymbol(parametro.getName().toUpperCase())) {
+		        semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + parametro.getName());
+	        } 	
             tablaSimbolosProcedimiento.addSymbol(parametro.getName().toUpperCase(),parametro);
             tipoProcedimiento.addTipoParametro(parametro.getType());
         }
@@ -651,17 +665,12 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
         
         // Para cada nombre creo un parametro
 		for (Object objeto:((ListaObjetos)listaNombres).getVariables()) {
-		       String nombreParametro = (String)objeto;
-		       if (scopeManager.containsSymbol(nombreParametro)) {
-		           semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + nombreParametro);
-	           } else {
-	               SymbolParameter sP = new SymbolParameter(scope, nombreParametro, tablaTipos.getType((String)tipo));
-	               tablaSimbolos.addSymbol(nombreParametro, sP);
-	               listaParametros.getListaParametros().add(sP);
-	           }
-	        }
-	        RESULT = listaParametros;
-	    }	    
+			String nombreParametro = (String)objeto;
+			SymbolParameter sP = new SymbolParameter(null, nombreParametro, tablaTipos.getType((String)tipo));	               
+			listaParametros.getListaParametros().add(sP);	           
+		}
+		RESULT = listaParametros;
+	}	    
 :}
     | lista_nombres:listaNombres DOS_PUNTOS tipo:tipo 
 {:
@@ -672,18 +681,13 @@ parametros_subprograma ::= lista_nombres:listaNombres DOS_PUNTOS tipo:tipo PUNTO
     if (!scopeManager.containsType((String)tipo)) {
         semanticErrorManager.semanticFatalError("ERROR: tipo desconocido " + (String)tipo);
     } else {
-	   ListaParametrosDeclaracion listaParametros = new ListaParametrosDeclaracion();
+		ListaParametrosDeclaracion listaParametros = new ListaParametrosDeclaracion();
         
         // Para cada nombre creo un parametro
 	    for (Object objeto:((ListaObjetos)listaNombres).getVariables()) {
             String nombreParametro = (String)objeto;
-	        if (scopeManager.containsSymbol(nombreParametro)) {
-	           semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + nombreParametro);
-            } else {
-                SymbolParameter sP = new SymbolParameter(scope, nombreParametro, scopeManager.searchType((String)tipo));
-	            tablaSimbolos.addSymbol(nombreParametro, sP);
-	            listaParametros.getListaParametros().add(sP);
-            }
+	        SymbolParameter sP = new SymbolParameter(null, nombreParametro, scopeManager.searchType((String)tipo));
+			listaParametros.getListaParametros().add(sP);
         }
 	   RESULT = listaParametros;
     }        
