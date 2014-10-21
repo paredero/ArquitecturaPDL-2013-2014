@@ -77,7 +77,11 @@ public class Expresion extends NonTerminal {
 
         TemporalIF tempReferencia = r.getTemporal();
         TemporalIF temp = tF.create();
-        cb.addQuadruple(InstructionSet.MVA, temp, tempReferencia);
+        if (r.getVariable() != null && r.getVariable().isParameter()) {
+        	cb.addQuadruple(InstructionSet.MVA, temp, r.getVariable());
+        } else {
+        	cb.addQuadruple(InstructionSet.MVA, temp, tempReferencia);
+        }
         this.setTemporal(temp);
         
         this.setIntermediateCode(cb.create());
@@ -124,7 +128,7 @@ public class Expresion extends NonTerminal {
         TemporalFactory tF = new TemporalFactory (scope);
         TemporalIF temp = tF.create();
         cb.addQuadruples(l.getIntermediateCode());
-        cb.addQuadruple (InstructionSet.RET, temp);
+        
         this.setTemporal(temp);
         this.setIntermediateCode(cb.create());
 	}

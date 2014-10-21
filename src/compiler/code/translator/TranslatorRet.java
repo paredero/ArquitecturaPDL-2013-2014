@@ -27,6 +27,8 @@ public class TranslatorRet extends Translator {
 	public String translate() {
 		// Esta parte solo es válida para las funciones
 		if (q.getResult() != null) {
+			sb.append("; Asigno el valor devuelto \n");
+			sb.append("MOVE ").append(traducirOperando(q.getResult())).append(", #0[.IY]").append(" \n");
 		}
 		sb.append("RET \n");
 		return sb.toString();

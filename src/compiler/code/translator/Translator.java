@@ -42,10 +42,12 @@ public abstract class Translator {
 			int dirVar = v.getAddress() + v.getDesplazamiento();
 			if (v.isGlobal()) {	
 				return "/" + dirVar;
-			} else {
+			} else if (!v.isParameter()) {
 				// Si se trata de una variable local se direcciona relativo al registro [.IX]
 				// En v.address tenemos el desplazamiento
 				return "#" + dirVar + "[.IX]";
+			} else if (v.isParameter()) {
+				return "#-" + (dirVar + 1)  + "[.IY]";
 			}
 			// Los parámetros se posicionan en las direcciones superiores al
 			// puntero de marco.

@@ -169,6 +169,7 @@ program ::=
 		HashMap<String, SymbolProcedure> subprogramas = new HashMap<String, SymbolProcedure>();
 		for (ScopeIF scope: todosAmbitos){
 			int desplazamientoAmbito = 0;
+			int desplazamientoFuncion = 1;
 			boolean ambitoGlobal = false;
 			List<SymbolIF> simbolosAmbito = scope.getSymbolTable().getSymbols();
 			for (SymbolIF simbolo:simbolosAmbito){
@@ -178,8 +179,8 @@ program ::=
 						simboloVar.setAddress(globalAddress);
 						globalAddress += simboloVar.getType().getSize();
 					} else {						
-						simboloVar.setAddress(desplazamientoAmbito + 4); // Ademas de la dir de retorno se reserva espacio para el estado y el enlace de contro
-						desplazamientoAmbito += simboloVar.getType().getSize();
+						simboloVar.setAddress(desplazamientoFuncion); // Ademas de la dir de retorno se reserva espacio para el estado y el enlace de contro
+						desplazamientoFuncion += simboloVar.getType().getSize();
 						SymbolFunction funcion = (SymbolFunction)subprogramas.get(simboloVar.getScope().getName());
 						funcion.addToSize(simboloVar.getType().getSize());
 						funcion.addToVarTempSize(simboloVar.getType().getSize());
@@ -210,15 +211,17 @@ program ::=
 			for (TemporalIF t:temporalesAmbito) {
 				if (scope.getLevel() == 0) {
 					t.setAddress(desplazamientoAmbito);
+					desplazamientoAmbito++;
 				} else {
-					t.setAddress(desplazamientoAmbito);
+					t.setAddress(desplazamientoFuncion);
 					SymbolFunction funcion = (SymbolFunction)subprogramas.get(t.getScope().getName());
 					funcion.incSize();
 					funcion.incVarTempSize();
+					desplazamientoFuncion++;
 				}
-				desplazamientoAmbito++;
+				
 				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() + " " + t.getScope()
-														+ " -------------> direccion " + (globalAddress + t.getAddress()));
+														+ " -------------> direccion " + t.getAddress());
 			}
 			if (scope.getLevel() == 0) {
 				scopeActual = scope;
@@ -568,17 +571,19 @@ funcion ::= FUNCTION IDENTIFICADOR:idFuncion ABRE_PARENTESIS parametros_subprogr
         TypeTableIF tablaTiposFuncion = scopeFuncion.getTypeTable();
         SymbolTableIF tablaSimbolosFuncion = scopeFuncion.getSymbolTable();
         // Almacena los parámetros en la propia funcion
-        for (SymbolParameter parametro:listaParametros.getListaParametros()) {
-			semanticErrorManager.semanticDebug("Gestiono el parametro " + parametro.getName() + "scope: " + parametro.getScope());      
-			parametro.setScope(scopeFuncion);
-			semanticErrorManager.semanticDebug("Nuevo scope " + parametro.getName() + "scope: " + parametro.getScope());    
-			if (scopeManager.containsSymbol(parametro.getName().toUpperCase())) {
-		        semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + parametro.getName());
-	        } 			
-            tablaSimbolosFuncion.addSymbol(parametro.getName().toUpperCase(),parametro);
-            tipoFuncion.addTipoParametro(parametro.getType());
-			tipoFuncion.addParametro(parametro);
-        }
+		if (listaParametros != null && listaParametros.getListaParametros() != null) {
+			for (SymbolParameter parametro:listaParametros.getListaParametros()) {
+				semanticErrorManager.semanticDebug("Gestiono el parametro " + parametro.getName() + "scope: " + parametro.getScope());      
+				parametro.setScope(scopeFuncion);
+				semanticErrorManager.semanticDebug("Nuevo scope " + parametro.getName() + "scope: " + parametro.getScope());    
+				if (scopeManager.containsSymbol(parametro.getName().toUpperCase())) {
+					semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + parametro.getName());
+				} 			
+				tablaSimbolosFuncion.addSymbol(parametro.getName().toUpperCase(),parametro);
+				tipoFuncion.addTipoParametro(parametro.getType());
+				tipoFuncion.addParametro(parametro);
+			}
+		}
     } else {
         semanticErrorManager.semanticFatalError("ERROR: Funcion ya declarada " +  idFuncion.getLexema()
             +" en linea: "+idFuncion.getLine());        
@@ -1130,7 +1135,9 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
             
             List<TypeIF> paramInvocacion = pa.getParameterTypes();
             List<TypeIF> paramTeoricos = tf.getTipoParametros();
-            if (paramInvocacion.equals(paramTeoricos)) {
+            if ((paramInvocacion == null && (paramTeoricos == null || paramTeoricos.size() == 0))
+				|| (paramInvocacion != null && paramInvocacion.size() == 0 && ((paramTeoricos == null || paramTeoricos.size() == 0)))
+				|| paramInvocacion.equals(paramTeoricos)) {
                 //OK
                 TypeIF returnType = tf.getTipoResultado();
                 
@@ -1142,7 +1149,7 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
                 RESULT = funcion;
             } else {
                 semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a funcion " 
-                    + name + ", linea: " + id.getLine());    
+                    + name + ", Invoca: " + paramInvocacion + " debe ser " + paramTeoricos);    
             }
         } else if (s instanceof SymbolProcedure) {
             // Se trata de un procedimiento

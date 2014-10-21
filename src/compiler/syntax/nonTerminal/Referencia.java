@@ -61,7 +61,8 @@ public class Referencia extends NonTerminal {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
         	o = new Variable(lexema, symbol);     
         	((Variable) o).setParameter(true);      
-        	//TODO El codigo de un parametro
+        	this.setVariable((Variable)o);
+        	cb.addQuadruple (InstructionSet.MVA, temp, variable);   
         } else {
         	SymbolConstant constante = (SymbolConstant)symbol;
             o = new Value(constante.getValue());

@@ -29,8 +29,6 @@ public class TranslatorCall extends Translator {
 		sb.append("; Almaceno un enlace al registro de activacion del subprograma llamante \n");
 		sb.append("PUSH .IX \n");
 		
-		sb.append(";Almaceno el valor correcto del PC \n");
-		sb.append("MOVE .PC, #1[.IY] \n");
 		if (q.getResult() instanceof Procedure) {
 			sb.append(";Es procedure \n");
 			Procedure p = (Procedure)q.getResult();
@@ -48,6 +46,28 @@ public class TranslatorCall extends Translator {
 		sb.append("; Situo el indice IX al inicio del frame \n");
 		sb.append("MOVE .SP, .IX \n");
 		sb.append("CALL ").append(traducirOperando(q.getResult()));
+		sb.append("; Restauro el estado \n");
+		sb.append("; Saco variables y temporales \n");
+		Procedure p = (Procedure)q.getResult();
+		SymbolFunction sf = (SymbolFunction)p.getSimbolo();
+		int tamVarsTemp = sf.getVarTempSize();
+		while (tamVarsTemp > 0) {
+			sb.append("POP .R9 \n");
+			tamVarsTemp--;
+		}
+		sb.append("; Restauro el enlace de control \n");
+		sb.append("POP .IX \n");
+		
+		sb.append("; Restauro el estado \n");
+		sb.append("POP .SR \n");
+		sb.append("; Saco parametros de la pila \n");
+		int varSize = sf.getSize() - sf.getVarTempSize();
+		while (varSize > 0) {
+			sb.append("POP .R9 \n");
+			varSize--;
+		}
+		sb.append("; Saco el resultado a un temporal \n");
+		sb.append("POP ").append(traducirOperando(q.getFirstOperand())).append(" \n");
 		return sb.toString();
 	}
 

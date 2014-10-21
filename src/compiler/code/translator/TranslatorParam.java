@@ -21,9 +21,6 @@ public class TranslatorParam extends Translator {
 			// Reservo un espacio para el valor de retorno
 			sb.append("; Reservo un espacio al valor de retorno \n");
 			sb.append("DEC ").append(".SP").append(" \n");
-			//En el tope de la pila almaceno la direccion de retorno
-			sb.append("; Almaceno la direccion de retorno \n");
-			sb.append("PUSH ").append(".PC").append(" \n");
 		}
 		//Introduzco el parametro
 		sb.append("; Introduzco el parametro \n");

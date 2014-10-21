@@ -12,6 +12,8 @@ import compiler.semantic.symbol.SymbolProcedure;
 import compiler.semantic.type.TypeProcedure;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.TemporalFactory;
+import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -20,6 +22,7 @@ public class LlamadaSubprograma extends Sentencia {
 	
 	private TypeIF returnType;
 	private String nombre;
+	private TemporalIF temporal;
 	
 	/**
 	 * Genera el codigo intermedio para una llamada a funcion
@@ -35,9 +38,14 @@ public class LlamadaSubprograma extends Sentencia {
         cb.addQuadruples(pa.getIntermediateCode());    
         Procedure funcion = new Procedure(nombre, scope);
         funcion.setSimbolo(sf);
-        cb.addQuadruple (InstructionSet.CALL, funcion);
+        TemporalFactory tF = new TemporalFactory (scope);
+        TemporalIF temporal = tF.create();
+        this.setTemporal(temporal);
+        cb.addQuadruple (InstructionSet.CALL, funcion, temporal);
         this.setIntermediateCode(cb.create());
 	}
+
+
 
 	/**
 	 * Genera el codigo intermedio para un procedimiento
@@ -105,4 +113,18 @@ public class LlamadaSubprograma extends Sentencia {
 		this.nombre = nombre;
 	}
 
+	private void setTemporal(TemporalIF temporal) {
+		this.temporal = temporal;
+	}
+
+
+
+	/**
+	 * @return the temporal
+	 */
+	public TemporalIF getTemporal() {
+		return temporal;
+	}
+	
+	
 }
