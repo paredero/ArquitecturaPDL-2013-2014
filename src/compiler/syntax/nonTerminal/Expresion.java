@@ -74,26 +74,12 @@ public class Expresion extends NonTerminal {
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         cb.addQuadruples(r.getIntermediateCode());
+
+        TemporalIF tempReferencia = r.getTemporal();
+        TemporalIF temp = tF.create();
+        cb.addQuadruple(InstructionSet.MVA, temp, tempReferencia);
+        this.setTemporal(temp);
         
-//        if (r.getAccesoRegistro()) {
-        if (false) {
-        	// Si se trata del acceso a un registro
-        	TemporalIF tempReferencia = r.getTemporal();
-//        	TemporalIF tempIndexReferencia = r.getTemporalIndex();
-//        	TemporalIF tempOffsetReferencia = r.getTemporalOffset();
-        	TemporalIF tempExpresion = tF.create();
-        	int registroSize = r.getType().getSize();
-//        	cb.addQuadruple(InstructionSet.MUL, tempExpresion, tempIndexReferencia, registroSize);
-        	cb.addQuadruple(InstructionSet.ADD, tempExpresion, tempExpresion, tempReferencia);
-//        	cb.addQuadruple(InstructionSet.ADD, tempExpresion, tempExpresion, tempOffsetReferencia);
-        	cb.addQuadruple(InstructionSet.MVP, tempExpresion, tempExpresion);
-        	this.setTemporal(tempExpresion);
-        } else {
-	        TemporalIF tempReferencia = r.getTemporal();
-	        TemporalIF temp = tF.create();
-	        cb.addQuadruple(InstructionSet.MVA, temp, tempReferencia);
-	        this.setTemporal(temp);
-        }
         this.setIntermediateCode(cb.create());
 	}
 	

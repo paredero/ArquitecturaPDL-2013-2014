@@ -166,7 +166,7 @@ program ::=
 		int desplazamientoGlobal = 0;
 		List<ScopeIF> todosAmbitos = scopeManager.getAllScopes();
 		ScopeIF scopeActual = null;
-		List<SymbolConstant> listaConstantes = new ArrayList<SymbolConstant>();
+		HashMap<String, SymbolProcedure> subprogramas = new HashMap<String, SymbolProcedure>();
 		for (ScopeIF scope: todosAmbitos){
 			int desplazamientoAmbito = 0;
 			boolean ambitoGlobal = false;
@@ -177,9 +177,12 @@ program ::=
 					if (scope.getLevel() == 0) {
 						simboloVar.setAddress(globalAddress);
 						globalAddress += simboloVar.getType().getSize();
-					} else {
-						simboloVar.setAddress(desplazamientoAmbito);
+					} else {						
+						simboloVar.setAddress(desplazamientoAmbito + 4); // Ademas de la dir de retorno se reserva espacio para el estado y el enlace de contro
 						desplazamientoAmbito += simboloVar.getType().getSize();
+						SymbolFunction funcion = (SymbolFunction)subprogramas.get(simboloVar.getScope().getName());
+						funcion.addToSize(simboloVar.getType().getSize());
+						funcion.addToVarTempSize(simboloVar.getType().getSize());
 					}
 					semanticErrorManager.semanticDebug("Var: "+ simboloVar.getName() 
 														+ " tipo: " +simboloVar.getType().getName()
@@ -187,18 +190,32 @@ program ::=
 				} else if (simbolo instanceof SymbolFunction) {
 					semanticErrorManager.semanticDebug("Funcion: "+ simbolo.getName() + " scope: " + simbolo.getScope()
 														+ " tipo: " +simbolo.getType().getName());
+					subprogramas.put(simbolo.getName(), (SymbolFunction)simbolo);
 				}  else if (simbolo instanceof SymbolParameter) {
-					semanticErrorManager.semanticDebug("Parametro: "+ simbolo.getName() + " scope: " + simbolo.getScope()
-														+ " tipo: " +simbolo.getType().getName());
-				} 
-				else {
+					SymbolParameter parametro = (SymbolParameter)simbolo;
+					parametro.setAddress(desplazamientoAmbito);
+					desplazamientoAmbito += parametro.getType().getSize();
+					SymbolFunction funcion = (SymbolFunction)subprogramas.get(parametro.getScope().getName());
+					funcion.addToSize(parametro.getType().getSize());
+					semanticErrorManager.semanticDebug("Param: "+ parametro.getName() 
+														+ " tipo: " +parametro.getType().getName()
+														+ " -------------> direccion " + parametro.getAddress() + " Desplazamiento :" + desplazamientoAmbito);
+					semanticErrorManager.semanticDebug("Obtenida la funcion: "+ funcion);
+				} else {
 					semanticErrorManager.semanticDebug("Simbolo no procesado: "+ simbolo.getName() + " " + simbolo.getClass());
 				}
 			}
 			
 			List<TemporalIF> temporalesAmbito = scope.getTemporalTable().getTemporals();
 			for (TemporalIF t:temporalesAmbito) {
-				t.setAddress(desplazamientoAmbito);
+				if (scope.getLevel() == 0) {
+					t.setAddress(desplazamientoAmbito);
+				} else {
+					t.setAddress(desplazamientoAmbito);
+					SymbolFunction funcion = (SymbolFunction)subprogramas.get(t.getScope().getName());
+					funcion.incSize();
+					funcion.incVarTempSize();
+				}
 				desplazamientoAmbito++;
 				semanticErrorManager.semanticDebug("Temporal: "+ t.getName() + " " + t.getScope()
 														+ " -------------> direccion " + (globalAddress + t.getAddress()));
@@ -209,6 +226,8 @@ program ::=
 			}
 			
 		}
+		semanticErrorManager.semanticDebug("----------------------------------------------------------------------------");
+		
         
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeActual);
 		
@@ -733,10 +752,12 @@ lista_sentencias_funcion ::=  sentencia_funcion:sentenciaFuncion PUNTO_COMA list
 
 sentencia_funcion ::= sentencia:sentencia
 {:
+	semanticErrorManager.semanticInfo("sentencia_funcion ::= sentencia:sentencia");
 	RESULT = sentencia; 
 :}
     | sentencia_return:sent_return
 {:
+	semanticErrorManager.semanticInfo("sentencia_funcion ::= sentencia_return:sent_return");
     RESULT = sent_return;
 :};
 

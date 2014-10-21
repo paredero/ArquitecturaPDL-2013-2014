@@ -3,10 +3,12 @@ package compiler.intermediate;
 import java.util.List;
 
 import compiler.semantic.symbol.SymbolParameter;
+
 import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.ProcedureIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
+import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 
 /**
  * Class for procedures and functions in intermediate code.
@@ -19,6 +21,7 @@ public class Procedure
     private ScopeIF scope    = null;
     private LabelIF codeLabel = null;
     private List<SymbolParameter> params;
+    private SymbolIF simbolo;
         
     /**
      * Constructor for Variable.
@@ -124,6 +127,20 @@ public class Procedure
 	 */
 	public void setParams(List<SymbolParameter> params) {
 		this.params = params;
+	}
+
+	/**
+	 * @return the simbolo
+	 */
+	public SymbolIF getSimbolo() {
+		return simbolo;
+	}
+
+	/**
+	 * @param simbolo the simbolo to set
+	 */
+	public void setSimbolo(SymbolIF simbolo) {
+		this.simbolo = simbolo;
 	}
     
     

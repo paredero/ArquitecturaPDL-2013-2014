@@ -13,7 +13,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class SymbolFunction
     extends SymbolProcedure
 {
-      
+	
     /**
      * Constructor for SymbolFunction.
      * @param scope The declaration scope.
@@ -25,5 +25,5 @@ public class SymbolFunction
                            TypeIF type)
     {
         super (scope, name, type);
-    } 
+    }
 }

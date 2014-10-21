@@ -30,10 +30,7 @@ public class SymbolParameter
         super (scope, name, type);
     }
 
-	public void setAddress(int i) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 	/**
 	 * @return the address
@@ -41,6 +38,17 @@ public class SymbolParameter
 	public int getAddress() {
 		return address;
 	}
+
+
+
+	/**
+	 * @param address the address to set
+	 */
+	public void setAddress(int address) {
+		this.address = address;
+	}
+
+
 
 	/**
 	 * @return the temporal
