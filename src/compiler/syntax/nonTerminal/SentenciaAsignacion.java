@@ -26,6 +26,8 @@ public class SentenciaAsignacion extends Sentencia {
         TemporalIF temporal = tF.create();
         if (expresion.getType() instanceof TypeFunction) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Codigo intermedio de una asignacion de funcion ");
+        	CompilerContext.getSemanticErrorManager().semanticDebug(expresion);
+        	CompilerContext.getSemanticErrorManager().semanticDebug(referencia);
         	cb.addQuadruples(expresion.getIntermediateCode());
         	cb.addQuadruple(InstructionSet.STP, temporal, temporalExpresion);
         	cb.addQuadruple(InstructionSet.MV, referencia.getVariable(), temporal);

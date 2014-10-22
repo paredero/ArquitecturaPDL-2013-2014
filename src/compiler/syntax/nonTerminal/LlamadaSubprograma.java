@@ -43,6 +43,8 @@ public class LlamadaSubprograma extends Sentencia {
         this.setTemporal(temporal);
         cb.addQuadruple (InstructionSet.CALL, funcion, temporal);
         this.setIntermediateCode(cb.create());
+        CompilerContext.getSemanticErrorManager().semanticDebug("Codigo generado por la llamada");
+        CompilerContext.getSemanticErrorManager().semanticDebug(cb.create());
 	}
 
 
