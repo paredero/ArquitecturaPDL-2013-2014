@@ -41,6 +41,10 @@ public class LlamadaSubprograma extends Sentencia {
         TemporalFactory tF = new TemporalFactory (scope);
         TemporalIF temporal = tF.create();
         this.setTemporal(temporal);
+        if (pa == null || pa.getParametros() == null || pa.getParametros().size() == 0) {
+        	CompilerContext.getSemanticErrorManager().semanticDebug("Funcion sin parametros");
+        	cb.addQuadruple(InstructionSet.PARAM);
+        }
         cb.addQuadruple (InstructionSet.CALL, funcion, temporal);
         this.setIntermediateCode(cb.create());
         CompilerContext.getSemanticErrorManager().semanticDebug("Codigo generado por la llamada");
