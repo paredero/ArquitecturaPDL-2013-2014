@@ -13,7 +13,7 @@ public class TranslatorParam extends Translator {
 	public String translate() {
 		if ((q.getFirstOperand() == null) || 
 				(q.getSecondOperand() != null && q.getSecondOperand().toString().equals("1"))) {
-			//Primer parametro, preparo registro de activacion
+			//Primer parametro o lista de parametros vacios, preparo registro de activacion
 			
 			// Apunto el indice IY al tope de pila
 			sb.append("; como es el primer parametro o no hay parametros preparo el registro de activacion \n");
@@ -23,7 +23,7 @@ public class TranslatorParam extends Translator {
 			sb.append("; Reservo un espacio al valor de retorno \n");
 			sb.append("DEC ").append(".SP").append(" \n");
 		}
-		//Introduzco el parametro, si es que existe
+		// Introduzco el parametro, si es que existe
 		if (q.getFirstOperand() != null) {
 			sb.append("; Introduzco el parametro \n");
 			sb.append("PUSH ");

@@ -5,6 +5,7 @@ package compiler.code.translator;
 
 import compiler.intermediate.Procedure;
 import compiler.semantic.symbol.SymbolFunction;
+import compiler.semantic.symbol.SymbolProcedure;
 
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
@@ -33,7 +34,7 @@ public class TranslatorCall extends Translator {
 			sb.append(";Es procedure \n");
 			Procedure p = (Procedure)q.getResult();
 			sb.append("; " + p + " \n");
-			SymbolFunction sf = (SymbolFunction)p.getSimbolo();
+			SymbolProcedure sf = (SymbolProcedure)p.getSimbolo();
 			sb.append("; " + sf + " \n");
 			sb.append("; " + sf.getVarTempSize() + " \n");
 			int tamVarsTemp = sf.getVarTempSize();
@@ -49,7 +50,7 @@ public class TranslatorCall extends Translator {
 		sb.append("; Restauro el estado \n");
 		sb.append("; Saco variables y temporales \n");
 		Procedure p = (Procedure)q.getResult();
-		SymbolFunction sf = (SymbolFunction)p.getSimbolo();
+		SymbolProcedure sf = (SymbolProcedure)p.getSimbolo();
 		int tamVarsTemp = sf.getVarTempSize();
 		while (tamVarsTemp > 0) {
 			sb.append("POP .R9 \n");
@@ -66,8 +67,14 @@ public class TranslatorCall extends Translator {
 			sb.append("POP .R9 \n");
 			varSize--;
 		}
-		sb.append("; Saco el resultado a un temporal \n");
-		sb.append("POP ").append(traducirOperando(q.getFirstOperand())).append(" \n");
+		
+		if (sf instanceof SymbolFunction) {
+			sb.append("; Saco el resultado a un temporal \n");
+			sb.append("POP ").append(traducirOperando(q.getFirstOperand())).append(" \n");
+		} else {
+			sb.append("; Extraigo el ultimo hueco del RA \n");
+			sb.append("POP .R9 \n");
+		}
 		return sb.toString();
 	}
 

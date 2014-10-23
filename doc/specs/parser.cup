@@ -179,9 +179,9 @@ program ::=
 						simboloVar.setAddress(globalAddress);
 						globalAddress += simboloVar.getType().getSize();
 					} else {						
-						simboloVar.setAddress(desplazamientoFuncion); // Ademas de la dir de retorno se reserva espacio para el estado y el enlace de contro
+						simboloVar.setAddress(desplazamientoFuncion); // Ademas de la dir de retorno se reserva espacio para el estado y el enlace de control
 						desplazamientoFuncion += simboloVar.getType().getSize();
-						SymbolFunction funcion = (SymbolFunction)subprogramas.get(simboloVar.getScope().getName());
+						SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(simboloVar.getScope().getName());
 						funcion.addToSize(simboloVar.getType().getSize());
 						funcion.addToVarTempSize(simboloVar.getType().getSize());
 					}
@@ -192,16 +192,20 @@ program ::=
 					semanticErrorManager.semanticDebug("Funcion: "+ simbolo.getName() + " scope: " + simbolo.getScope()
 														+ " tipo: " +simbolo.getType().getName());
 					subprogramas.put(simbolo.getName(), (SymbolFunction)simbolo);
-				}  else if (simbolo instanceof SymbolParameter) {
+				} else if (simbolo instanceof SymbolProcedure) {
+					semanticErrorManager.semanticDebug("Procedimiento: "+ simbolo.getName() + " scope: " + simbolo.getScope()
+														+ " tipo: " +simbolo.getType().getName());
+					subprogramas.put(simbolo.getName(), (SymbolProcedure)simbolo);
+				} else if (simbolo instanceof SymbolParameter) {
 					SymbolParameter parametro = (SymbolParameter)simbolo;
 					parametro.setAddress(desplazamientoAmbito);
 					desplazamientoAmbito += parametro.getType().getSize();
-					SymbolFunction funcion = (SymbolFunction)subprogramas.get(parametro.getScope().getName());
+					SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(parametro.getScope().getName());
 					funcion.addToSize(parametro.getType().getSize());
 					semanticErrorManager.semanticDebug("Param: "+ parametro.getName() 
 														+ " tipo: " +parametro.getType().getName()
 														+ " -------------> direccion " + parametro.getAddress() + " Desplazamiento :" + desplazamientoAmbito);
-					semanticErrorManager.semanticDebug("Obtenida la funcion: "+ funcion);
+					semanticErrorManager.semanticDebug("Obtenido el subprograma: "+ funcion);
 				} else {
 					semanticErrorManager.semanticDebug("Simbolo no procesado: "+ simbolo.getName() + " " + simbolo.getClass());
 				}
@@ -214,7 +218,7 @@ program ::=
 					desplazamientoAmbito++;
 				} else {
 					t.setAddress(desplazamientoFuncion);
-					SymbolFunction funcion = (SymbolFunction)subprogramas.get(t.getScope().getName());
+					SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(t.getScope().getName());
 					funcion.incSize();
 					funcion.incVarTempSize();
 					desplazamientoFuncion++;
