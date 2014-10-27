@@ -41,6 +41,7 @@ public class DeclaracionSubprograma extends NonTerminal {
         } else {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Procedimiento " + cuerpoProcedimiento);
         	cb.addQuadruples(cuerpoProcedimiento.getIntermediateCode());
+        	cb.addQuadruple(InstructionSet.RET);
         }
         this.setIntermediateCode(cb.create());
 	}

@@ -1,15 +1,10 @@
 package compiler.syntax.nonTerminal;
 
-import java.util.List;
-
 import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
 import compiler.intermediate.Procedure;
-import compiler.intermediate.Temporal;
 import compiler.semantic.symbol.SymbolFunction;
-import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolProcedure;
-import compiler.semantic.type.TypeProcedure;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.TemporalFactory;
@@ -32,8 +27,7 @@ public class LlamadaSubprograma extends Sentencia {
 	public void generarCodigoIntermedio(SymbolFunction sf, 
 			ListaParametrosEjecucion pa) {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
-        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);        
         
         cb.addQuadruples(pa.getIntermediateCode());    
         Procedure funcion = new Procedure(nombre, scope);
@@ -47,7 +41,7 @@ public class LlamadaSubprograma extends Sentencia {
         }
         cb.addQuadruple (InstructionSet.CALL, funcion, temporal);
         this.setIntermediateCode(cb.create());
-        CompilerContext.getSemanticErrorManager().semanticDebug("Codigo generado por la llamada");
+        CompilerContext.getSemanticErrorManager().semanticDebug("Codigo generado por la llamada a la funcion");
         CompilerContext.getSemanticErrorManager().semanticDebug(cb.create());
 	}
 
@@ -55,38 +49,27 @@ public class LlamadaSubprograma extends Sentencia {
 
 	/**
 	 * Genera el codigo intermedio para un procedimiento
-	 * @param tp
+	 * @param sp el simbolo del procedimiento
 	 * @param pa
 	 */
 	public void generarCodigoIntermedio(SymbolProcedure sp, 
 			ListaParametrosEjecucion pa) {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        cb.addQuadruples(pa.getIntermediateCode());            
-        Procedure p = creaProcedure(sp.getName().toUpperCase(), scope, pa);
-        cb.addQuadruple (InstructionSet.CALL, p);
+        
+        cb.addQuadruples(pa.getIntermediateCode());  
+        Procedure procedimiento = new Procedure(nombre, scope);
+        procedimiento.setSimbolo(sp);
+        if (pa == null || pa.getParametros() == null || pa.getParametros().size() == 0) {
+        	CompilerContext.getSemanticErrorManager().semanticDebug("procedimiento sin parametros");
+        	cb.addQuadruple(InstructionSet.PARAM);
+        }
+        cb.addQuadruple (InstructionSet.CALL, procedimiento, temporal);
         this.setIntermediateCode(cb.create());
+        CompilerContext.getSemanticErrorManager().semanticDebug("Codigo generado por la llamada al procedimiento");
+        CompilerContext.getSemanticErrorManager().semanticDebug(cb.create());
+        
 	}
-
-	
-	private Procedure creaProcedure(String nombre, ScopeIF scope, ListaParametrosEjecucion parametrosEjecucion) {
-		TypeIF tipo = scope.getScopeManager().searchType(nombre.toUpperCase());
-		TypeProcedure tProc = (TypeProcedure) tipo;
-		List<SymbolParameter> parametrosDeclaracion = tProc.getParametros();
-		CompilerContext.getSemanticErrorManager().semanticDebug(
-				"parameters ejec --> " + parametrosEjecucion.getParametros().size());
-		for (int i = 0; i < parametrosDeclaracion.size(); i++) {
-			Temporal temp = (Temporal) parametrosEjecucion.getParametros().get(i).getTemporal();
-			CompilerContext.getSemanticErrorManager().semanticDebug("Temporal Procedimiento " + temp);
-			parametrosDeclaracion.get(i).setTemporal(temp);
-		}
-		
-		Procedure proc = new Procedure(nombre, scope);
-        proc.setParams(parametrosDeclaracion);
-		return proc;
-	}
-
-	
 	
 //-----------------------------------------------------------------------------	
 //--------------GETTER & SETTER & TOSTRING

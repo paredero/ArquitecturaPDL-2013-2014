@@ -3,8 +3,6 @@
  */
 package compiler.code.translator;
 
-import compiler.intermediate.InstructionSet;
-
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -26,8 +24,10 @@ public class TranslatorBranchFalse extends Translator {
 	 */
 	@Override
 	public String translate() {		 
-		sb.append("CMP #1, ").append(traducirOperando(q.getResult())).append(" \n");
-		sb.append("BNZ /" + q.getFirstOperand()).append(" \n");
+		sb.append("CMP ").append(traducirOperando(q.getFirstOperand()))
+				.append(", ").append(traducirOperando(q.getSecondOperand()))
+				.append(" \n");
+		sb.append("BZ /" + q.getResult()).append(" \n");
 		return sb.toString();
 	}
 

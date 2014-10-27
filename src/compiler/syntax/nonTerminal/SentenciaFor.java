@@ -2,6 +2,7 @@ package compiler.syntax.nonTerminal;
 
 import compiler.CompilerContext;
 import compiler.intermediate.InstructionSet;
+import compiler.intermediate.Variable;
 import compiler.semantic.symbol.SymbolVariable;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
@@ -23,12 +24,17 @@ public class SentenciaFor extends Sentencia {
         TemporalIF tempExpresionFin = expFin.getTemporal();
         LabelIF l1 = lF.create();
         LabelIF l2 = lF.create();
+        Variable variableIndice = new Variable(indice.getName(), indice);
         
-        cb.addQuadruples(expInicio.getIntermediateCode());
+        
+        cb.addQuadruples(expInicio.getIntermediateCode());        
+        cb.addQuadruple(InstructionSet.MV, variableIndice, expInicio.getTemporal());
         cb.addQuadruple(InstructionSet.INL, l1);
         cb.addQuadruples(expFin.getIntermediateCode());
-        cb.addQuadruple(InstructionSet.BRANCH_FALSE, tempExpresionFin, l2);
+        cb.addQuadruple(InstructionSet.INCREMENT, tempExpresionFin); //Para pillar el ultimo del rango
+        cb.addQuadruple(InstructionSet.BRANCH_FALSE,l2, variableIndice, tempExpresionFin);
         cb.addQuadruples(listaSentencias.getIntermediateCode());
+        cb.addQuadruple(InstructionSet.INCREMENT, variableIndice);
         cb.addQuadruple(InstructionSet.BR, l1);
         cb.addQuadruple(InstructionSet.INL, l2);
         this.setIntermediateCode(cb.create());		
