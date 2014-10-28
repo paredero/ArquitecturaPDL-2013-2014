@@ -1,5 +1,7 @@
 package compiler.intermediate;
 
+import compiler.semantic.symbol.SymbolProcedure;
+
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
@@ -146,5 +148,6 @@ public class Temporal
 		this.size = size;
 	}
 
-    
+
+	
 }

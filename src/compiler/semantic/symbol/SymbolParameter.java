@@ -17,6 +17,7 @@ public class SymbolParameter
 {  
    int address;
    TemporalIF temporal;
+   private SymbolProcedure enclosingSymbol = null;
     /**
      * Constructor for SymbolParameter.
      * @param scope The declaration scope.
@@ -62,6 +63,24 @@ public class SymbolParameter
 	 */
 	public void setTemporal(TemporalIF temporal) {
 		this.temporal = temporal;
+	}
+
+
+
+	/**
+	 * @return the enclosingSymbol
+	 */
+	public SymbolProcedure getEnclosingSymbol() {
+		return enclosingSymbol;
+	}
+
+
+
+	/**
+	 * @param enclosingSymbol the enclosingSymbol to set
+	 */
+	public void setEnclosingSymbol(SymbolProcedure enclosingSymbol) {
+		this.enclosingSymbol = enclosingSymbol;
 	} 
 
 	

@@ -4,6 +4,7 @@ import compiler.intermediate.Procedure;
 import compiler.intermediate.Temporal;
 import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
+
 import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
@@ -14,7 +15,7 @@ public abstract class Translator {
 
 	protected QuadrupleIF q;
 	protected StringBuilder sb;
-
+	
 	public static int scopeCount = 0;
 
 	public abstract String translate();
@@ -45,22 +46,23 @@ public abstract class Translator {
 			} else if (!v.isParameter()) {
 				// Si se trata de una variable local se direcciona relativo al registro [.IX]
 				// En v.address tenemos el desplazamiento
-				return "#" + dirVar + "[.IX]";
+				if (v.getScope().getLevel() == scopeCount) {
+					// Referencia local
+					return "#" + dirVar + "[.IX]";
+				} else {
+					dirVar = dirVar + v.getEnclosingSymbol().getSize() + 4;
+//					return "dirVar: " + dirVar + "Desplaz funcion " +   v.getEnclosingSymbol().getSize();
+					return "#" + dirVar + "[.IX]";
+				}
 			} else if (v.isParameter()) {
-				return "#-" + (dirVar + 1)  + "[.IY]";
+				if (v.getScope().getLevel() == scopeCount) {
+					return "#-" + (dirVar + 1)  + "[.IY]";
+				} else {
+					dirVar = dirVar + v.getEnclosingSymbol().getSize() + 4;
+					return "#-" + (dirVar + 1)  + "[.IY]";
+				}
 			}
-			// Los parámetros se posicionan en las direcciones superiores al
-			// puntero de marco.
-			// Se deja un espacio para el valor de retorno en las funciones
-//			if (v.isParameter()) {
-//				return "#" + (v.getAddress() + 1) + "[.IX]";
-//			}
-//			if (isNoLocal(v)) {
-//				return "[.R1]";
-//			}
-//			return "#-" + v.getAddress() + "[.IX]";
 		} else if (o instanceof Temporal) {
-			// En temporales se emplea direccionamiento relativo a registro indice
 			Temporal t = (Temporal) o;
 			return "#" + t.getAddress() + "[.IX]";
 		} else if (o instanceof Value) {

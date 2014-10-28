@@ -1,8 +1,8 @@
 package compiler.intermediate;
 
 import compiler.semantic.symbol.SymbolParameter;
+import compiler.semantic.symbol.SymbolProcedure;
 import compiler.semantic.symbol.SymbolVariable;
-
 import es.uned.lsi.compiler.intermediate.VariableIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
@@ -20,6 +20,19 @@ public class Variable
     private SymbolIF simbolo = null;
     // Para calcular el desplazamiento de un campo de un registro
     private int desplazamiento = 0;
+    private SymbolProcedure enclosingSymbol = null;
+	/**
+	 * @return the enclosingSymbol
+	 */
+	public SymbolProcedure getEnclosingSymbol() {
+		return enclosingSymbol;
+	}
+	/**
+	 * @param enclosingSymbol the enclosingSymbol to set
+	 */
+	public void setEnclosingSymbol(SymbolProcedure enclosingSymbol) {
+		this.enclosingSymbol = enclosingSymbol;
+	}
         
     /**
 	 * @return the simbolo
@@ -178,6 +191,6 @@ public class Variable
 		this.desplazamiento = desplazamiento;
 	}
 
-	
+
     
 }

@@ -8,6 +8,7 @@ import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
 import compiler.semantic.symbol.SymbolConstant;
 import compiler.semantic.symbol.SymbolParameter;
+import compiler.semantic.symbol.SymbolProcedure;
 import compiler.semantic.symbol.SymbolVariable;
 import compiler.semantic.type.TypeRecord;
 
@@ -53,13 +54,23 @@ public class Referencia extends NonTerminal {
         CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol.getName());
         if (symbol instanceof SymbolVariable) {
         	// Se trata de una variable
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Es Variable");  
+        	CompilerContext.getSemanticErrorManager().semanticDebug(" Es Variable ");  
         	Variable variable = new Variable(lexema, symbol.getScope());
+        	SymbolProcedure enclosingSymbol = (SymbolProcedure) scopeManager.searchSymbol(scope.getName());
+			CompilerContext.getSemanticErrorManager().semanticDebug(
+					"La referencia aparece en el procedimiento \n "
+							+ enclosingSymbol);
+        	variable.setEnclosingSymbol(enclosingSymbol);
         	cb.addQuadruple (InstructionSet.MVA, temp, variable);   
         	this.setVariable(variable);
         } else if (symbol instanceof SymbolParameter) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
         	o = new Variable(lexema, symbol);     
+        	SymbolProcedure enclosingSymbol = (SymbolProcedure) scopeManager.searchSymbol(scope.getName());
+			CompilerContext.getSemanticErrorManager().semanticDebug(
+					"La referencia aparece en el procedimiento \n "
+							+ enclosingSymbol);
+        	((Variable) o).setEnclosingSymbol(enclosingSymbol);
         	((Variable) o).setParameter(true);      
         	this.setVariable((Variable)o);
         	cb.addQuadruple (InstructionSet.MVA, temp, variable);   

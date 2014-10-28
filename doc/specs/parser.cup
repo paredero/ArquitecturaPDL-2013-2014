@@ -184,9 +184,11 @@ program ::=
 						SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(simboloVar.getScope().getName());
 						funcion.addToSize(simboloVar.getType().getSize());
 						funcion.addToVarTempSize(simboloVar.getType().getSize());
+						simboloVar.setEnclosingSymbol(funcion);
+						semanticErrorManager.semanticDebug(simboloVar.getName()  + "Incremento el tam del subprograma: "+ funcion);
 					}
 					semanticErrorManager.semanticDebug("Var: "+ simboloVar.getName() 
-														+ " tipo: " +simboloVar.getType().getName()
+														+ " tipo: " +simboloVar.getType().getName() + "scope: "+simboloVar.getScope()
 														+ " -------------> direccion " + simboloVar.getAddress());
 				} else if (simbolo instanceof SymbolFunction) {
 					semanticErrorManager.semanticDebug("Funcion: "+ simbolo.getName() + " scope: " + simbolo.getScope()
@@ -202,10 +204,11 @@ program ::=
 					desplazamientoAmbito += parametro.getType().getSize();
 					SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(parametro.getScope().getName());
 					funcion.addToSize(parametro.getType().getSize());
+					parametro.setEnclosingSymbol(funcion);
 					semanticErrorManager.semanticDebug("Param: "+ parametro.getName() 
 														+ " tipo: " +parametro.getType().getName()
 														+ " -------------> direccion " + parametro.getAddress() + " Desplazamiento :" + desplazamientoAmbito);
-					semanticErrorManager.semanticDebug("Obtenido el subprograma: "+ funcion);
+					semanticErrorManager.semanticDebug("Incremento el tam del subprograma: "+ funcion +": " + funcion.getSize());
 				} else {
 					semanticErrorManager.semanticDebug("Simbolo no procesado: "+ simbolo.getName() + " " + simbolo.getClass());
 				}
@@ -220,6 +223,7 @@ program ::=
 					t.setAddress(desplazamientoFuncion);
 					SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(t.getScope().getName());
 					funcion.incSize();
+					semanticErrorManager.semanticDebug("Incremento el tam del subprograma: "+ funcion +": " + funcion.getSize());
 					funcion.incVarTempSize();
 					desplazamientoFuncion++;
 				}
@@ -1028,7 +1032,7 @@ sentencia_for ::=  FOR IDENTIFICADOR:indice IN expresion:expInicio
     DELIMITADOR_RANGO expresion:expFin LOOP lista_sentencias:listaSentencias 
     END LOOP
 {:
-semanticErrorManager.semanticDebug("53");
+	semanticErrorManager.semanticDebug("53");
     //Indice debe corresponder con una variable de tipo entero
     List<SymbolIF> posiblesIndices = scopeManager.searchSymbols(indice.getLexema().toUpperCase());
     if (posiblesIndices == null || posiblesIndices.size() == 0) {

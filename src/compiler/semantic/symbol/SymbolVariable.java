@@ -40,5 +40,19 @@ public class SymbolVariable
 		this.address = address;
 	} 
     
-    
+	private SymbolProcedure enclosingSymbol = null;
+	/**
+	 * @return the enclosingSymbol
+	 */
+	public SymbolProcedure getEnclosingSymbol() {
+		return enclosingSymbol;
+	}
+	/**
+	 * @param enclosingSymbol the enclosingSymbol to set
+	 */
+	public void setEnclosingSymbol(SymbolProcedure enclosingSymbol) {
+		this.enclosingSymbol = enclosingSymbol;
+	}
+	
+	
 }

@@ -24,6 +24,8 @@ public class TranslatorCall extends Translator {
 
 	@Override
 	public String translate() {
+		scopeCount++;
+		sb.append("; Ambitos abiertos: " + scopeCount);
 		sb.append("; Llamada a la funcion, continuo creando el RA \n");
 		sb.append("; En primer lugar almaceno el estado \n");
 		sb.append("PUSH .SR \n");
@@ -75,6 +77,8 @@ public class TranslatorCall extends Translator {
 			sb.append("; Extraigo el ultimo hueco del RA \n");
 			sb.append("POP .R9 \n");
 		}
+		scopeCount--;
+		sb.append("; Ambitos abiertos: " + scopeCount);
 		return sb.toString();
 	}
 
