@@ -45,18 +45,20 @@ public abstract class Translator {
 				return "/" + dirVar;
 			} else if (!v.isParameter()) {
 				// Si se trata de una variable local se direcciona relativo al registro [.IX]
-				// En v.address tenemos el desplazamiento
 				if (v.getScope().getLevel() == scopeCount) {
 					// Referencia local
 					return "#" + dirVar + "[.IX]";
 				} else {
 					dirVar = dirVar + v.getEnclosingSymbol().getSize() + 4;
-//					return "dirVar: " + dirVar + "Desplaz funcion " +   v.getEnclosingSymbol().getSize();
 					return "#" + dirVar + "[.IX]";
 				}
 			} else if (v.isParameter()) {
 				if (v.getScope().getLevel() == scopeCount) {
-					return "#-" + (dirVar + 1)  + "[.IY]";
+					return "#"
+							+ (v.getEnclosingSymbol().getSize() + 2
+									- v.getEnclosingSymbol().getParamSize() + dirVar + 1)
+							+ "[.IX]";
+//					return "#-" + (dirVar + 1)  + "[.IY]";
 				} else {
 					dirVar = dirVar + v.getEnclosingSymbol().getSize() + 4;
 					return "#-" + (dirVar + 1)  + "[.IY]";

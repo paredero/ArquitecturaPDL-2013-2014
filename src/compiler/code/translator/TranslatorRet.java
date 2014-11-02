@@ -3,6 +3,8 @@
  */
 package compiler.code.translator;
 
+import compiler.intermediate.Temporal;
+
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -28,7 +30,10 @@ public class TranslatorRet extends Translator {
 		// Esta parte solo es válida para las funciones
 		if (q.getResult() != null) {
 			sb.append("; Asigno el valor devuelto \n");
-			sb.append("MOVE ").append(traducirOperando(q.getResult())).append(", #0[.IY]").append(" \n");
+			sb.append("MOVE ").append(traducirOperando(q.getResult())).append(", ").append("");
+			Temporal t = (Temporal)q.getResult();
+			int dirResultado = t.getEnclosingSymbol().getSize() + 3;
+			sb.append("#").append(dirResultado).append("[.IX]").append(" \n");
 		}
 		sb.append("RET \n");
 		return sb.toString();

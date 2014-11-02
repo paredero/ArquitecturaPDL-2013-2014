@@ -223,6 +223,7 @@ program ::=
 					t.setAddress(desplazamientoFuncion);
 					SymbolProcedure funcion = (SymbolProcedure)subprogramas.get(t.getScope().getName());
 					funcion.incSize();
+					((Temporal)t).setEnclosingSymbol(funcion);
 					semanticErrorManager.semanticDebug("Incremento el tam del subprograma: "+ funcion +": " + funcion.getSize());
 					funcion.incVarTempSize();
 					desplazamientoFuncion++;
@@ -237,6 +238,10 @@ program ::=
 			}
 			
 		}
+		for (SymbolProcedure p : subprogramas.values()) {
+            semanticErrorManager.semanticDebug("Funciones y procedimiento: "+ p.getName() + " Size: " + p.getSize()
+														+ "varTempSize: " + p.getVarTempSize());
+        }
 		semanticErrorManager.semanticDebug("----------------------------------------------------------------------------");
 		
         

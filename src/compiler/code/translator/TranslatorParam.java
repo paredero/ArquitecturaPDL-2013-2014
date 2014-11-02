@@ -17,8 +17,8 @@ public class TranslatorParam extends Translator {
 			
 			// Apunto el indice IY al tope de pila
 			sb.append("; como es el primer parametro o no hay parametros preparo el registro de activacion \n");
-			sb.append("; Apunto el indice IY al comienzo \n");
-			sb.append("MOVE ").append(".SP").append(", ").append(".IY").append(" \n");
+//			sb.append("; Apunto el indice IY al comienzo \n");
+//			sb.append("MOVE ").append(".SP").append(", ").append(".IY").append(" \n");
 			// Reservo un espacio para el valor de retorno
 			sb.append("; Reservo un espacio al valor de retorno \n");
 			sb.append("DEC ").append(".SP").append(" \n");

@@ -79,7 +79,6 @@ public class Referencia extends NonTerminal {
             o = new Value(constante.getValue());
             cb.addQuadruple(InstructionSet.MV, temp, o);
             CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada " + o);  
-        	//TODO El codigo de una constante
         }       
                 
         this.temporal = temp;

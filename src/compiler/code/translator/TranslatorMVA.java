@@ -1,5 +1,7 @@
 package compiler.code.translator;
 
+import compiler.intermediate.Variable;
+
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 public class TranslatorMVA extends Translator {
@@ -10,6 +12,13 @@ public class TranslatorMVA extends Translator {
 
 	@Override
 	public String translate() {
+		if (q.getFirstOperand() instanceof Variable) {
+			Variable v = (Variable)q.getFirstOperand();
+			if (v.getScope().getLevel() != scopeCount) {
+				// Variable no local
+				
+			}
+		}
 		StringBuilder sb = new StringBuilder();
 		sb.append("MOVE ");
 		sb.append(traducirOperando(q.getFirstOperand()));

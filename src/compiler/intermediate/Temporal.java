@@ -16,6 +16,7 @@ public class Temporal
     private ScopeIF scope   = null;
     private int     address = 0;
     private int size = 1;
+    private SymbolProcedure enclosingSymbol = null;
            
     /**
      * Constructor for Temporal.
@@ -146,6 +147,22 @@ public class Temporal
 	 */
 	public void setSize(int size) {
 		this.size = size;
+	}
+
+
+	/**
+	 * @return the enclosingSymbol
+	 */
+	public SymbolProcedure getEnclosingSymbol() {
+		return enclosingSymbol;
+	}
+
+
+	/**
+	 * @param enclosingSymbol the enclosingSymbol to set
+	 */
+	public void setEnclosingSymbol(SymbolProcedure enclosingSymbol) {
+		this.enclosingSymbol = enclosingSymbol;
 	}
 
 

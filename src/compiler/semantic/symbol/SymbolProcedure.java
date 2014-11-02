@@ -59,7 +59,10 @@ public class SymbolProcedure
 	public void setVarTempSize(short varTempSize) {
 		this.varTempSize = varTempSize;
 	}
-    
+   
+	public int getParamSize() {
+		return this.getSize() - this.varTempSize;
+	}
 	public void addToVarTempSize(int i) {
 		this.varTempSize+=i;
 	}
