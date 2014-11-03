@@ -661,14 +661,16 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:idProcedimiento ABRE_PARENTESIS parame
         SymbolTableIF tablaSimbolosProcedimiento = scopeProcedimiento.getSymbolTable();
             
         // Almaceno los parametros en la tabla de simbolos y la de tipos
-        for (SymbolParameter parametro:listaParametros.getListaParametros()) {
-			parametro.setScope(scopeProcedimiento);
-			if (scopeManager.containsSymbol(parametro.getName().toUpperCase())) {
-		        semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + parametro.getName());
-	        } 	
-            tablaSimbolosProcedimiento.addSymbol(parametro.getName().toUpperCase(),parametro);
-            tipoProcedimiento.addTipoParametro(parametro.getType());
-        }
+		if (listaParametros != null  && listaParametros.getListaParametros() != null) {
+			for (SymbolParameter parametro:listaParametros.getListaParametros()) {
+				parametro.setScope(scopeProcedimiento);
+				if (scopeManager.containsSymbol(parametro.getName().toUpperCase())) {
+					semanticErrorManager.semanticFatalError("ERROR: parametro duplicado " + parametro.getName());
+				} 	
+				tablaSimbolosProcedimiento.addSymbol(parametro.getName().toUpperCase(),parametro);
+				tipoProcedimiento.addTipoParametro(parametro.getType());
+			}
+		}
     } else {
         semanticErrorManager.semanticFatalError("ERROR: Procedimiento ya declarada " + nombreProcedimiento
                                                     +" en linea: "+idProcedimiento.getLine());        
@@ -1172,8 +1174,8 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS lista_parametros:pa CIE
             
             List<TypeIF> paramInvocacion = pa.getParameterTypes();
             List<TypeIF> paramTeoricos = tf.getTipoParametros();
-            if (!paramInvocacion.equals(paramTeoricos)) {
-                semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a procedimiento " + name + ", linea: " + id.getLine());    
+            if (!paramInvocacion.equals(paramTeoricos) || (paramInvocacion != null ^ paramTeoricos != null)) {
+                semanticErrorManager.semanticFatalError("ERROR: parametros erroneos en invocacion a procedimiento " + name + ", linea: " + id.getLine() + paramInvocacion + paramTeoricos);    
             }
             
             LlamadaSubprograma procedimiento = new LlamadaSubprograma();

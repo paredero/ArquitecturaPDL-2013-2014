@@ -57,7 +57,7 @@ public class TypeProcedure
 	 * @return the tipoParametro
 	 */
 	public List<TypeIF> getTipoParametros() {
-		return tipoParametros;
+		return tipoParametros != null? tipoParametros:new ArrayList<TypeIF>();
 	}
 
 	/**
