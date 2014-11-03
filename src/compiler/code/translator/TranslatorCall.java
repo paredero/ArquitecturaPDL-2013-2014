@@ -32,6 +32,7 @@ public class TranslatorCall extends Translator {
 		sb.append("; Almaceno un enlace al registro de activacion del subprograma llamante \n");
 		sb.append("PUSH .IX \n");
 		
+		int posIX = 0;
 		if (q.getResult() instanceof Procedure) {
 			sb.append(";Es procedure \n");
 			Procedure p = (Procedure)q.getResult();
@@ -40,20 +41,26 @@ public class TranslatorCall extends Translator {
 			sb.append("; " + sf + " \n");
 			sb.append("; " + sf.getVarTempSize() + " \n");
 			int tamVarsTemp = sf.getVarTempSize();
+			posIX = sf.getVarTempSize();
 			sb.append("; Reservo espacio para " + tamVarsTemp + " temporales y variables locales \n");
 			while (tamVarsTemp > 0) {
 				sb.append("DEC .SP \n");
 				tamVarsTemp--;
-			}
+			}			
 		}
+		
 		sb.append("; Situo el indice IX al inicio del frame \n");
 		sb.append("MOVE .SP, .IX \n");
+		sb.append("; Almaceno el taman del procedimiento justo antes del PC para poder localizar el vinculo de control \n");
+		sb.append("PUSH #").append(posIX).append(" \n");
 		sb.append("CALL ").append(traducirOperando(q.getResult()));
-		sb.append("; Restauro el estado \n");
-		sb.append("; Saco variables y temporales \n");
+		
+		sb.append("; Saco el tamaño \n");
+		sb.append("POP .R9 \n");
 		Procedure p = (Procedure)q.getResult();
 		SymbolProcedure sf = (SymbolProcedure)p.getSimbolo();
 		int tamVarsTemp = sf.getVarTempSize();
+		sb.append("; Saco variables y temporales \n");
 		while (tamVarsTemp > 0) {
 			sb.append("POP .R9 \n");
 			tamVarsTemp--;
