@@ -24,10 +24,12 @@ public class TranslatorBranchFalse extends Translator {
 	 */
 	@Override
 	public String translate() {		 
-		sb.append("CMP ").append(traducirOperando(q.getFirstOperand()))
-				.append(", ").append(traducirOperando(q.getSecondOperand()))
-				.append(" \n");
-		sb.append("BZ /" + q.getResult()).append(" \n");
+//		sb.append("CMP ").append(traducirOperando(q.getFirstOperand()))
+//				.append(", ").append(traducirOperando(q.getSecondOperand()))
+//				.append(" \n");
+		sb.append("CMP #0, ").append(traducirOperando(q.getResult())).append(" \n");
+		
+		sb.append("BZ /" + q.getFirstOperand()).append(" \n");
 		return sb.toString();
 	}
 
