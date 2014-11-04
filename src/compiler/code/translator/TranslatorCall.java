@@ -30,9 +30,11 @@ public class TranslatorCall extends Translator {
 		sb.append("; En primer lugar almaceno el estado \n");
 		sb.append("PUSH .SR \n");
 		sb.append("; Almaceno un enlace al registro de activacion del subprograma llamante \n");
+//		sb.append("MOVE .SP, .IY \n");
+		// TODO Este apilamiento de IX va a sobrar, lo conservo para no rehacer de momento todas las refedrencias
 		sb.append("PUSH .IX \n");
 		
-		int posIX = 0;
+		
 		if (q.getResult() instanceof Procedure) {
 			sb.append(";Es procedure \n");
 			Procedure p = (Procedure)q.getResult();
@@ -41,7 +43,6 @@ public class TranslatorCall extends Translator {
 			sb.append("; " + sf + " \n");
 			sb.append("; " + sf.getVarTempSize() + " \n");
 			int tamVarsTemp = sf.getVarTempSize();
-			posIX = sf.getVarTempSize();
 			sb.append("; Reservo espacio para " + tamVarsTemp + " temporales y variables locales \n");
 			while (tamVarsTemp > 0) {
 				sb.append("DEC .SP \n");
@@ -49,10 +50,15 @@ public class TranslatorCall extends Translator {
 			}			
 		}
 		
-		sb.append("; Situo el indice IX al inicio del frame \n");
-		sb.append("MOVE .SP, .IX \n");
+		
+		
 		sb.append("; Almaceno el taman del procedimiento justo antes del PC para poder localizar el vinculo de control \n");
-		sb.append("PUSH #").append(posIX).append(" \n");
+		sb.append("; Almaceno un enlace al registro de activacion del subprograma llamante \n");
+		sb.append("MOVE .SP, .IY \n");
+		sb.append("PUSH .IX \n");
+		sb.append("; Situo el indice IX al inicio del frame \n");
+		sb.append("MOVE .IY, .IX \n");
+		
 		sb.append("CALL ").append(traducirOperando(q.getResult()));
 		
 		sb.append("; Saco el tamaño \n");
