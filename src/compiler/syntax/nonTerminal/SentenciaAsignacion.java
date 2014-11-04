@@ -20,9 +20,8 @@ public class SentenciaAsignacion extends Sentencia {
         
         
         TemporalIF temporalExpresion = expresion.getTemporal();
-        TemporalIF temporalReferencia = referencia.getTemporal();
         TemporalIF temporalIndexReferencia = referencia.getTemporalIndex();
-//        TemporalIF temporalOffsetReferencia = referencia.getTemporalOffset();
+
         TemporalIF temporal = tF.create();
         if (expresion.getType() instanceof TypeFunction) {
         	CompilerContext.getSemanticErrorManager().semanticDebug("Codigo intermedio de una asignacion de funcion ");
@@ -31,7 +30,6 @@ public class SentenciaAsignacion extends Sentencia {
         	cb.addQuadruples(expresion.getIntermediateCode());
         	cb.addQuadruple(InstructionSet.STP, temporal, temporalExpresion);
         	cb.addQuadruple(InstructionSet.MV, referencia.getVariable(), temporal);
-//        	cb.addQuadruple(InstructionSet.RET, temporalExpresion);
         } else {
         	cb.addQuadruples(expresion.getIntermediateCode());
         	cb.addQuadruples(referencia.getIntermediateCode());   	

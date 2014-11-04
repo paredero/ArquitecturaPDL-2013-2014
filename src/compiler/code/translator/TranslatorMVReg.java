@@ -23,7 +23,6 @@ public class TranslatorMVReg extends Translator {
 
 				var = (Variable) q.getSecondOperand();
 
-				SymbolVariable s = (SymbolVariable) var.getSimbolo();
 				// Sumo la direccion de la variable mas el desplazamiento para
 				// obtener la dir del campo
 				sb.append("ADD ")

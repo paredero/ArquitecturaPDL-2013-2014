@@ -124,7 +124,6 @@ public class Expresion extends NonTerminal {
 	public void generarCodigoIntermedio(LlamadaSubprograma l) {
         ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        TemporalFactory tF = new TemporalFactory (scope);
         TemporalIF temp = l.getTemporal();
         cb.addQuadruples(l.getIntermediateCode());
         
