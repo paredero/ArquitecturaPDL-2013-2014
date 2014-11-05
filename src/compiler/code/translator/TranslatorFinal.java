@@ -12,11 +12,6 @@ public class TranslatorFinal extends Translator {
 	public String translate() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("HALT\n");
-		String labels = LabelManager.getLabels();
-		if(labels != null)
-		{
-			sb.append(labels);
-		}
 		sb.append("END \n");
 		return sb.toString();
 	}

@@ -16,7 +16,6 @@ public class TranslatorEscribeValor extends Translator {
 	 */
 	public TranslatorEscribeValor(QuadrupleIF quadruple) {
 		super(quadruple);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

@@ -19,7 +19,7 @@ public class SentenciaPutLine extends Sentencia {
 	        LabelFactoryIF lF = new LabelFactory();
 	        LabelIF l1 = lF.create();
 	        LabelIF l2 = lF.create();
-	        cb.addQuadruple(InstructionSet.BRANCH_FALSE, exp.getTemporal(), l1);
+	        cb.addQuadruple(InstructionSet.BRANCH_FALSE,l1, exp.getTemporal());
 	        cb.addQuadruple(InstructionSet.ESCRIBE, null, new Value("\"true\""));
 	        cb.addQuadruple(InstructionSet.BR, l2);
 	        cb.addQuadruple(InstructionSet.INL, l1);

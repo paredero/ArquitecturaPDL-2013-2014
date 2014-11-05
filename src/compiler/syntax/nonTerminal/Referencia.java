@@ -28,10 +28,6 @@ public class Referencia extends NonTerminal {
 	private int line;
 	private TemporalIF temporal;
 	private TemporalIF temporalIndex;
-//	private TemporalIF temporalOffset;
-//	private Boolean accesoRegistro = false;
-//	SymbolVariable variableRegistro;
-//	SymbolVariable campoRegistro;
 	private Variable variable;
 	
 
@@ -51,34 +47,24 @@ public class Referencia extends NonTerminal {
         SymbolIF symbol = scopeManager.searchSymbol(lexema);
         OperandIF o;
         
-        CompilerContext.getSemanticErrorManager().semanticDebug("Obtenido simbolo " + symbol.getName());
         if (symbol instanceof SymbolVariable) {
         	// Se trata de una variable
-        	CompilerContext.getSemanticErrorManager().semanticDebug(" Es Variable ");  
         	Variable variable = new Variable(lexema, symbol.getScope());
         	SymbolProcedure enclosingSymbol = (SymbolProcedure) scopeManager.searchSymbol(scope.getName());
-			CompilerContext.getSemanticErrorManager().semanticDebug(
-					"La referencia aparece en el procedimiento \n "
-							+ enclosingSymbol);
-        	variable.setEnclosingSymbol(enclosingSymbol);
+			variable.setEnclosingSymbol(enclosingSymbol);
         	cb.addQuadruple (InstructionSet.MVA, temp, variable);   
         	this.setVariable(variable);
-        } else if (symbol instanceof SymbolParameter) {
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Es parametro"); 
+        } else if (symbol instanceof SymbolParameter) { 
         	o = new Variable(lexema, symbol);     
         	SymbolProcedure enclosingSymbol = (SymbolProcedure) scopeManager.searchSymbol(scope.getName());
-			CompilerContext.getSemanticErrorManager().semanticDebug(
-					"La referencia aparece en el procedimiento \n "
-							+ enclosingSymbol);
-        	((Variable) o).setEnclosingSymbol(enclosingSymbol);
+			((Variable) o).setEnclosingSymbol(enclosingSymbol);
         	((Variable) o).setParameter(true);      
         	this.setVariable((Variable)o);
         	cb.addQuadruple (InstructionSet.MVA, temp, variable);   
         } else {
         	SymbolConstant constante = (SymbolConstant)symbol;
             o = new Value(constante.getValue());
-            cb.addQuadruple(InstructionSet.MV, temp, o);
-            CompilerContext.getSemanticErrorManager().semanticDebug("Constante creada " + o);  
+            cb.addQuadruple(InstructionSet.MV, temp, o); 
         }       
                 
         this.temporal = temp;

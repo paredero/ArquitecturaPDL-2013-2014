@@ -30,7 +30,6 @@ public class TranslatorEscribe extends Translator {
 		sb.append("WRCHAR #13 ").append(" \n");
 		sb.append(label).append(": DATA ").append(q.getFirstOperand()).append(" \n");
 		sb.append("NOP \n");
-// TODO Deberia borrar esto		LabelManager.addLabel(label, "DATA "+ q.getResult());
 		return sb.toString();
 	}
 

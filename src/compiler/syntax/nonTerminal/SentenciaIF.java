@@ -26,7 +26,7 @@ public class SentenciaIF extends Sentencia {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
 
 		cb.addQuadruples(expCondicion.getIntermediateCode());
-		cb.addQuadruple(InstructionSet.BRANCH_FALSE, eTemp, l1);
+		cb.addQuadruple(InstructionSet.BRANCH_FALSE,l1, eTemp);
 		cb.addQuadruples(listaSentencias.getIntermediateCode());
 		cb.addQuadruple(InstructionSet.INL, l1);
 
@@ -50,7 +50,7 @@ public class SentenciaIF extends Sentencia {
 		TemporalIF temporalExpresion = expCondicion.getTemporal();
 		
 		cb.addQuadruples(expCondicion.getIntermediateCode());
-		cb.addQuadruple(InstructionSet.BRANCH_FALSE, temporalExpresion, l1);
+		cb.addQuadruple(InstructionSet.BRANCH_FALSE,l1, temporalExpresion);
 		cb.addQuadruples(listaSentencias.getIntermediateCode());
 		cb.addQuadruple(InstructionSet.BR, l2);
 		cb.addQuadruple(InstructionSet.INL, l1);

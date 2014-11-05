@@ -43,9 +43,6 @@ public class Expresion extends NonTerminal {
 	}	
 
 	public void generarCodigoIntermedio(Expresion e1, Expresion e2, String operador) {
-		CompilerContext.getSemanticErrorManager().semanticDebug(
-				"generarCodigoIntermedio(Expresion e1, Expresion e2, String operador) "
-						+ e1 + " " + e2 + " " + operador);
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
@@ -107,7 +104,6 @@ public class Expresion extends NonTerminal {
 	 * @param valor
 	 */
 	public void generarCodigoIntermedio(Valor valor) {
-		CompilerContext.getSemanticErrorManager().semanticDebug("generarCodigoIntermedio(Valor " + valor);
 
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         TemporalFactory tF = new TemporalFactory (scope);

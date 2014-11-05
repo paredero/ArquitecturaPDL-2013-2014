@@ -8,25 +8,23 @@ import compiler.code.translator.TranslatorAdd;
 import compiler.code.translator.TranslatorBR;
 import compiler.code.translator.TranslatorBranchFalse;
 import compiler.code.translator.TranslatorCall;
+import compiler.code.translator.TranslatorData;
 import compiler.code.translator.TranslatorEqual;
 import compiler.code.translator.TranslatorEscribe;
 import compiler.code.translator.TranslatorEscribeValor;
 import compiler.code.translator.TranslatorFinal;
-import compiler.code.translator.TranslatorGE;
 import compiler.code.translator.TranslatorGT;
 import compiler.code.translator.TranslatorIncrement;
-import compiler.code.translator.TranslatorData;
 import compiler.code.translator.TranslatorLabel;
 import compiler.code.translator.TranslatorMV;
 import compiler.code.translator.TranslatorMVA;
-import compiler.code.translator.TranslatorMVReg;
 import compiler.code.translator.TranslatorMul;
 import compiler.code.translator.TranslatorOR;
 import compiler.code.translator.TranslatorParam;
 import compiler.code.translator.TranslatorRet;
-import compiler.code.translator.TranslatorStp;
 import compiler.intermediate.InstructionSet;
 import compiler.semantic.type.TypeSimple;
+
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
@@ -136,9 +134,7 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				trans = new TranslatorEscribe(quadruple);
 			} else if (op.equals(InstructionSet.ESCRIBE_VALOR)) {
 				trans = new TranslatorEscribeValor(quadruple);
-			} else if (op.equals(InstructionSet.GREATER_EQUAL)) {
-				trans = new TranslatorGE(quadruple);
-			} else if (op.equals(InstructionSet.GREATER_THAN)) {
+			}else if (op.equals(InstructionSet.GREATER_THAN)) {
 				trans = new TranslatorGT(quadruple);
 			} else if (op.equals(InstructionSet.INCREMENT)) {
 				trans = new TranslatorIncrement(quadruple);
@@ -148,11 +144,7 @@ public class ExecutionEnvironmentEns2001 implements ExecutionEnvironmentIF {
 				trans = new TranslatorMV(quadruple);
 			} else if (op.equals(InstructionSet.MVA)) {
 				trans = new TranslatorMVA(quadruple);
-			} else if (op.equals(InstructionSet.STP)) {
-				trans = new TranslatorStp(quadruple);
-			} else if(op.equals(InstructionSet.MOVE_REG)){	    		
-	    		trans = new TranslatorMVReg(quadruple);
-	    	} else if (op.equals(InstructionSet.OR)) {
+			} else if (op.equals(InstructionSet.OR)) {
 				trans = new TranslatorOR(quadruple);
 			} else if (op.equals(InstructionSet.RET)) {
 				trans = new TranslatorRet(quadruple);

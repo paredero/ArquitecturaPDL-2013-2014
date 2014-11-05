@@ -16,19 +16,15 @@ public class SentenciaAsignacion extends Sentencia {
 		ScopeManagerIF scopeManager = CompilerContext.getScopeManager();
 		ScopeIF scope = scopeManager.getCurrentScope();
 		TemporalFactory tF = new TemporalFactory (scope);
-        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);        
         
         TemporalIF temporalExpresion = expresion.getTemporal();
         TemporalIF temporalIndexReferencia = referencia.getTemporalIndex();
-
         TemporalIF temporal = tF.create();
+        
         if (expresion.getType() instanceof TypeFunction) {
-        	CompilerContext.getSemanticErrorManager().semanticDebug("Codigo intermedio de una asignacion de funcion ");
-        	CompilerContext.getSemanticErrorManager().semanticDebug(expresion);
-        	CompilerContext.getSemanticErrorManager().semanticDebug(referencia);
         	cb.addQuadruples(expresion.getIntermediateCode());
-        	cb.addQuadruple(InstructionSet.STP, temporal, temporalExpresion);
+        	cb.addQuadruple(InstructionSet.MV, temporal, temporalExpresion);
         	cb.addQuadruple(InstructionSet.MV, referencia.getVariable(), temporal);
         } else {
         	cb.addQuadruples(expresion.getIntermediateCode());
@@ -36,13 +32,10 @@ public class SentenciaAsignacion extends Sentencia {
         	if (temporalIndexReferencia != null) {
         		cb.addQuadruple(InstructionSet.MUL, temporal, temporalIndexReferencia);
         	}
-//        		cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalReferencia);
-//        		cb.addQuadruple(InstructionSet.ADD, temporal, temporal, temporalOffsetReferencia);
-        	
-        	cb.addQuadruple(InstructionSet.STP, temporal, temporalExpresion);
+        	cb.addQuadruple(InstructionSet.MV, temporal, temporalExpresion);
         	cb.addQuadruple(InstructionSet.MV, referencia.getVariable(), temporal);
-        	CompilerContext.getSemanticErrorManager().semanticDebug("*Referencia asignacion* " + referencia.getVariable());
         }
+        
         this.setIntermediateCode(cb.create()); 
 	}
 }

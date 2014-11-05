@@ -377,7 +377,6 @@ declaraciones ::= declaracion_constantes:dc
 
 declaracion_constantes ::= constante:c declaracion_constantes:declaraciones 
 {:
-	semanticErrorManager.semanticDebug("declaracion_constantes ::= constante declaracion_constantes " + declaraciones + c);
 	if (declaraciones == null) {
 		declaraciones = new Declaraciones();
 	}
@@ -392,7 +391,6 @@ declaracion_constantes ::= constante:c declaracion_constantes:declaraciones
 
 constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v PUNTO_COMA
     {:
-        semanticErrorManager.semanticDebug("constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v PUNTO_COMA");
         ScopeIF scope = scopeManager.getCurrentScope();
         String nombreConstante = (String)((ListaObjetos)listaNombres).get(0);
 
@@ -405,6 +403,7 @@ constante ::= lista_nombres:listaNombres DOS_PUNTOS CONSTANT ASIGNACION valor:v 
             SymbolConstant simboloCte = new SymbolConstant(scope,nombreConstante.toUpperCase(),v.getType());
 			simboloCte.setValue(v.getValue());
 			
+			semanticErrorManager.semanticDebug("Declarada la constante " + simboloCte);
             // La guardo en la tabla de simbolos
             tablaSimbolos.addSymbol(nombreConstante, simboloCte);
             Declaraciones dc = new Declaraciones();
@@ -1078,12 +1077,6 @@ sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
 		} else {
 			SentenciaAsignacion s = new SentenciaAsignacion();
 			s.generarCodigoIntermedio(referencia, expresion);
-			semanticErrorManager.semanticDebug("**********************");
-			semanticErrorManager.semanticDebug("Codigo asignacion: ");
-			for (QuadrupleIF q:s.getIntermediateCode()) {
-				syntaxErrorManager.syntaxInfo (q.toString());
-			}
-			semanticErrorManager.semanticDebug("**********************");
 			RESULT = s;
 		}
 	} else if (!(referencia.getType() instanceof TypeSimple)) {
@@ -1093,20 +1086,13 @@ sentencia_asignacion ::= referencia:referencia ASIGNACION expresion:expresion
     } else {
         SentenciaAsignacion s = new SentenciaAsignacion();
         s.generarCodigoIntermedio(referencia, expresion);
-        semanticErrorManager.semanticDebug("**********************");
-		semanticErrorManager.semanticDebug("Codigo asignacion: ");
-		for (QuadrupleIF q:s.getIntermediateCode()) {
-			syntaxErrorManager.syntaxInfo (q.toString());
-		}
-		semanticErrorManager.semanticDebug("**********************");
         RESULT = s;
     }
 :};
 
 sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS expresion:parametro CIERRA_PARENTESIS
 {:
-	semanticErrorManager.semanticDebug("55: sentencia_entrada_salida ::= PUT_LINE ABRE_PARENTESIS expresion:parametro CIERRA_PARENTESIS");
-    if (!(parametro.getType() instanceof TypeSimple)) {
+	if (!(parametro.getType() instanceof TypeSimple)) {
         semanticErrorManager.semanticFatalError("ERROR: parametros no compatibles en put_line " + parametro.getLexema());
     }
     SentenciaPutLine sent = new SentenciaPutLine();

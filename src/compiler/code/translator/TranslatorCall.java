@@ -30,7 +30,7 @@ public class TranslatorCall extends Translator {
 		sb.append("; En primer lugar almaceno el estado \n");
 		sb.append("PUSH .SR \n");
 		sb.append("; Almaceno un enlace al registro de activacion del subprograma llamante \n");
-//		sb.append("MOVE .SP, .IY \n");
+
 		// TODO Este apilamiento de IX va a sobrar, lo conservo para no rehacer de momento todas las refedrencias
 		sb.append("PUSH .IX \n");
 		

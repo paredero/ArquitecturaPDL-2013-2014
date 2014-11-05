@@ -23,13 +23,15 @@ public class TranslatorBranchFalse extends Translator {
 	 * @see compiler.code.translator.Translator#translate()
 	 */
 	@Override
-	public String translate() {		 
-//		sb.append("CMP ").append(traducirOperando(q.getFirstOperand()))
-//				.append(", ").append(traducirOperando(q.getSecondOperand()))
-//				.append(" \n");
-		sb.append("CMP #0, ").append(traducirOperando(q.getResult())).append(" \n");
-		
-		sb.append("BZ /" + q.getFirstOperand()).append(" \n");
+	public String translate() {
+		if (q.getSecondOperand() != null) {
+		sb.append("CMP ").append(traducirOperando(q.getFirstOperand()))
+				.append(", ").append(traducirOperando(q.getSecondOperand()))
+				.append(" \n");
+		} else {
+			sb.append("CMP #0, ").append(traducirOperando(q.getFirstOperand())).append(" \n");
+		}
+		sb.append("BZ /" + q.getResult()).append(" \n");
 		return sb.toString();
 	}
 
