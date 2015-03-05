@@ -319,7 +319,7 @@ ESPACIO=([\ \t\b\r\n\f])+
             return token;
     }
     
-    "--".*\r\n {
+    "-- ".*\r\n {
 //            Token token = new Token (sym.COMENTARIO);
 //            token.setLine (yyline + 1);
 //            token.setColumn (yycolumn + 1);
